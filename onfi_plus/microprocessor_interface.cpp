@@ -280,7 +280,7 @@ void interface::test_leds_increment(bool verbose)
 	... set data lines as input right before when needed
 	R/B signal will be set as input
 	*/
-__attribute__((always_inline)) void interface::set_pin_direction_inactive()
+void interface::set_pin_direction_inactive()
 {
 	// set the required pins as output from the angle of NIOS machine
 	*jumper_direction |= (DQ_mask+CLE_mask+ALE_mask+WP_mask+RE_mask+WE_mask+CE_mask);	// this line just sets the output pins
@@ -290,7 +290,7 @@ __attribute__((always_inline)) void interface::set_pin_direction_inactive()
 	*jumper_address &= ~(DQ_mask);
 }
 
-__attribute__((always_inline)) void interface::set_ce_low()
+void interface::set_ce_low()
 {
 	/**
 	we do not touch the DQ pin values here
@@ -301,7 +301,7 @@ __attribute__((always_inline)) void interface::set_ce_low()
 	*jumper_address &= ~(CE_mask);
 }
 
-__attribute__((always_inline)) void interface::set_default_pin_values()
+void interface::set_default_pin_values()
 {
 	/**
 	we do not touch the DQ pin values here
@@ -321,7 +321,7 @@ __attribute__((always_inline)) void interface::set_default_pin_values()
 	.. to be used when sending data or sending command
 	... this function must be called once the datalines are set as input
 	*/
-__attribute__((always_inline)) void interface::set_datalines_direction_default()
+void interface::set_datalines_direction_default()
 {
 	//. set the datalines as input
 	*jumper_direction |= (DQ_mask);
@@ -334,7 +334,7 @@ __attribute__((always_inline)) void interface::set_datalines_direction_default()
 	.. to be used when data is to be received from NAND
 	... please do not forget to reset them to output once done
 	*/
-__attribute__((always_inline)) void interface::set_datalines_direction_input()
+void interface::set_datalines_direction_input()
 {
 	//. set the datalines as input
 	*jumper_direction &= ~(DQ_mask);
@@ -344,7 +344,7 @@ __attribute__((always_inline)) void interface::set_datalines_direction_input()
 	function to send an arbitrary command signal to the NAND device
 	.. the procedure is as follows ( in the sequence )
 	*/
-__attribute__((always_inline)) void interface::send_command(uint8_t command_to_send)
+void interface::send_command(uint8_t command_to_send)
 {
 	// .. Write Enable should go low WE => low
 	// .. reset the bit that is connected to WE
@@ -389,7 +389,7 @@ __attribute__((always_inline)) void interface::send_command(uint8_t command_to_s
 	.. param: address_to_send is the address value to be sent to the NAND device
 	.. num_address_bytes is the number of bytes in the address 
 	*/
-__attribute__((always_inline)) void interface::send_addresses(uint8_t* address_to_send, uint8_t num_address_bytes, bool verbose)
+void interface::send_addresses(uint8_t* address_to_send, uint8_t num_address_bytes, bool verbose)
 {
 #if DEBUG_INTERFACE
 	if(interface_debug_file)
@@ -460,7 +460,7 @@ __attribute__((always_inline)) void interface::send_addresses(uint8_t* address_t
 	first parameter is the array to be sent
 	second parameter is the number of iterms in the array above
 	*/
-__attribute__((always_inline)) void interface::send_data(uint8_t* data_to_send,uint16_t num_data)
+void interface::send_data(uint8_t* data_to_send,uint16_t num_data)
 {
 	if(interface_type==asynchronous)
 	{

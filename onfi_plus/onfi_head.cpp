@@ -235,7 +235,9 @@ void onfi_interface::get_data(uint8_t* data_received,uint16_t num_data)
 		// .. data can be received when on ready state (RDY signal)
 		// .. ensure RDY is high
 		// .. .. just keep spinning here checking for ready signal
-		while((*jumper_address & RB_mask)== 0x00);
+                while((*jumper_address & RB_mask)== 0x00) {
+                        ;
+                }
 
 		// .. data can be received following READ operation
 		// .. the procedure should be as follows
@@ -356,7 +358,9 @@ void onfi_interface::device_initialization(bool verbose)
 	for(i=0;i<90;i++);	//50 us max
 
 	// wait for R/B signal to go high
-	while((*jumper_address & RB_mask)==0);
+        while((*jumper_address & RB_mask)==0) {
+                ;
+        }
 
 	// now issue RESET command
 #if DEBUG_ONFI
@@ -397,7 +401,9 @@ void onfi_interface::reset_device()
 	// .. but we should wait for tWB = 200ns before the RB signal is valid
 	tWB;	// tWB = 200ns
 
-	while((*jumper_address & RB_mask)==0);
+        while((*jumper_address & RB_mask)==0) {
+                ;
+        }
 }
 
 // read id of the device
@@ -414,7 +420,9 @@ void onfi_interface::read_id()
 	uint8_t* my_unique_id = (uint8_t*)(malloc(num_bytes*sizeof(uint8_t)));
 	tRR;
 	//wait for RB# signal to be high
-	while((*jumper_address & RB_mask)==0);	
+        while((*jumper_address & RB_mask)==0) {
+                ;
+        }
 	tRR;
 
 	get_data(my_unique_id,num_bytes);
@@ -574,7 +582,9 @@ void onfi_interface::read_parameters(param_type ONFI_OR_JEDEC, bool bytewise, bo
 {
 
 	// make sure none of the LUNs are busy
-	while((*jumper_address & RB_mask)==0);
+        while((*jumper_address & RB_mask)==0) {
+                ;
+        }
 
 	uint8_t address_to_send = 0x00;
 	std::string type_parameter = "ONFI";
@@ -594,7 +604,9 @@ void onfi_interface::read_parameters(param_type ONFI_OR_JEDEC, bool bytewise, bo
 #endif
 
 	// make sure none of the LUNs are busy
-	while((*jumper_address & RB_mask)==0);
+        while((*jumper_address & RB_mask)==0) {
+                ;
+        }
 
 #if DEBUG_ONFI
 	if(onfi_debug_file)
@@ -621,7 +633,9 @@ void onfi_interface::read_parameters(param_type ONFI_OR_JEDEC, bool bytewise, bo
 	//have some delay here and wait for busy signal again before reading the paramters
 	asm("nop");
 	// make sure none of the LUNs are busy
-	while((*jumper_address & RB_mask)==0);
+        while((*jumper_address & RB_mask)==0) {
+                ;
+        }
 
 #if DEBUG_ONFI
 	if(onfi_debug_file)
@@ -923,7 +937,9 @@ void onfi_interface::read_page(unsigned int my_block_number, unsigned int my_pag
 	uint8_t address[address_length];
 	convert_pagenumber_to_columnrow_address(my_block_number, my_page_number, address);
 	// make sure none of the LUNs are busy
-	while((*jumper_address & RB_mask)==0);
+        while((*jumper_address & RB_mask)==0) {
+                ;
+        }
 
 	if(flash_chip==toshiba_tlc_toggle)
 		send_command(0x0);
@@ -947,7 +963,9 @@ void onfi_interface::read_page(unsigned int my_block_number, unsigned int my_pag
 	// }
 
 	// check for RDY signal
-	while((*jumper_address & RB_mask)==0);
+        while((*jumper_address & RB_mask)==0) {
+                ;
+        }
 #if PROFILE_TIME
 	END_TIME;
 	if(verbose) fprintf(stdout,"Read page completed \n");
@@ -986,7 +1004,9 @@ void onfi_interface::disable_erase()
 {
 	// check to see if the device is busy
 	// .. wait if busy
-	while((*jumper_address&RB_mask)==0x00);
+        while((*jumper_address&RB_mask)==0x00) {
+                ;
+        }
 
 	// wp to low
 	*jumper_address &= ~WP_mask;	
@@ -1000,7 +1020,9 @@ void onfi_interface::enable_erase()
 {
 	// check to see if the device is busy
 	// .. wait if busy
-	while((*jumper_address&RB_mask)==0x00);
+        while((*jumper_address&RB_mask)==0x00) {
+                ;
+        }
 
 	// wp to high
 	*jumper_address |= WP_mask;
@@ -1023,7 +1045,9 @@ void onfi_interface::erase_block(unsigned int my_block_number, bool verbose)
 	*jumper_direction &= ~RB_mask;
 
 	// check if it is out of Busy cycle
-	while((*jumper_address & RB_mask)==0);
+        while((*jumper_address & RB_mask)==0) {
+                ;
+        }
 
 	send_command(0x60);
 	send_addresses(row_address,3);
@@ -1037,7 +1061,9 @@ void onfi_interface::erase_block(unsigned int my_block_number, bool verbose)
 	
 
 	// check if it is out of Busy cycle
-	while((*jumper_address & RB_mask)==0);
+        while((*jumper_address & RB_mask)==0) {
+                ;
+        }
 
 #if PROFILE_TIME
 	END_TIME;
@@ -1104,7 +1130,9 @@ void onfi_interface::partial_erase_block(unsigned int my_block_number, unsigned 
 	*jumper_direction &= ~RB_mask;
 
 	// check if it is out of Busy cycle
-	while((*jumper_address & RB_mask)==0);
+        while((*jumper_address & RB_mask)==0) {
+                ;
+        }
 
 	send_command(0x60);
 	send_addresses(row_address,3);
@@ -1127,7 +1155,9 @@ void onfi_interface::partial_erase_block(unsigned int my_block_number, unsigned 
 #endif	
 
 	// check if it is out of Busy cycle
-	while((*jumper_address & RB_mask)==0);
+        while((*jumper_address & RB_mask)==0) {
+                ;
+        }
 
 #if DEBUG_ONFI
 	if(onfi_debug_file)
@@ -1462,7 +1492,9 @@ void onfi_interface::program_page(unsigned int my_block_number, unsigned int my_
 
 	tWB;
 		// check if it is out of Busy cycle
-	while((*jumper_address & RB_mask)==0);
+        while((*jumper_address & RB_mask)==0) {
+                ;
+        }
 #if PROFILE_TIME
 	END_TIME;
 	PRINT_TIME;
@@ -1550,7 +1582,9 @@ void onfi_interface::program_page_tlc_toshiba_subpage(unsigned int my_block_numb
 
 	tWB;
 		// check if it is out of Busy cycle
-	while((*jumper_address & RB_mask)==0);
+        while((*jumper_address & RB_mask)==0) {
+                ;
+        }
 #if PROFILE_TIME
 	END_TIME;
 	PRINT_TIME;
@@ -1641,7 +1675,9 @@ void onfi_interface::program_page_tlc_toshiba(unsigned int my_block_number,unsig
 
 	tWB;
 		// check if it is out of Busy cycle
-	while((*jumper_address & RB_mask)==0);
+        while((*jumper_address & RB_mask)==0) {
+                ;
+        }
 #if PROFILE_TIME
 	END_TIME;
 	PRINT_TIME;
@@ -1694,7 +1730,9 @@ void onfi_interface::program_page_tlc_toshiba(unsigned int my_block_number,unsig
 
 	tWB;
 		// check if it is out of Busy cycle
-	while((*jumper_address & RB_mask)==0);
+        while((*jumper_address & RB_mask)==0) {
+                ;
+        }
 #if PROFILE_TIME
 	END_TIME;
 	PRINT_TIME;
@@ -1746,7 +1784,9 @@ void onfi_interface::program_page_tlc_toshiba(unsigned int my_block_number,unsig
 
 	tWB;
 		// check if it is out of Busy cycle
-	while((*jumper_address & RB_mask)==0);
+        while((*jumper_address & RB_mask)==0) {
+                ;
+        }
 #if PROFILE_TIME
 	END_TIME;
 	PRINT_TIME;
@@ -1829,7 +1869,9 @@ void onfi_interface::partial_program_page(unsigned int my_block_number, unsigned
 	PRINT_TIME;
 #endif
 	// check if it is out of Busy cycle
-	while((*jumper_address & RB_mask)==0);
+        while((*jumper_address & RB_mask)==0) {
+                ;
+        }
 
 	uint8_t status;
 	read_status(&status);
@@ -2477,7 +2519,9 @@ void onfi_interface::read_page_and_return_value(unsigned int my_block_number, un
 void onfi_interface::set_features(uint8_t address, uint8_t* data_to_send,bool verbose, uint8_t command)
 {
 	// check if it is out of Busy cycle
-	while((*jumper_address & RB_mask)==0);
+        while((*jumper_address & RB_mask)==0) {
+                ;
+        }
 
 	//send command
 	send_command(command);
@@ -2493,7 +2537,9 @@ void onfi_interface::set_features(uint8_t address, uint8_t* data_to_send,bool ve
 	tWB;
 
 	// check if it is out of Busy cycle
-	while((*jumper_address & RB_mask)==0);
+        while((*jumper_address & RB_mask)==0) {
+                ;
+        }
 }
 
 //The GET FEATURES (EEh) command reads the subfeature parameters (P1-P4) from the
@@ -2503,7 +2549,9 @@ void onfi_interface::set_features(uint8_t address, uint8_t* data_to_send,bool ve
 void onfi_interface::get_features(uint8_t address, uint8_t* data_received,bool verbose, uint8_t command)
 {
 	// check if it is out of Busy cycle
-	while((*jumper_address & RB_mask)==0);
+        while((*jumper_address & RB_mask)==0) {
+                ;
+        }
 
 	//send command
 	send_command(command);
@@ -2513,7 +2561,9 @@ void onfi_interface::get_features(uint8_t address, uint8_t* data_received,bool v
 	//now we wait
 	tWB;
 	// check if it is out of Busy cycle
-	while((*jumper_address & RB_mask)==0);
+        while((*jumper_address & RB_mask)==0) {
+                ;
+        }
 	asm("nop");
 
 	get_data(data_received,4);
@@ -2588,7 +2638,9 @@ void onfi_interface::convert_to_slc(unsigned int my_block_number, bool first_tim
 	send_addresses(my_test_block_address+2);
 	send_command(0xd0);
 	tWB;
-	while((*jumper_address & RB_mask)==0);
+        while((*jumper_address & RB_mask)==0) {
+                ;
+        }
 
 	//perform erase operation to init
 	if(first_time) erase_block(my_block_number);
@@ -2606,12 +2658,14 @@ void onfi_interface::revert_to_mlc(unsigned int my_block_number)
 	send_addresses(my_test_block_address+2);
 	send_command(0xd0);
 	tWB;
-	while((*jumper_address & RB_mask)==0);
+        while((*jumper_address & RB_mask)==0) {
+                ;
+        }
 }
 
 // this function introduces delay
 // .. the delay is caused using a for loop
-__attribute__((always_inline)) void onfi_interface::delay_function(uint32_t loop_count)
+void onfi_interface::delay_function(uint32_t loop_count)
 {
 	for(;loop_count>0;loop_count--)
 		asm("nop");
