@@ -1563,15 +1563,18 @@ void onfi_interface::program_page_tlc_toshiba_subpage(unsigned int my_block_numb
 	{
 		if(status&0x01)
 		{
-			fprintf(stdout,"Failed Program Operation of "<<my_subpage_number<<" subpage: %d,%d,%d\n",page_address[2],page_address[3],page_address[4]);
+fprintf(stdout,
+        "Failed Program Operation of %u subpage: %d,%d,%d\n",
+        my_subpage_number,
+        page_address[2], page_address[3], page_address[4]);
 		}
 		else
 		{
 #if DEBUG_ONFI
 	if(onfi_debug_file) onfi_debug_file<<"Program Operation Completed of "<<my_subpage_number<<" subpage"<<endl;
-	else fprintf(stdout,"Program Operation Completed of "<<my_subpage_number<<" subpage\n");
+        else fprintf(stdout,"Program Operation Completed of %u subpage\n", my_subpage_number);
 #else
-	if(verbose) fprintf(stdout,"Program Operation Completed of "<<my_subpage_number<<" subpage\n");
+        if(verbose) fprintf(stdout,"Program Operation Completed of %u subpage\n", my_subpage_number);
 #endif
 		}
 	}
@@ -1579,9 +1582,9 @@ void onfi_interface::program_page_tlc_toshiba_subpage(unsigned int my_block_numb
 	{
 #if DEBUG_ONFI
 	if(onfi_debug_file) onfi_debug_file<<"Program Operation of "<<my_subpage_number<<" subpage, should not be here"<<endl;
-	else fprintf(stdout,"Program Operation of "<<my_subpage_number<<" subpage, should not be here\n");
+        else fprintf(stdout,"Program Operation of %u subpage, should not be here\n", my_subpage_number);
 #else
-	if(verbose) fprintf(stdout,"Program Operation of "<<my_subpage_number<<" subpage, should not be here\n");
+        if(verbose) fprintf(stdout,"Program Operation of %u subpage, should not be here\n", my_subpage_number);
 #endif
 	}
 
