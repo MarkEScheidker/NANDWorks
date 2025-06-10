@@ -3,6 +3,8 @@
 
 #include <fcntl.h>
 #include <sys/mman.h>
+#include <unistd.h>
+#include <cstdint>
 
 using namespace std;
 
@@ -167,11 +169,11 @@ void* interface::get_base_bridge(int *fd)
 	*/
 void interface::convert_peripheral_address(void* bridge_base_virtual, bool verbose)
 {
-	jumper_address = (uint32_t*)((uint32_t)bridge_base_virtual+JP1_location_OFFSET);
-	jumper_direction = (uint32_t*)((uint32_t)bridge_base_virtual+JP1_direction_OFFSET);
-	push_button = (uint32_t*)((uint32_t)bridge_base_virtual+PUSH_KEY_LOCATION_OFFSET);
-	red_leds = (uint32_t*)((uint32_t)bridge_base_virtual+RLED_OFFSET);
-	interval_timer = (uint32_t*)((uint32_t)bridge_base_virtual+INTERVAL_TIMER_OFFSET);
+    jumper_address = reinterpret_cast<volatile uint32_t*>(reinterpret_cast<uintptr_t>(bridge_base_virtual)+JP1_location_OFFSET);
+    jumper_direction = reinterpret_cast<volatile uint32_t*>(reinterpret_cast<uintptr_t>(bridge_base_virtual)+JP1_direction_OFFSET);
+    push_button = reinterpret_cast<volatile uint32_t*>(reinterpret_cast<uintptr_t>(bridge_base_virtual)+PUSH_KEY_LOCATION_OFFSET);
+    red_leds = reinterpret_cast<volatile uint32_t*>(reinterpret_cast<uintptr_t>(bridge_base_virtual)+RLED_OFFSET);
+    interval_timer = reinterpret_cast<volatile uint32_t*>(reinterpret_cast<uintptr_t>(bridge_base_virtual)+INTERVAL_TIMER_OFFSET);
 
 	*(interval_timer+2) = 0xffff; // lower 16-bits for timer
 	*(interval_timer+3) = 0xffff; // upper 16-bits for timer
@@ -180,34 +182,34 @@ void interface::convert_peripheral_address(void* bridge_base_virtual, bool verbo
 	if(interface_debug_file)
 	{
 		interface_debug_file<<"************************************************************"<<endl;
-		interface_debug_file<<"I: The base received in function is 0x"<<std::hex<<(uint32_t)bridge_base_virtual<<endl;
-		interface_debug_file<<"I: JP1_location at offset 0x"<<std::hex<<JP1_location_OFFSET<<" is 0x"<<std::hex<<(uint32_t)jumper_address<<endl;
-		interface_debug_file<<"I: JP1_direction at offset 0x"<<std::hex<<JP1_direction_OFFSET<<" is 0x"<<std::hex<<(uint32_t)jumper_direction<<endl;
-		interface_debug_file<<"I: push_button at offset 0x"<<std::hex<<PUSH_KEY_LOCATION_OFFSET<<" is 0x"<<std::hex<<(uint32_t)push_button<<endl;
-		interface_debug_file<<"I: Red LEDs at offset 0x"<<std::hex<<RLED_OFFSET<<" is 0x"<<std::hex<<(uint32_t)red_leds<<endl;
-		interface_debug_file<<"I: Interval Timer at offset 0x"<<std::hex<<INTERVAL_TIMER_OFFSET<<" is 0x"<<std::hex<<(uint32_t)interval_timer<<endl;
+                interface_debug_file<<"I: The base received in function is 0x"<<std::hex<<reinterpret_cast<uintptr_t>(bridge_base_virtual)<<endl;
+                interface_debug_file<<"I: JP1_location at offset 0x"<<std::hex<<JP1_location_OFFSET<<" is 0x"<<std::hex<<reinterpret_cast<uintptr_t>(jumper_address)<<endl;
+                interface_debug_file<<"I: JP1_direction at offset 0x"<<std::hex<<JP1_direction_OFFSET<<" is 0x"<<std::hex<<reinterpret_cast<uintptr_t>(jumper_direction)<<endl;
+                interface_debug_file<<"I: push_button at offset 0x"<<std::hex<<PUSH_KEY_LOCATION_OFFSET<<" is 0x"<<std::hex<<reinterpret_cast<uintptr_t>(push_button)<<endl;
+                interface_debug_file<<"I: Red LEDs at offset 0x"<<std::hex<<RLED_OFFSET<<" is 0x"<<std::hex<<reinterpret_cast<uintptr_t>(red_leds)<<endl;
+                interface_debug_file<<"I: Interval Timer at offset 0x"<<std::hex<<INTERVAL_TIMER_OFFSET<<" is 0x"<<std::hex<<reinterpret_cast<uintptr_t>(interval_timer)<<endl;
 		interface_debug_file<<"************************************************************"<<endl;
 	}else
 	{
 		cout<<"************************************************************"<<endl;
-		cout<<"I: The base received in function is 0x"<<std::hex<<(uint32_t)bridge_base_virtual<<endl;
-		cout<<"I: JP1_location at offset 0x"<<std::hex<<JP1_location_OFFSET<<" is 0x"<<std::hex<<(uint32_t)jumper_address<<endl;
-		cout<<"I: JP1_direction at offset 0x"<<std::hex<<JP1_direction_OFFSET<<" is 0x"<<std::hex<<(uint32_t)jumper_direction<<endl;
-		cout<<"I: push_button at offset 0x"<<std::hex<<PUSH_KEY_LOCATION_OFFSET<<" is 0x"<<std::hex<<(uint32_t)push_button<<endl;
-		cout<<"I: Red LEDs at offset 0x"<<std::hex<<RLED_OFFSET<<" is 0x"<<std::hex<<(uint32_t)red_leds<<endl;
-		cout<<"I: Interval Timer at offset 0x"<<std::hex<<INTERVAL_TIMER_OFFSET<<" is 0x"<<std::hex<<(uint32_t)interval_timer<<endl;
+                cout<<"I: The base received in function is 0x"<<std::hex<<reinterpret_cast<uintptr_t>(bridge_base_virtual)<<endl;
+                cout<<"I: JP1_location at offset 0x"<<std::hex<<JP1_location_OFFSET<<" is 0x"<<std::hex<<reinterpret_cast<uintptr_t>(jumper_address)<<endl;
+                cout<<"I: JP1_direction at offset 0x"<<std::hex<<JP1_direction_OFFSET<<" is 0x"<<std::hex<<reinterpret_cast<uintptr_t>(jumper_direction)<<endl;
+                cout<<"I: push_button at offset 0x"<<std::hex<<PUSH_KEY_LOCATION_OFFSET<<" is 0x"<<std::hex<<reinterpret_cast<uintptr_t>(push_button)<<endl;
+                cout<<"I: Red LEDs at offset 0x"<<std::hex<<RLED_OFFSET<<" is 0x"<<std::hex<<reinterpret_cast<uintptr_t>(red_leds)<<endl;
+                cout<<"I: Interval Timer at offset 0x"<<std::hex<<INTERVAL_TIMER_OFFSET<<" is 0x"<<std::hex<<reinterpret_cast<uintptr_t>(interval_timer)<<endl;
 		cout<<"************************************************************"<<endl;
 	}
 #else
 	if(verbose) 
 	{
 		cout<<"************************************************************"<<endl;
-		cout<<"I: The base received in function is 0x"<<std::hex<<(uint32_t)bridge_base_virtual<<endl;
-		cout<<"I: JP1_location at offset 0x"<<std::hex<<JP1_location_OFFSET<<" is 0x"<<std::hex<<(uint32_t)jumper_address<<endl;
-		cout<<"I: JP1_direction at offset 0x"<<std::hex<<JP1_direction_OFFSET<<" is 0x"<<std::hex<<(uint32_t)jumper_direction<<endl;
-		cout<<"I: push_button at offset 0x"<<std::hex<<PUSH_KEY_LOCATION_OFFSET<<" is 0x"<<std::hex<<(uint32_t)push_button<<endl;
-		cout<<"I: Red LEDs at offset 0x"<<std::hex<<RLED_OFFSET<<" is 0x"<<std::hex<<(uint32_t)red_leds<<endl;
-		cout<<"I: Interval Timer at offset 0x"<<std::hex<<INTERVAL_TIMER_OFFSET<<" is 0x"<<std::hex<<(uint32_t)interval_timer<<endl;
+                cout<<"I: The base received in function is 0x"<<std::hex<<reinterpret_cast<uintptr_t>(bridge_base_virtual)<<endl;
+                cout<<"I: JP1_location at offset 0x"<<std::hex<<JP1_location_OFFSET<<" is 0x"<<std::hex<<reinterpret_cast<uintptr_t>(jumper_address)<<endl;
+                cout<<"I: JP1_direction at offset 0x"<<std::hex<<JP1_direction_OFFSET<<" is 0x"<<std::hex<<reinterpret_cast<uintptr_t>(jumper_direction)<<endl;
+                cout<<"I: push_button at offset 0x"<<std::hex<<PUSH_KEY_LOCATION_OFFSET<<" is 0x"<<std::hex<<reinterpret_cast<uintptr_t>(push_button)<<endl;
+                cout<<"I: Red LEDs at offset 0x"<<std::hex<<RLED_OFFSET<<" is 0x"<<std::hex<<reinterpret_cast<uintptr_t>(red_leds)<<endl;
+                cout<<"I: Interval Timer at offset 0x"<<std::hex<<INTERVAL_TIMER_OFFSET<<" is 0x"<<std::hex<<reinterpret_cast<uintptr_t>(interval_timer)<<endl;
 		cout<<"************************************************************"<<endl;
 	}
 #endif
