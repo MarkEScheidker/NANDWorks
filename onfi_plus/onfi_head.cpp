@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <cstring>
 #include <cstdint>
+#include <iomanip>
 
 #include <algorithm>    // std::sort
 
@@ -1410,8 +1411,15 @@ bool onfi_interface::verify_program_page(unsigned int my_block_number, unsigned 
 			}
 		}
 	}
-	if(fail_count) cout<<"For page "<< my_page_number<<" of block "<< my_block_number <<", program operation failed at "<<std::dec<<fail_count<<" bytes."<<endl;
-	else cout<<"For page "<< my_page_number<<" of block "<< my_block_number <<", program operation did not fail."<<endl;
+        if(fail_count)
+            cout<<"For page "<< my_page_number<<" of block "<< my_block_number
+                <<", program operation failed at "<<std::dec<<fail_count<<" bytes ("
+                <<std::fixed<<std::setprecision(2)
+                <<(static_cast<double>(fail_count)*100.0/num_bytes_to_test)
+                <<"% of page)."<<endl;
+        else
+            cout<<"For page "<< my_page_number<<" of block "<< my_block_number
+                <<", program operation did not fail."<<endl;
 
 	fflush(stdout);
 	free(data_read_from_page);
