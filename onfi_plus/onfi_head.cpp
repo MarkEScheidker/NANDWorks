@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <cstring>
+#include <cstdint>
 
 #include <algorithm>    // std::sort
 
@@ -166,12 +167,12 @@ void onfi_interface::initialize_onfi(bool verbose)
 	}else
 	{
 #if DEBUG_ONFI
-	if(onfi_debug_file)
-		onfi_debug_file<<"I: Converting to virtual successful. The base address is "<<std::hex<<(uint32_t)bridge_base_virtual<<endl;
-	else
-		cout<<"I: Converting to virtual successful. The base address is "<<std::hex<<(uint32_t)bridge_base_virtual<<endl;
+        if(onfi_debug_file)
+                onfi_debug_file<<"I: Converting to virtual successful. The base address is "<<std::hex<<reinterpret_cast<uintptr_t>(bridge_base_virtual)<<endl;
+        else
+                cout<<"I: Converting to virtual successful. The base address is "<<std::hex<<reinterpret_cast<uintptr_t>(bridge_base_virtual)<<endl;
 #else
-	if(verbose) cout<<"I: Converting to virtual successful. The base address is "<<std::hex<<(uint32_t)bridge_base_virtual<<endl;
+        if(verbose) cout<<"I: Converting to virtual successful. The base address is "<<std::hex<<reinterpret_cast<uintptr_t>(bridge_base_virtual)<<endl;
 #endif
 	}
 	// let us convert the address of the peripherals
@@ -1220,7 +1221,7 @@ bool onfi_interface::verify_block_erase_sample(unsigned int my_block_number, boo
 	uint8_t* data_read_from_page = new uint8_t[num_bytes_in_page+num_spare_bytes_in_page];
 	
 	//let us initialize the array to 0x00
-	memset(data_read_from_page,0x00,sizeof(data_read_from_page+num_spare_bytes_in_page));
+        memset(data_read_from_page,0x00,num_bytes_in_page+num_spare_bytes_in_page);
 
 	//let us read the page data to the cache memory of flash
 	read_page(my_block_number, page_num_to_verify,5);
@@ -1286,7 +1287,7 @@ bool onfi_interface::verify_block_erase(unsigned int my_block_number, bool compl
 			curr_page_index = page_indices[idx];
 
 			// let us first reset all the values in the local variables to 0x00
-			memset(data_read_from_page,0x00,sizeof(data_read_from_page));
+                        memset(data_read_from_page,0x00,num_bytes_to_test);
 			//first let us get the data from the page to the cache memory
 			read_page(my_block_number, curr_page_index, 5);
 			// now let us get the values from the cache memory to our local variable
@@ -1325,7 +1326,7 @@ bool onfi_interface::verify_block_erase(unsigned int my_block_number, bool compl
 		for(idx = 0;idx<num_pages_in_block;idx++)
 		{
 			// let us first reset all the values in the local variables to 0x00
-			memset(data_read_from_page,0x00,sizeof(data_read_from_page));
+                        memset(data_read_from_page,0x00,num_bytes_to_test);
 			//first let us get the data from the page to the cache memory
 			read_page(my_block_number, idx, 5);
 			// now let us get the values from the cache memory to our local variable
@@ -1379,7 +1380,7 @@ bool onfi_interface::verify_program_page(unsigned int my_block_number, unsigned 
 	uint8_t* data_read_from_page = (uint8_t*)malloc(sizeof(uint8_t)*(num_bytes_to_test));
 
 	// let us first reset all the values in the local variables to 0x00
-	memset(data_read_from_page,0xff,sizeof(data_read_from_page));
+        memset(data_read_from_page,0xff,num_bytes_to_test);
 	//first let us get the data from the page to the cache memory
 	read_page(my_block_number, my_page_number, 5);
 	// now let us get the values from the cache memory to our local variable
@@ -1870,8 +1871,8 @@ void onfi_interface::partial_program_page(unsigned int my_block_number, unsigned
 // .. verbose is for printing
 void onfi_interface::program_pages_in_a_block_slc(unsigned int my_block_number, uint16_t num_pages,bool verbose)
 {
-	uint8_t* data_to_program = (uint8_t*) malloc(sizeof(uint8_t)*(num_bytes_in_page+num_spare_bytes_in_page));
-	memset(data_to_program,0x00,sizeof(data_to_program));
+        uint8_t* data_to_program = (uint8_t*) malloc(sizeof(uint8_t)*(num_bytes_in_page+num_spare_bytes_in_page));
+        memset(data_to_program,0x00,num_bytes_in_page+num_spare_bytes_in_page);
 
 	// let us program all the pages in the block
 	uint16_t page_idx = 0;
@@ -1895,8 +1896,8 @@ void onfi_interface::program_n_pages_in_a_block(unsigned int my_block_number, ui
 		data_to_program = provided_array;
 	}else
 	{
-		data_to_program = (uint8_t*) malloc(sizeof(uint8_t)*(num_bytes_in_page+num_spare_bytes_in_page));
-		memset(data_to_program,0x00,sizeof(data_to_program));
+        data_to_program = (uint8_t*) malloc(sizeof(uint8_t)*(num_bytes_in_page+num_spare_bytes_in_page));
+        memset(data_to_program,0x00,num_bytes_in_page+num_spare_bytes_in_page);
 	}
 
 	// let us program all the pages in the block
@@ -1974,7 +1975,7 @@ void onfi_interface::program_pages_in_a_block(unsigned int my_block_number, bool
 		}
 	}else
 	{
-		memset(data_to_program,00,sizeof(data_to_program));
+                memset(data_to_program,0x00,num_bytes_in_page+num_spare_bytes_in_page);
 	}
 	// memset(data_to_program+1000,0x00,sizeof(uint8_t)*1000);
 	std::fstream input_data_file;
@@ -2025,8 +2026,8 @@ void onfi_interface::program_pages_in_a_block(unsigned int my_block_number, bool
 
 void onfi_interface::partial_program_pages_in_a_block(unsigned int my_block_number,uint32_t loop_count,bool complete_block,uint16_t* page_indices,uint16_t num_pages,bool verbose)
 {
-	uint8_t* data_to_program = (uint8_t*) malloc(sizeof(uint8_t)*(num_bytes_in_page+num_spare_bytes_in_page));
-	memset(data_to_program,0x00,sizeof(data_to_program));
+        uint8_t* data_to_program = (uint8_t*) malloc(sizeof(uint8_t)*(num_bytes_in_page+num_spare_bytes_in_page));
+        memset(data_to_program,0x00,num_bytes_in_page+num_spare_bytes_in_page);
 
 	if(complete_block)
 	{
@@ -2076,8 +2077,8 @@ bool onfi_interface::verify_program_pages_in_a_block(unsigned int my_block_numbe
 	//uint16_t num_bytes_to_test = num_bytes_in_page+num_spare_bytes_in_page;
 	uint16_t num_bytes_to_test = num_bytes_in_page;
 
-	uint8_t* data_to_program = (uint8_t*) malloc(sizeof(uint8_t)*(num_bytes_to_test));
-	memset(data_to_program,0x00,sizeof(data_to_program));
+        uint8_t* data_to_program = (uint8_t*) malloc(sizeof(uint8_t)*(num_bytes_to_test));
+        memset(data_to_program,0x00,num_bytes_to_test);
 
 	if(complete_block)
 	{
@@ -2118,8 +2119,8 @@ bool onfi_interface::verify_program_pages_in_a_block_slc(unsigned int my_block_n
 {
 	bool return_value = true;
 
-	uint8_t* data_to_program = (uint8_t*) malloc(sizeof(uint8_t)*(num_bytes_in_page+num_spare_bytes_in_page));
-	memset(data_to_program,0x00,sizeof(data_to_program));
+        uint8_t* data_to_program = (uint8_t*) malloc(sizeof(uint8_t)*(num_bytes_in_page+num_spare_bytes_in_page));
+        memset(data_to_program,0x00,num_bytes_in_page+num_spare_bytes_in_page);
 
 	// let us program all the pages in the block
 	uint16_t page_idx = 0;
@@ -2141,7 +2142,7 @@ void onfi_interface::read_and_spit_page(unsigned int my_block_number, unsigned i
 	uint8_t* data_read_from_page = (uint8_t*)malloc(sizeof(uint8_t)*(num_bytes_in_page+num_spare_bytes_in_page));
 
 	// let us first reset all the values in the local variables to 0x00
-	memset(data_read_from_page,0xff,sizeof(data_read_from_page));
+        memset(data_read_from_page,0xff,num_bytes_in_page+num_spare_bytes_in_page);
 	//first let us get the data from the page to the cache memory
 	read_page(my_block_number, my_page_number, 5);
 	// now let us get the values from the cache memory to our local variable
@@ -2226,7 +2227,7 @@ void onfi_interface::read_and_spit_page_tlc_toshiba(unsigned int my_block_number
 	uint8_t* data_read_from_page = (uint8_t*)malloc(sizeof(uint8_t)*(num_bytes_in_page+num_spare_bytes_in_page));
 
 	// let us first reset all the values in the local variables to 0xff
-	memset(data_read_from_page,0xff,sizeof(data_read_from_page));
+        memset(data_read_from_page,0xff,num_bytes_in_page+num_spare_bytes_in_page);
 
 	// for LSB page
 	send_command(0x01);
@@ -2287,7 +2288,7 @@ void onfi_interface::read_and_spit_page_tlc_toshiba(unsigned int my_block_number
 
 //////////////////////
 	// let us first reset all the values in the local variables to 0xff
-	memset(data_read_from_page,0xff,sizeof(data_read_from_page));
+        memset(data_read_from_page,0xff,num_bytes_in_page+num_spare_bytes_in_page);
 	// for CSB page
 	send_command(0x02);
 	//first let us get the data from the page to the cache memory
@@ -2345,7 +2346,7 @@ void onfi_interface::read_and_spit_page_tlc_toshiba(unsigned int my_block_number
 	fflush(stdout);
 /////////////////////////////////
 	// let us first reset all the values in the local variables to 0xff
-	memset(data_read_from_page,0xff,sizeof(data_read_from_page));
+        memset(data_read_from_page,0xff,num_bytes_in_page+num_spare_bytes_in_page);
 	// for MSB page
 	send_command(0x03);
 	//first let us get the data from the page to the cache memory
@@ -2428,8 +2429,8 @@ void onfi_interface::read_block_data_n_pages(unsigned int my_block_number, uint1
 void onfi_interface::read_block_data(unsigned int my_block_number, unsigned int my_page_number, bool complete_block,uint16_t* page_indices,uint16_t num_pages,bool verbose)
 {
 
-	uint8_t* data_to_program = (uint8_t*) malloc(sizeof(uint8_t)*(num_bytes_in_page+num_spare_bytes_in_page));
-	memset(data_to_program,0x00,sizeof(data_to_program));
+        uint8_t* data_to_program = (uint8_t*) malloc(sizeof(uint8_t)*(num_bytes_in_page+num_spare_bytes_in_page));
+        memset(data_to_program,0x00,num_bytes_in_page+num_spare_bytes_in_page);
 
 	if(complete_block)
 	{
@@ -2461,7 +2462,7 @@ void onfi_interface::read_block_data(unsigned int my_block_number, unsigned int 
 // .. block and puts the read value into the array passed " return_value" as argument
 void onfi_interface::read_page_and_return_value(unsigned int my_block_number, unsigned int my_page_number, uint16_t index,uint8_t* return_value,bool including_spare)
 {
-	memset(return_value,0xff,sizeof(return_value));
+        memset(return_value,0xff,including_spare?(num_bytes_in_page+num_spare_bytes_in_page):num_bytes_in_page);
 
 	// now read the page with local_address
 	read_page(my_block_number, my_page_number, 5);
