@@ -37,17 +37,13 @@ make clean
 
 ## Basic Usage
 
-The entry point `main.cpp` demonstrates a very small test that reads a pair of pages after initializing the interface:
+Running the program without arguments executes a small battery of
+sanity tests that exercise erase, program and read operations.  Pass
+`-v` to enable verbose output:
 
-```cpp
-onfi_interface onfi_instance;
-onfi_instance.get_started();
-
-unsigned int my_block_number = 0x01;
-unsigned int my_page_number = 393;
-onfi_instance.read_and_spit_page(my_block_number, my_page_number, true);
-my_page_number = 538;
-onfi_instance.read_and_spit_page(my_block_number, my_page_number, true);
+```bash
+./main            # run basic tests
+./main -v         # run tests with additional logging
 ```
 
 For more complex scenarios see `help.cpp`.  It illustrates how to:
