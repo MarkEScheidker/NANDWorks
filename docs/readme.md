@@ -17,11 +17,11 @@ Comprehensive API documentation generated with Doxygen is included in the `html/
 - `hardware_locations.h` – Pin assignments, timing macros and configuration values for the DE1‑SoC board.
 - `help.cpp` – Extensive usage examples that showcase more advanced flows.
 - `html/` – Pre‑built Doxygen output describing all classes and functions.
-- `makefile` – Simple build script for compiling the example program.
+- `Makefile` – Simple build script for compiling the example program.
 
 ## Building
 
-The project is built using the provided `makefile`.  From the `onfi_plus` directory simply run:
+The project is built using the provided `Makefile`.  From the repository root directory simply run:
 
 ```bash
 make
