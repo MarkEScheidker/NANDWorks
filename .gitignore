@@ -1,3 +1,9 @@
+# Build artifacts
+build/
+main
+
+# Temporary files
+*.o
 *.txt
 *.jpg
 *.vsdx
