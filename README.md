@@ -98,4 +98,3 @@ Refer to the Doxygen HTML for complete parameter descriptions.
 ## Documentation
 
 Open `docs/html/index.html` in a browser to read the full API reference.
-
