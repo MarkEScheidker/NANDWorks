@@ -43,55 +43,67 @@ The code supports a wide range of NAND operations:
 
 ## Public API
 
-The main user-facing class is `onfi_interface` defined in `include/onfi_head.h`. Key methods include:
+The main user-facing class is `onfi_interface` defined in `include/onfi_head.h`.  The
+lists below group its most common functions by purpose and provide brief
+descriptions.
 
-- `get_started()`
-- `initialize_onfi()` / `deinitialize_onfi()`
-- `test_onfi_leds()`
-- `open_onfi_debug_file()`
-- `open_onfi_data_file()`
-- `get_data()`
-- `check_status()` and `wait_on_status()`
-- `device_initialization()` and `reset_device()`
-- `read_parameters()` and `read_id()`
-- `decode_ONFI_version()`
-- `set_page_size()` / `set_page_size_spare()`
-- `set_block_size()` / `set_lun_size()`
-- `is_bad_block()`
-- `read_page()`
-- `open_time_profile_file()`
-- `change_read_column()`
-- `erase_block()` / `partial_erase_block()`
-- `read_status()`
-- `verify_block_erase_sample()` / `verify_block_erase()`
-- `disable_erase()` / `enable_erase()`
-- `program_page()` / `partial_program_page()`
-- `program_page_tlc_toshiba()` / `program_page_tlc_toshiba_subpage()`
-- `verify_program_page()`
-- `program_pages_in_a_block()` / `program_pages_in_a_block_data()`
-- `program_n_pages_in_a_block()` / `program_pages_in_a_block_slc()`
-- `partial_program_pages_in_a_block()`
-- `verify_program_pages_in_a_block()` / `verify_program_pages_in_a_block_slc()`
-- `read_and_spit_page()` / `read_and_spit_page_tlc_toshiba()`
-- `read_block_data()` / `read_block_data_n_pages()`
-- `read_page_and_return_value()`
-- `set_features()` / `get_features()`
-- `convert_to_slc_set_features()` / `revert_to_mlc_set_features()`
-- `convert_to_slc()` / `revert_to_mlc()`
-- `delay_function()` / `profile_time()`
-- `convert_pagenumber_to_columnrow_address()`
+### Setup & Initialization
+- `get_started()` – prepare the GPIO interface and internal state.
+- `initialize_onfi()` / `deinitialize_onfi()` – allocate or release resources.
+- `open_onfi_debug_file()` / `open_onfi_data_file()` – create log files for debug output.
+- `open_time_profile_file()` – enable timing logs.
+- `device_initialization()` / `reset_device()` – perform ONFI resets and handshakes.
+- `test_onfi_leds()` – flash LEDs to verify the connection.
 
-The `interface` base class in `include/microprocessor_interface.h` exposes lower level helpers:
+### Status and Configuration
+- `read_parameters()` / `read_id()` – query device geometry and identification.
+- `decode_ONFI_version()` – parse the ONFI version field.
+- `set_page_size()` / `set_page_size_spare()` – configure page and spare area sizes.
+- `set_block_size()` / `set_lun_size()` – adjust geometry settings.
+- `check_status()` / `wait_on_status()` – poll the chip status register.
+- `read_status()` – read the current state directly.
 
-- `open_physical()` / `close_physical()`
-- `map_physical()` / `unmap_physical()` / `get_base_bridge()`
-- `convert_peripheral_address()`
-- `open_interface_debug_file()` / `close_interface_debug_file()`
-- `turn_leds_on()` / `turn_leds_off()` / `test_leds_increment()`
-- `set_ce_low()` / `set_default_pin_values()`
-- `set_datalines_direction_input()` / `set_datalines_direction_default()`
-- `set_pin_direction_inactive()`
-- `send_command()` / `send_addresses()` / `send_data()`
+### Block Operations
+- `erase_block()` / `partial_erase_block()` – erase pages within a block.
+- `verify_block_erase()` / `verify_block_erase_sample()` – confirm an erase completed.
+- `is_bad_block()` – check if a block is marked bad.
+- `disable_erase()` / `enable_erase()` – gate erase functionality.
+
+### Page Program and Read
+- `program_page()` / `partial_program_page()` – write data to a page.
+- `program_page_tlc_toshiba()` / `program_page_tlc_toshiba_subpage()` – helpers for Toshiba TLC devices.
+- `verify_program_page()` – verify that a page was written correctly.
+- `read_page()` – read a page into a buffer.
+- `read_and_spit_page()` / `read_and_spit_page_tlc_toshiba()` – dump a page to stdout.
+- `read_block_data()` / `read_block_data_n_pages()` – sequential page reads.
+- `read_page_and_return_value()` – fetch a page and return it as a string.
+- `program_pages_in_a_block()` / `program_pages_in_a_block_data()` – write an entire block.
+- `program_n_pages_in_a_block()` / `program_pages_in_a_block_slc()` – program a subset of pages.
+- `partial_program_pages_in_a_block()` – partial writes within a block.
+- `verify_program_pages_in_a_block()` / `verify_program_pages_in_a_block_slc()` – bulk verification.
+- `change_read_column()` – shift the read pointer before issuing a read command.
+- `convert_to_slc()` / `revert_to_mlc()` – switch cell mode using standard commands.
+- `convert_to_slc_set_features()` / `revert_to_mlc_set_features()` – alternative SLC/MLC toggles.
+
+### Utilities
+- `get_data()` – convert a buffer into a printable string.
+- `set_features()` / `get_features()` – issue ONFI feature commands.
+- `delay_function()` / `profile_time()` – simple timing helpers.
+- `convert_pagenumber_to_columnrow_address()` – translate a page number to an address tuple.
+
+### Hardware Interface Primitives
+The `interface` base class in `include/microprocessor_interface.h` provides the
+low-level helpers used by `onfi_interface`:
+
+- `open_physical()` / `close_physical()` – handle `/dev/mem` access.
+- `map_physical()` / `unmap_physical()` / `get_base_bridge()` – map the HPS–FPGA bridge.
+- `convert_peripheral_address()` – compute a virtual address for a peripheral.
+- `open_interface_debug_file()` / `close_interface_debug_file()` – log hardware transactions.
+- `turn_leds_on()` / `turn_leds_off()` / `test_leds_increment()` – simple LED helpers.
+- `set_ce_low()` / `set_default_pin_values()` – manage the chip enable and default pin states.
+- `set_datalines_direction_input()` / `set_datalines_direction_default()` – switch GPIO direction.
+- `set_pin_direction_inactive()` – tri-state the bus.
+- `send_command()` / `send_addresses()` / `send_data()` – raw NAND transactions.
 
 Refer to the Doxygen HTML for complete parameter descriptions.
 
