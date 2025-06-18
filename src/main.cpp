@@ -6,8 +6,8 @@ Description: This source file is to test the basic functionality of the interfac
                         .. .. erase, program etc
 */
 
-// onfi_head.h has the necessary functionalities defined
-#include "onfi_head.h"
+// onfi_interface.h has the necessary functionalities defined
+#include "onfi_interface.h"
 
 #include <cstdlib>
 #include <cstring>

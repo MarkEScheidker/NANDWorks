@@ -6,16 +6,16 @@ This repository contains firmware and example code for interfacing ONFI-complian
 
 The software runs under Linux on the DE1‑SoC ARM processor.  It accesses the board peripherals directly through `/dev/mem`, so administrator privileges are required.  The interface abstracts low‑level pin manipulation and exposes convenient APIs for erase, program and read operations.
 
-Comprehensive API documentation generated with Doxygen is included in the `html/` directory.  Additional working examples can be found in `help.cpp`.
+Comprehensive API documentation generated with Doxygen is included in the `html/` directory.  Additional working examples can be found in `examples`.
 
 
 ## Repository Layout
 
 - `main.cpp` – Minimal demonstration application used to verify connectivity and exercise basic commands.
-- `onfi_head.cpp` / `onfi_head.h` – Implementation of the ONFI protocol, including block erase, page program, page read and various helper routines.
+- `onfi/*.cpp` / `onfi_interface.h` – Implementation of the ONFI protocol, including block erase, page program, page read and various helper routines.
 - `microprocessor_interface.cpp` / `microprocessor_interface.h` – Hardware abstraction layer for the DE1‑SoC.  Provides memory‑mapped I/O access, LED helpers and pin configuration utilities.
 - `hardware_locations.h` – Pin assignments, timing macros and configuration values for the DE1‑SoC board.
-- `help.cpp` – Extensive usage examples that showcase more advanced flows.
+- `examples` – Extensive usage examples that showcase more advanced flows.
 - `html/` – Pre‑built Doxygen output describing all classes and functions.
 - `Makefile` – Simple build script for compiling the example program.
 
@@ -46,7 +46,7 @@ sanity tests that exercise erase, program and read operations.  Pass
 ./main -v         # run tests with additional logging
 ```
 
-For more complex scenarios see `help.cpp`.  It illustrates how to:
+For more complex scenarios see `examples`.  It illustrates how to:
 
 - Initialize the hardware and the NAND device
 - Erase blocks and verify that an erase completed

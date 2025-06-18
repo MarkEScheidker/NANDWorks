@@ -1,5 +1,5 @@
 /**
-File:			onfi_head.h
+File:			onfi_interface.h
 Description:	This file contains the necessary functions that are defined by the ONFI protocol
 				.. for interfacing with a serial NAND memory.
 				The implementation here is tested on NAND memory from Micron.
@@ -7,8 +7,8 @@ Author: 		Prawar Poudel, pp0030 (at) uah (dot) edu
 Date: 			18 July 2020
 */
 
-#ifndef ONFI_HEAD
-#define ONFI_HEAD
+#ifndef ONFI_INTERFACE_H
+#define ONFI_INTERFACE_H
 
 // include our next header
 #include "microprocessor_interface.h"
