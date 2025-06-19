@@ -109,7 +109,7 @@ void onfi_interface::initialize_onfi(bool verbose)
 
 void onfi_interface::deinitialize_onfi(bool verbose)
 {
-	unmap_physical(bridge_base_virtual,LW_BRIDGE_SPAN,verbose);
+	unmap_physical(bridge_base_virtual,hw::LW_BRIDGE_SPAN,verbose);
 	close_physical(fd,verbose);
 }
 // this function can be used to test the LEDs if they are properly set up
@@ -165,7 +165,7 @@ void onfi_interface::device_initialization(bool verbose)
 	for(i=0;i<90;i++);	//50 us max
 
 	// wait for R/B signal to go high
-	while((*jumper_address & RB_mask)==0);
+	while((*jumper_address & hw::RB_mask)==0);
 
 	// now issue RESET command
 #if DEBUG_ONFI
@@ -206,7 +206,7 @@ void onfi_interface::reset_device()
 	// .. but we should wait for tWB = 200ns before the RB signal is valid
 	tWB;	// tWB = 200ns
 
-	while((*jumper_address & RB_mask)==0);
+	while((*jumper_address & hw::RB_mask)==0);
 }
 
 

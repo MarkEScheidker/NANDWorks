@@ -92,12 +92,12 @@ void onfi_interface::get_data(uint8_t* data_received,uint16_t num_data)
 		// .. data can be received when on ready state (RDY signal)
 		// .. ensure RDY is high
 		// .. .. just keep spinning here checking for ready signal
-		while((*jumper_address & RB_mask)== 0x00);
+		while((*jumper_address & hw::RB_mask)== 0x00);
 
 		// .. data can be received following READ operation
 		// .. the procedure should be as follows
 		// .. .. CE should be low
-		*jumper_address &= ~CE_mask;
+		*jumper_address &= ~hw::CE_mask;
 		// .. make WE high
 		// .. .. WE should be high from before
 		// .. .. ALE and CLE should be low
@@ -111,7 +111,7 @@ void onfi_interface::get_data(uint8_t* data_received,uint16_t num_data)
 			// 	START_TIME;
 			// #endif
 			// set the RE to low for next cycle
-			*jumper_address &= ~RE_mask;
+			*jumper_address &= ~hw::RE_mask;
 
 			// tREA = 40ns
 			SAMPLE_TIME;
@@ -119,10 +119,10 @@ void onfi_interface::get_data(uint8_t* data_received,uint16_t num_data)
 			asm("NOP");
 
 			// read the data
-			data_received[i] = *jumper_address & DQ_mask;
+			data_received[i] = *jumper_address & hw::DQ_mask;
 
 			// .. data is available at DQ pins on the rising edge of RE pin (RE is also input to NAND)
-			*jumper_address |= RE_mask;
+			*jumper_address |= hw::RE_mask;
 			
 			// #if PROFILE_TIME
 			// 	fprintf(stderr,".. time profile from get_data() one word: ");
@@ -149,30 +149,30 @@ void onfi_interface::get_data(uint8_t* data_received,uint16_t num_data)
 		set_default_pin_values();
 		set_datalines_direction_input();
 
-		*jumper_address &= ~CE_mask;
+		*jumper_address &= ~hw::CE_mask;
 		asm("nop");
 
 		// now take RE# to low
-		*jumper_address &= ~RE_mask;
+		*jumper_address &= ~hw::RE_mask;
 		// now take DQS to low
 		// set DQS as output
-		*jumper_address |= DQS_mask;
-		*jumper_direction |= (DQS_mask+DQSc_mask);
-		*jumper_address &= ~DQS_mask;
+		*jumper_address |= hw::DQS_mask;
+		*jumper_direction |= (hw::DQS_mask+hw::DQSc_mask);
+		*jumper_address &= ~hw::DQS_mask;
 		asm("nop");
-		*jumper_address |= RE_mask;
+		*jumper_address |= hw::RE_mask;
 		asm("nop");
 		// now in a loop read the data
 		uint16_t i=0;
 		for( i=0;i<num_data;i+=1)
 		{
 			// read the data
-			data_received[i] = *jumper_address & DQ_mask;
+			data_received[i] = *jumper_address & hw::DQ_mask;
 
-			*jumper_address ^= RE_mask;
-			*jumper_address ^= DQS_mask;
+			*jumper_address ^= hw::RE_mask;
+			*jumper_address ^= hw::DQS_mask;
 		}
-		*jumper_address |= RE_mask;
+		*jumper_address |= hw::RE_mask;
 
 		// set the pins as output
 		set_datalines_direction_default();
@@ -235,7 +235,7 @@ void onfi_interface::convert_pagenumber_to_columnrow_address(unsigned int my_blo
 void onfi_interface::set_features(uint8_t address, uint8_t* data_to_send,bool verbose, uint8_t command)
 {
 	// check if it is out of Busy cycle
-	while((*jumper_address & RB_mask)==0);
+	while((*jumper_address & hw::RB_mask)==0);
 
 	//send command
 	send_command(command);
@@ -251,7 +251,7 @@ void onfi_interface::set_features(uint8_t address, uint8_t* data_to_send,bool ve
 	tWB;
 
 	// check if it is out of Busy cycle
-	while((*jumper_address & RB_mask)==0);
+	while((*jumper_address & hw::RB_mask)==0);
 }
 
 //The GET FEATURES (EEh) command reads the subfeature parameters (P1-P4) from the
@@ -261,7 +261,7 @@ void onfi_interface::set_features(uint8_t address, uint8_t* data_to_send,bool ve
 void onfi_interface::get_features(uint8_t address, uint8_t* data_received,bool verbose, uint8_t command)
 {
 	// check if it is out of Busy cycle
-	while((*jumper_address & RB_mask)==0);
+	while((*jumper_address & hw::RB_mask)==0);
 
 	//send command
 	send_command(command);
@@ -271,7 +271,7 @@ void onfi_interface::get_features(uint8_t address, uint8_t* data_received,bool v
 	//now we wait
 	tWB;
 	// check if it is out of Busy cycle
-	while((*jumper_address & RB_mask)==0);
+	while((*jumper_address & hw::RB_mask)==0);
 	asm("nop");
 
 	get_data(data_received,4);

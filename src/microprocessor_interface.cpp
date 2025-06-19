@@ -159,7 +159,7 @@ void* interface::get_base_bridge(int *fd)
 		return NULL;
 	}
 
-	return_base_address = map_physical(*fd,LW_BRIDGE_BASE,LW_BRIDGE_SPAN);
+        return_base_address = map_physical(*fd,hw::LW_BRIDGE_BASE,hw::LW_BRIDGE_SPAN);
 	return return_base_address;
 }
 
@@ -169,11 +169,11 @@ void* interface::get_base_bridge(int *fd)
 	*/
 void interface::convert_peripheral_address(void* bridge_base_virtual, bool verbose)
 {
-    jumper_address = reinterpret_cast<uint32_t*>(reinterpret_cast<uintptr_t>(bridge_base_virtual)+JP1_location_OFFSET);
-    jumper_direction = reinterpret_cast<uint32_t*>(reinterpret_cast<uintptr_t>(bridge_base_virtual)+JP1_direction_OFFSET);
-    push_button = reinterpret_cast<uint32_t*>(reinterpret_cast<uintptr_t>(bridge_base_virtual)+PUSH_KEY_LOCATION_OFFSET);
-    red_leds = reinterpret_cast<uint32_t*>(reinterpret_cast<uintptr_t>(bridge_base_virtual)+RLED_OFFSET);
-    interval_timer = reinterpret_cast<unsigned int*>(reinterpret_cast<uintptr_t>(bridge_base_virtual)+INTERVAL_TIMER_OFFSET);
+    jumper_address = reinterpret_cast<uint32_t*>(reinterpret_cast<uintptr_t>(bridge_base_virtual)+hw::JP1_location_OFFSET);
+    jumper_direction = reinterpret_cast<uint32_t*>(reinterpret_cast<uintptr_t>(bridge_base_virtual)+hw::JP1_direction_OFFSET);
+    push_button = reinterpret_cast<uint32_t*>(reinterpret_cast<uintptr_t>(bridge_base_virtual)+hw::PUSH_KEY_LOCATION_OFFSET);
+    red_leds = reinterpret_cast<uint32_t*>(reinterpret_cast<uintptr_t>(bridge_base_virtual)+hw::RLED_OFFSET);
+    interval_timer = reinterpret_cast<unsigned int*>(reinterpret_cast<uintptr_t>(bridge_base_virtual)+hw::INTERVAL_TIMER_OFFSET);
 
 	*(interval_timer+2) = 0xffff; // lower 16-bits for timer
 	*(interval_timer+3) = 0xffff; // upper 16-bits for timer
@@ -183,21 +183,21 @@ void interface::convert_peripheral_address(void* bridge_base_virtual, bool verbo
 	{
 		interface_debug_file<<"************************************************************"<<endl;
                 interface_debug_file<<"I: The base received in function is 0x"<<std::hex<<reinterpret_cast<uintptr_t>(bridge_base_virtual)<<endl;
-                interface_debug_file<<"I: JP1_location at offset 0x"<<std::hex<<JP1_location_OFFSET<<" is 0x"<<std::hex<<reinterpret_cast<uintptr_t>(jumper_address)<<endl;
-                interface_debug_file<<"I: JP1_direction at offset 0x"<<std::hex<<JP1_direction_OFFSET<<" is 0x"<<std::hex<<reinterpret_cast<uintptr_t>(jumper_direction)<<endl;
-                interface_debug_file<<"I: push_button at offset 0x"<<std::hex<<PUSH_KEY_LOCATION_OFFSET<<" is 0x"<<std::hex<<reinterpret_cast<uintptr_t>(push_button)<<endl;
-                interface_debug_file<<"I: Red LEDs at offset 0x"<<std::hex<<RLED_OFFSET<<" is 0x"<<std::hex<<reinterpret_cast<uintptr_t>(red_leds)<<endl;
-                interface_debug_file<<"I: Interval Timer at offset 0x"<<std::hex<<INTERVAL_TIMER_OFFSET<<" is 0x"<<std::hex<<reinterpret_cast<uintptr_t>(interval_timer)<<endl;
+                interface_debug_file<<"I: JP1_location at offset 0x"<<std::hex<<hw::JP1_location_OFFSET<<" is 0x"<<std::hex<<reinterpret_cast<uintptr_t>(jumper_address)<<endl;
+                interface_debug_file<<"I: JP1_direction at offset 0x"<<std::hex<<hw::JP1_direction_OFFSET<<" is 0x"<<std::hex<<reinterpret_cast<uintptr_t>(jumper_direction)<<endl;
+                interface_debug_file<<"I: push_button at offset 0x"<<std::hex<<hw::PUSH_KEY_LOCATION_OFFSET<<" is 0x"<<std::hex<<reinterpret_cast<uintptr_t>(push_button)<<endl;
+                interface_debug_file<<"I: Red LEDs at offset 0x"<<std::hex<<hw::RLED_OFFSET<<" is 0x"<<std::hex<<reinterpret_cast<uintptr_t>(red_leds)<<endl;
+                interface_debug_file<<"I: Interval Timer at offset 0x"<<std::hex<<hw::INTERVAL_TIMER_OFFSET<<" is 0x"<<std::hex<<reinterpret_cast<uintptr_t>(interval_timer)<<endl;
 		interface_debug_file<<"************************************************************"<<endl;
 	}else
 	{
 		cout<<"************************************************************"<<endl;
                 cout<<"I: The base received in function is 0x"<<std::hex<<reinterpret_cast<uintptr_t>(bridge_base_virtual)<<endl;
-                cout<<"I: JP1_location at offset 0x"<<std::hex<<JP1_location_OFFSET<<" is 0x"<<std::hex<<reinterpret_cast<uintptr_t>(jumper_address)<<endl;
-                cout<<"I: JP1_direction at offset 0x"<<std::hex<<JP1_direction_OFFSET<<" is 0x"<<std::hex<<reinterpret_cast<uintptr_t>(jumper_direction)<<endl;
-                cout<<"I: push_button at offset 0x"<<std::hex<<PUSH_KEY_LOCATION_OFFSET<<" is 0x"<<std::hex<<reinterpret_cast<uintptr_t>(push_button)<<endl;
-                cout<<"I: Red LEDs at offset 0x"<<std::hex<<RLED_OFFSET<<" is 0x"<<std::hex<<reinterpret_cast<uintptr_t>(red_leds)<<endl;
-                cout<<"I: Interval Timer at offset 0x"<<std::hex<<INTERVAL_TIMER_OFFSET<<" is 0x"<<std::hex<<reinterpret_cast<uintptr_t>(interval_timer)<<endl;
+                cout<<"I: JP1_location at offset 0x"<<std::hex<<hw::JP1_location_OFFSET<<" is 0x"<<std::hex<<reinterpret_cast<uintptr_t>(jumper_address)<<endl;
+                cout<<"I: JP1_direction at offset 0x"<<std::hex<<hw::JP1_direction_OFFSET<<" is 0x"<<std::hex<<reinterpret_cast<uintptr_t>(jumper_direction)<<endl;
+                cout<<"I: push_button at offset 0x"<<std::hex<<hw::PUSH_KEY_LOCATION_OFFSET<<" is 0x"<<std::hex<<reinterpret_cast<uintptr_t>(push_button)<<endl;
+                cout<<"I: Red LEDs at offset 0x"<<std::hex<<hw::RLED_OFFSET<<" is 0x"<<std::hex<<reinterpret_cast<uintptr_t>(red_leds)<<endl;
+                cout<<"I: Interval Timer at offset 0x"<<std::hex<<hw::INTERVAL_TIMER_OFFSET<<" is 0x"<<std::hex<<reinterpret_cast<uintptr_t>(interval_timer)<<endl;
 		cout<<"************************************************************"<<endl;
 	}
 #else
@@ -205,11 +205,11 @@ void interface::convert_peripheral_address(void* bridge_base_virtual, bool verbo
 	{
 		cout<<"************************************************************"<<endl;
                 cout<<"I: The base received in function is 0x"<<std::hex<<reinterpret_cast<uintptr_t>(bridge_base_virtual)<<endl;
-                cout<<"I: JP1_location at offset 0x"<<std::hex<<JP1_location_OFFSET<<" is 0x"<<std::hex<<reinterpret_cast<uintptr_t>(jumper_address)<<endl;
-                cout<<"I: JP1_direction at offset 0x"<<std::hex<<JP1_direction_OFFSET<<" is 0x"<<std::hex<<reinterpret_cast<uintptr_t>(jumper_direction)<<endl;
-                cout<<"I: push_button at offset 0x"<<std::hex<<PUSH_KEY_LOCATION_OFFSET<<" is 0x"<<std::hex<<reinterpret_cast<uintptr_t>(push_button)<<endl;
-                cout<<"I: Red LEDs at offset 0x"<<std::hex<<RLED_OFFSET<<" is 0x"<<std::hex<<reinterpret_cast<uintptr_t>(red_leds)<<endl;
-                cout<<"I: Interval Timer at offset 0x"<<std::hex<<INTERVAL_TIMER_OFFSET<<" is 0x"<<std::hex<<reinterpret_cast<uintptr_t>(interval_timer)<<endl;
+                cout<<"I: JP1_location at offset 0x"<<std::hex<<hw::JP1_location_OFFSET<<" is 0x"<<std::hex<<reinterpret_cast<uintptr_t>(jumper_address)<<endl;
+                cout<<"I: JP1_direction at offset 0x"<<std::hex<<hw::JP1_direction_OFFSET<<" is 0x"<<std::hex<<reinterpret_cast<uintptr_t>(jumper_direction)<<endl;
+                cout<<"I: push_button at offset 0x"<<std::hex<<hw::PUSH_KEY_LOCATION_OFFSET<<" is 0x"<<std::hex<<reinterpret_cast<uintptr_t>(push_button)<<endl;
+                cout<<"I: Red LEDs at offset 0x"<<std::hex<<hw::RLED_OFFSET<<" is 0x"<<std::hex<<reinterpret_cast<uintptr_t>(red_leds)<<endl;
+                cout<<"I: Interval Timer at offset 0x"<<std::hex<<hw::INTERVAL_TIMER_OFFSET<<" is 0x"<<std::hex<<reinterpret_cast<uintptr_t>(interval_timer)<<endl;
 		cout<<"************************************************************"<<endl;
 	}
 #endif
@@ -283,11 +283,11 @@ void interface::test_leds_increment(bool verbose)
 __attribute__((always_inline)) void interface::set_pin_direction_inactive()
 {
 	// set the required pins as output from the angle of NIOS machine
-	*jumper_direction |= (DQ_mask+CLE_mask+ALE_mask+WP_mask+RE_mask+WE_mask+CE_mask);	// this line just sets the output pins
-	*jumper_direction &= ~(RB_mask);	//this line does it for input pin R/B
+	*jumper_direction |= (hw::DQ_mask+hw::CLE_mask+hw::ALE_mask+hw::WP_mask+hw::RE_mask+hw::WE_mask+hw::CE_mask);	// this line just sets the output pins
+	*jumper_direction &= ~(hw::RB_mask);	//this line does it for input pin R/B
 	
 	// let us first reset the DQ pints
-	*jumper_address &= ~(DQ_mask);
+	*jumper_address &= ~(hw::DQ_mask);
 }
 
 __attribute__((always_inline)) void interface::set_ce_low()
@@ -298,7 +298,7 @@ __attribute__((always_inline)) void interface::set_ce_low()
 	.. since ALE and CLE are active high, we will reset them to 0
 	..
 	*/
-	*jumper_address &= ~(CE_mask);
+	*jumper_address &= ~(hw::CE_mask);
 }
 
 __attribute__((always_inline)) void interface::set_default_pin_values()
@@ -308,11 +308,11 @@ __attribute__((always_inline)) void interface::set_default_pin_values()
 	.. since CE#, RE# and WE# are active low, we will set them to 1
 	.. since ALE and CLE are active high, we will reset them to 0
 	*/
-	*jumper_address |= (CE_mask+RE_mask+WE_mask);
-	*jumper_address &= ~(ALE_mask+CLE_mask+DQ_mask);
+	*jumper_address |= (hw::CE_mask+hw::RE_mask+hw::WE_mask);
+	*jumper_address &= ~(hw::ALE_mask+hw::CLE_mask+hw::DQ_mask);
 
 	// set DQS to inputs
-	*jumper_direction &= ~(DQS_mask+DQSc_mask);
+	*jumper_direction &= ~(hw::DQS_mask+hw::DQSc_mask);
 }
 
 
@@ -324,9 +324,9 @@ __attribute__((always_inline)) void interface::set_default_pin_values()
 __attribute__((always_inline)) void interface::set_datalines_direction_default()
 {
 	//. set the datalines as input
-	*jumper_direction |= (DQ_mask);
+	*jumper_direction |= (hw::DQ_mask);
 	// let us reset the DQ pints
-	*jumper_address &= ~(DQ_mask);
+	*jumper_address &= ~(hw::DQ_mask);
 }
 
 	/**
@@ -337,7 +337,7 @@ __attribute__((always_inline)) void interface::set_datalines_direction_default()
 __attribute__((always_inline)) void interface::set_datalines_direction_input()
 {
 	//. set the datalines as input
-	*jumper_direction &= ~(DQ_mask);
+	*jumper_direction &= ~(hw::DQ_mask);
 }
 
 	/**
@@ -348,29 +348,29 @@ __attribute__((always_inline)) void interface::send_command(uint8_t command_to_s
 {
 	// .. Write Enable should go low WE => low
 	// .. reset the bit that is connected to WE
-	*jumper_address &= ~(WE_mask);
+	*jumper_address &= ~(hw::WE_mask);
 	// .. .. Chip Enable should go low CE => low
-	*jumper_address &= ~(CE_mask);
+	*jumper_address &= ~(hw::CE_mask);
 	// .. .. ALE should go low ALE => low
 	// .. .. ALE should be zero from before
 	// .. ..RE goes high
 	// .. ..RE should be high from before
 	// .. .. CLE should go high CLE => high
-	*jumper_address |= (CLE_mask);
+	*jumper_address |= (hw::CLE_mask);
 
 	// .. .. send the command signal in the DQ pins	
 	// .. .. the idea is clear the least 8-bits
 	// .. .. copy the values to be sent
 	// .. .. ..the first part reset the DQ pins
 	// .. .. ..the second part has the actual command to send
-	*jumper_address = (*jumper_address&(~DQ_mask))|(command_to_send & DQ_mask);
+	*jumper_address = (*jumper_address&(~hw::DQ_mask))|(command_to_send & hw::DQ_mask);
 
 	//insert delay here
 	// .. tDS = 40 ns
 	SAMPLE_TIME;
 
 	// disable write enable again
-	*jumper_address |= (WE_mask);
+	*jumper_address |= (hw::WE_mask);
 
 	//insert delay here
 	// .. because the command is written on the rising edge of WE
@@ -379,7 +379,7 @@ __attribute__((always_inline)) void interface::send_command(uint8_t command_to_s
 	asm("NOP");
 
 	// disable CLE
-	*jumper_address &= ~(CLE_mask);
+	*jumper_address &= ~(hw::CLE_mask);
 	//make sure to call set_default_pin_values()
 	set_default_pin_values();
 }
@@ -400,21 +400,21 @@ __attribute__((always_inline)) void interface::send_addresses(uint8_t* address_t
 	if(verbose) cout<<"I: Sending Addresses "<<num_address_bytes<<" bytes"<<endl<<"\t:";
 #endif
 
-	*jumper_address &= ~CE_mask;
+	*jumper_address &= ~hw::CE_mask;
 	// .. CLE goes low
 	// .. CLE should be 0 from before
 	// .. ALE goes high
-	*jumper_address |= ALE_mask;
+	*jumper_address |= hw::ALE_mask;
 	// .. RE goes high
 	// .. RE should be high from before
 	uint8_t i=0;
 	for(i=0;i<num_address_bytes;i++)
 	{
-		*jumper_address &= ~(WE_mask);
+		*jumper_address &= ~(hw::WE_mask);
 		// .. Put data on the DQ pin
 		// .. .. the idea is clear the least 8-bits
 		// .. .. copy the values to be sent
-		*jumper_address = (*jumper_address&(~DQ_mask))|(address_to_send[i] & DQ_mask);
+		*jumper_address = (*jumper_address&(~hw::DQ_mask))|(address_to_send[i] & hw::DQ_mask);
 
 #if DEBUG_INTERFACE
 	if(interface_debug_file)
@@ -431,7 +431,7 @@ __attribute__((always_inline)) void interface::send_addresses(uint8_t* address_t
 		SAMPLE_TIME; //tDS
 
 		// .. Address is loaded from DQ on rising edge of WE
-		*jumper_address |= WE_mask;
+		*jumper_address |= hw::WE_mask;
 		// .. maintain WE high for certain duration and make it low
 		
 		// .. put next address bits on DQ and cause rising edge of WE
@@ -465,21 +465,21 @@ __attribute__((always_inline)) void interface::send_data(uint8_t* data_to_send,u
 	if(interface_type==asynchronous)
 	{
 		// .. CE should be low
-		*jumper_address &= ~CE_mask;
+		*jumper_address &= ~hw::CE_mask;
 		uint16_t i=0;
 		for(i=0;i<num_data;i++)
 		{
 			// .. make WE low and repeat the procedure again for number of bytes required (int num_data)
-			*jumper_address &= ~WE_mask;
+			*jumper_address &= ~hw::WE_mask;
 
 			// .. put data on DQ and latch WE high for certain duration
 			// .. .. the idea is clear the least 8-bits
 			// .. .. copy the values to be sent
-			*jumper_address = (*jumper_address&(~DQ_mask))|(data_to_send[i] & DQ_mask);
+			*jumper_address = (*jumper_address&(~hw::DQ_mask))|(data_to_send[i] & hw::DQ_mask);
 			//.. a simple delay
 			SAMPLE_TIME;	// tDS
 
-			*jumper_address |= WE_mask;
+			*jumper_address |= hw::WE_mask;
 
 			//insert delay here
 			// HOLD_TIME;	//tDH
@@ -488,7 +488,7 @@ __attribute__((always_inline)) void interface::send_data(uint8_t* data_to_send,u
 
 			// reset all the data on DQ pins
 			// .. this might be unnecesary
-			*jumper_address &= ~(DQ_mask);		
+			*jumper_address &= ~(hw::DQ_mask);		
 		}
 		//make sure to call set_default_pin_values()
 		set_default_pin_values();
@@ -496,22 +496,22 @@ __attribute__((always_inline)) void interface::send_data(uint8_t* data_to_send,u
 	{
 		set_datalines_direction_default();
 
-		*jumper_address &= ~CE_mask;
-		*jumper_address |= WE_mask;
+		*jumper_address &= ~hw::CE_mask;
+		*jumper_address |= hw::WE_mask;
 
-		*jumper_direction |= (DQS_mask+DQSc_mask);
-		*jumper_address |= DQS_mask;
+		*jumper_direction |= (hw::DQS_mask+hw::DQSc_mask);
+		*jumper_address |= hw::DQS_mask;
 
-		*jumper_address &= ~CLE_mask;
-		*jumper_address &= ~ALE_mask;
+		*jumper_address &= ~hw::CLE_mask;
+		*jumper_address &= ~hw::ALE_mask;
 
-		*jumper_address &= ~DQS_mask;
+		*jumper_address &= ~hw::DQS_mask;
 		asm("nop");
 		uint16_t i=0;
 		for(i=0;i<num_data;i++)
 		{
-			*jumper_address = (*jumper_address&(~DQ_mask))|(data_to_send[i] & DQ_mask);
-			*jumper_address ^= DQS_mask;
+			*jumper_address = (*jumper_address&(~hw::DQ_mask))|(data_to_send[i] & hw::DQ_mask);
+			*jumper_address ^= hw::DQS_mask;
 			asm("nop");
 		}
 		set_default_pin_values();

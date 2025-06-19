@@ -20,7 +20,7 @@ void onfi_interface::read_id()
 	uint8_t* my_unique_id = (uint8_t*)(malloc(num_bytes*sizeof(uint8_t)));
 	tRR;
 	//wait for RB# signal to be high
-	while((*jumper_address & RB_mask)==0);	
+	while((*jumper_address & hw::RB_mask)==0);	
 	tRR;
 
 	get_data(my_unique_id,num_bytes);
@@ -142,7 +142,7 @@ void onfi_interface::read_parameters(param_type ONFI_OR_JEDEC, bool bytewise, bo
 {
 
 	// make sure none of the LUNs are busy
-	while((*jumper_address & RB_mask)==0);
+	while((*jumper_address & hw::RB_mask)==0);
 
 	uint8_t address_to_send = 0x00;
 	std::string type_parameter = "ONFI";
@@ -162,7 +162,7 @@ void onfi_interface::read_parameters(param_type ONFI_OR_JEDEC, bool bytewise, bo
 #endif
 
 	// make sure none of the LUNs are busy
-	while((*jumper_address & RB_mask)==0);
+	while((*jumper_address & hw::RB_mask)==0);
 
 #if DEBUG_ONFI
 	if(onfi_debug_file)
@@ -189,7 +189,7 @@ void onfi_interface::read_parameters(param_type ONFI_OR_JEDEC, bool bytewise, bo
 	//have some delay here and wait for busy signal again before reading the paramters
 	asm("nop");
 	// make sure none of the LUNs are busy
-	while((*jumper_address & RB_mask)==0);
+	while((*jumper_address & hw::RB_mask)==0);
 
 #if DEBUG_ONFI
 	if(onfi_debug_file)
