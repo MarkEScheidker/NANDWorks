@@ -22,7 +22,7 @@ The resulting `main` executable must be run with root privileges.
 
 ## Basic Usage
 
-Running `./main` without arguments performs a small set of sanity tests. Pass `-v` for verbose output. Extensive usage examples can be found in `src/help.cpp`.
+Running `./main` without arguments performs a small set of sanity tests. Pass `-v` for verbose output. Extensive usage examples can be found in `examples/`.
 
 ## Hardware Setup
 
@@ -43,7 +43,7 @@ The code supports a wide range of NAND operations:
 
 ## Public API
 
-The main user-facing class is `onfi_interface` defined in `include/onfi_head.h`.  The
+The main user-facing class is `onfi_interface` defined in `include/onfi_interface.h`.  The
 lists below group its most common functions by purpose and provide brief
 descriptions.
 
