@@ -5,6 +5,8 @@
 #include <cstdint>
 #include <iomanip>
 #include <algorithm>
+#include <pigpio.h>
+
 using namespace std;
 
 void onfi_interface::read_page(unsigned int my_block_number, unsigned int my_page_number,uint8_t address_length,bool verbose)
@@ -16,7 +18,7 @@ void onfi_interface::read_page(unsigned int my_block_number, unsigned int my_pag
 	uint8_t address[address_length];
 	convert_pagenumber_to_columnrow_address(my_block_number, my_page_number, address);
 	// make sure none of the LUNs are busy
-	while((*jumper_address & RB_mask)==0);
+	while(gpioRead(RB_PIN)==0);
 
 	if(flash_chip==toshiba_tlc_toggle)
 		send_command(0x0);
@@ -33,21 +35,16 @@ void onfi_interface::read_page(unsigned int my_block_number, unsigned int my_pag
 
 	// just a delay
 	tWB;
-	// // this is added just for read-retry operation
-	// for(uint8_t vv=0;vv<255;vv++)
-	// {
-	// 	asm("nop");
-	// }
 
 	// check for RDY signal
-	while((*jumper_address & RB_mask)==0);
+	while(gpioRead(RB_PIN)==0);
 #if PROFILE_TIME
 	END_TIME;
 	if(verbose) fprintf(stdout,"Read page completed \n");
 	PRINT_TIME;
 #endif	
 	// tRR = 40ns
-	asm("NOP");
+	gpioDelay(1); // Replaced asm("NOP")
 }
 
 // this function opens a file named time_info_file.txt
@@ -83,8 +80,8 @@ void onfi_interface::read_and_spit_page(unsigned int my_block_number, unsigned i
 			col_address[1] = b_idx/256;
 			col_address[0] = b_idx%256;
 			change_read_column(col_address);
-			asm("NOP");
-			asm("NOP");
+			gpioDelay(1); // Replaced asm("NOP")
+			gpioDelay(1); // Replaced asm("NOP")
 			get_data(data_read_from_page+b_idx,1);
 		}
 	}else
@@ -403,4 +400,3 @@ void onfi_interface::read_page_and_return_value(unsigned int my_block_number, un
 // .. specified feature address to enable or disable target-specific features. This command is
 // .. accepted by the target only when all die (LUNs) on the target are idle.
 // .. the parameters P1-P4 are in data_to_send argument
-

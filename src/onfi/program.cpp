@@ -5,6 +5,8 @@
 #include <cstdint>
 #include <iomanip>
 #include <algorithm>
+#include <pigpio.h>
+
 using namespace std;
 
 bool onfi_interface::verify_program_page(unsigned int my_block_number, unsigned int my_page_number,uint8_t* data_to_program,bool verbose)
@@ -37,7 +39,7 @@ bool onfi_interface::verify_program_page(unsigned int my_block_number, unsigned 
 				#if DEBUG_ONFI
 					if(onfi_debug_file)
 					{
-						onfi_debug_file<<"P:"<<std::hex<<byte_id<<","<<std::hex<<0<<","<<std::hex<<data_read_from_page[byte_id]<<endl;
+						onfi_debug_file<<std::hex<<byte_id<<","<<std::hex<<0<<","<<std::hex<<data_read_from_page[byte_id]<<endl;
 					}
 					else fprintf(stdout,"P:%x,%x,%x\n",byte_id,0,data_read_from_page[byte_id]);
 				#else
@@ -105,7 +107,7 @@ void onfi_interface::program_page(unsigned int my_block_number, unsigned int my_
 
 	tWB;
 		// check if it is out of Busy cycle
-	while((*jumper_address & RB_mask)==0);
+	while(gpioRead(RB_PIN)==0);
 #if PROFILE_TIME
 	END_TIME;
 	PRINT_TIME;
@@ -193,7 +195,7 @@ void onfi_interface::program_page_tlc_toshiba_subpage(unsigned int my_block_numb
 
 	tWB;
 		// check if it is out of Busy cycle
-	while((*jumper_address & RB_mask)==0);
+	while(gpioRead(RB_PIN)==0);
 #if PROFILE_TIME
 	END_TIME;
 	PRINT_TIME;
@@ -284,7 +286,7 @@ void onfi_interface::program_page_tlc_toshiba(unsigned int my_block_number,unsig
 
 	tWB;
 		// check if it is out of Busy cycle
-	while((*jumper_address & RB_mask)==0);
+	while(gpioRead(RB_PIN)==0);
 #if PROFILE_TIME
 	END_TIME;
 	PRINT_TIME;
@@ -337,7 +339,7 @@ void onfi_interface::program_page_tlc_toshiba(unsigned int my_block_number,unsig
 
 	tWB;
 		// check if it is out of Busy cycle
-	while((*jumper_address & RB_mask)==0);
+	while(gpioRead(RB_PIN)==0);
 #if PROFILE_TIME
 	END_TIME;
 	PRINT_TIME;
@@ -389,7 +391,7 @@ void onfi_interface::program_page_tlc_toshiba(unsigned int my_block_number,unsig
 
 	tWB;
 		// check if it is out of Busy cycle
-	while((*jumper_address & RB_mask)==0);
+	while(gpioRead(RB_PIN)==0);
 #if PROFILE_TIME
 	END_TIME;
 	PRINT_TIME;
@@ -472,7 +474,7 @@ void onfi_interface::partial_program_page(unsigned int my_block_number, unsigned
 	PRINT_TIME;
 #endif
 	// check if it is out of Busy cycle
-	while((*jumper_address & RB_mask)==0);
+	while(gpioRead(RB_PIN)==0);
 
 	uint8_t status;
 	read_status(&status);
@@ -555,51 +557,6 @@ void onfi_interface::program_n_pages_in_a_block(unsigned int my_block_number, ui
 }
 
 // let us program pages in the block with all uint8_t* provided_data
-// the paramters are:
-// .. my_test_block_address is the address of the block (starting address)
-// .. complete_block if this is true all the pages in the block will be programmed
-// .. page_indices is an array of indices inside the block that we want to program
-// .. num_pages is the number of pages in the page_indices array
-// .. verbose is for printing
-void onfi_interface::program_pages_in_a_block_data(unsigned int my_block_number, uint8_t* provided_data,bool complete_block,uint16_t* page_indices,uint16_t num_pages,bool verbose)
-{
-	uint8_t* data_to_program = provided_data;
-
-	if(complete_block)
-	{
-		// let us program all the pages in the block
-		uint16_t page_idx = 0;
-		for(page_idx = 0;page_idx<num_pages_in_block;page_idx++)
-		{
-			// (uint8_t* page_address,uint8_t* data_to_program,bool including_spare,bool verbose)
-			program_page(my_block_number, page_idx, data_to_program,true,verbose);
-		}
-	}else
-	{
-		uint16_t curr_page_index = 0;
-
-		// let us sort the page indices here
-		uint16_t idx = 0;
-		uint16_t* page_indices_sorted = new uint16_t[num_pages];
-		for(idx = 0; idx < num_pages; idx++)
-			page_indices_sorted[idx] = page_indices[idx];
-
-		sort(page_indices_sorted,page_indices_sorted+num_pages);
-
-		for(idx = 0;idx<num_pages;idx++)
-		{
-			// let us grab the index from the array
-			// curr_page_index = page_indices[idx];
-			curr_page_index = page_indices_sorted[idx];
-
-			program_page(my_block_number, curr_page_index,data_to_program,true,verbose);
-		}
-
-		delete[] page_indices_sorted;
-
-	}
-}
-// let us program pages in the block with all 0s
 // the paramters are:
 // .. my_test_block_address is the address of the block (starting address)
 // .. complete_block if this is true all the pages in the block will be programmed
@@ -780,4 +737,3 @@ bool onfi_interface::verify_program_pages_in_a_block_slc(unsigned int my_block_n
 
 // this function reads the single page address provided
 // each value is hex while the sequence is terminated by newline character
-

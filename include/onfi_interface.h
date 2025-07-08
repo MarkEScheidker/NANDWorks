@@ -288,7 +288,7 @@ public:
 	.. num_pages is the number of pages in the page_indices array
 	.. verbose is for printing
 	*/
-	void program_pages_in_a_block(unsigned int my_block_number,bool complete_block = false, bool data_random = false, uint16_t* page_indices = page_indices_selected,uint16_t num_pages = num_pages_selected, bool verbose = false);
+	void program_pages_in_a_block(unsigned int my_block_number,bool complete_block, bool data_random, uint16_t* page_indices,uint16_t num_pages, bool verbose);
 
 
 /**
@@ -319,7 +319,7 @@ public:
 	*/
 	void program_pages_in_a_block_slc(unsigned int my_block_number,uint16_t num_pages = 256,bool verbose=false);
 	
-	void partial_program_pages_in_a_block(unsigned int my_block_number,uint32_t loop_count,bool complete_block = false,uint16_t* page_indices = page_indices_selected,uint16_t num_pages = num_pages_selected,bool verbose = false);
+	void partial_program_pages_in_a_block(unsigned int my_block_number,uint32_t loop_count,bool complete_block,uint16_t* page_indices,uint16_t num_pages,bool verbose);
 
 /**
 	let us verify program pages in the block 
@@ -330,7 +330,7 @@ public:
 	.. num_pages is the number of pages in the page_indices array
 	.. verbose is for printing
 	*/
-	bool verify_program_pages_in_a_block(unsigned int my_block_number,bool complete_block = false,uint16_t* page_indices = page_indices_selected,uint16_t num_pages = num_pages_selected,bool verbose = false);
+	bool verify_program_pages_in_a_block(unsigned int my_block_number,bool complete_block,uint16_t* page_indices,uint16_t num_pages,bool verbose);
 	bool verify_program_pages_in_a_block_slc(unsigned int my_block_number,bool verbose = false);
 
 	/**

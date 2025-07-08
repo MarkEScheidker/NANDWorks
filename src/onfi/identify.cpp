@@ -5,6 +5,8 @@
 #include <cstdint>
 #include <iomanip>
 #include <algorithm>
+#include <pigpio.h>
+
 using namespace std;
 
 void onfi_interface::read_id()
@@ -20,7 +22,7 @@ void onfi_interface::read_id()
 	uint8_t* my_unique_id = (uint8_t*)(malloc(num_bytes*sizeof(uint8_t)));
 	tRR;
 	//wait for RB# signal to be high
-	while((*jumper_address & RB_mask)==0);	
+	while(gpioRead(RB_PIN)==0);	
 	tRR;
 
 	get_data(my_unique_id,num_bytes);
@@ -142,7 +144,7 @@ void onfi_interface::read_parameters(param_type ONFI_OR_JEDEC, bool bytewise, bo
 {
 
 	// make sure none of the LUNs are busy
-	while((*jumper_address & RB_mask)==0);
+	while(gpioRead(RB_PIN)==0);
 
 	uint8_t address_to_send = 0x00;
 	std::string type_parameter = "ONFI";
@@ -162,7 +164,7 @@ void onfi_interface::read_parameters(param_type ONFI_OR_JEDEC, bool bytewise, bo
 #endif
 
 	// make sure none of the LUNs are busy
-	while((*jumper_address & RB_mask)==0);
+	while(gpioRead(RB_PIN)==0);
 
 #if DEBUG_ONFI
 	if(onfi_debug_file)
@@ -187,9 +189,9 @@ void onfi_interface::read_parameters(param_type ONFI_OR_JEDEC, bool bytewise, bo
 	send_addresses(&address_to_send);
 
 	//have some delay here and wait for busy signal again before reading the paramters
-	asm("nop");
+	// asm("nop"); // Replaced with pigpio delay if needed
 	// make sure none of the LUNs are busy
-	while((*jumper_address & RB_mask)==0);
+	while(gpioRead(RB_PIN)==0);
 
 #if DEBUG_ONFI
 	if(onfi_debug_file)
@@ -482,4 +484,3 @@ bool onfi_interface::is_bad_block(unsigned int my_block_number)
 // write a function to perform an read operation from NAND flash to cache register
 // .. reads one page from the NAND to the cache register
 // .. during the read, you can use change_read_column and change_row_address
-

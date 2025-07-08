@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS = -Wall -O0 -lrt -std=c++0x -Iinclude
+CXXFLAGS = -Wall -O0 -lrt -std=c++0x -Iinclude -lpigpio
 OBJ_DIR = build
 TARGET = main
 

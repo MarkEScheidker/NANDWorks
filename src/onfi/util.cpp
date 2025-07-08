@@ -5,6 +5,8 @@
 #include <cstdint>
 #include <iomanip>
 #include <algorithm>
+#include <pigpio.h>
+
 using namespace std;
 
 /**
@@ -92,12 +94,12 @@ void onfi_interface::get_data(uint8_t* data_received,uint16_t num_data)
 		// .. data can be received when on ready state (RDY signal)
 		// .. ensure RDY is high
 		// .. .. just keep spinning here checking for ready signal
-		while((*jumper_address & RB_mask)== 0x00);
+		while(gpioRead(RB_PIN)== 0x00);
 
 		// .. data can be received following READ operation
 		// .. the procedure should be as follows
 		// .. .. CE should be low
-		*jumper_address &= ~CE_mask;
+		gpioWrite(CE_PIN, 0);
 		// .. make WE high
 		// .. .. WE should be high from before
 		// .. .. ALE and CLE should be low
@@ -111,18 +113,18 @@ void onfi_interface::get_data(uint8_t* data_received,uint16_t num_data)
 			// 	START_TIME;
 			// #endif
 			// set the RE to low for next cycle
-			*jumper_address &= ~RE_mask;
+		gpioWrite(RE_PIN, 0);
 
 			// tREA = 40ns
 			SAMPLE_TIME;
-			asm("NOP");
-			asm("NOP");
+			gpioDelay(1); // Replaced asm("NOP")
+			gpioDelay(1); // Replaced asm("NOP")
 
 			// read the data
-			data_received[i] = *jumper_address & DQ_mask;
+			data_received[i] = read_dq_pins();
 
 			// .. data is available at DQ pins on the rising edge of RE pin (RE is also input to NAND)
-			*jumper_address |= RE_mask;
+			gpioWrite(RE_PIN, 1);
 			
 			// #if PROFILE_TIME
 			// 	fprintf(stderr,".. time profile from get_data() one word: ");
@@ -130,7 +132,7 @@ void onfi_interface::get_data(uint8_t* data_received,uint16_t num_data)
 			// 	PRINT_TIME;
 			// #endif	
 			// tREH
-			asm("NOP");
+			gpioDelay(1); // Replaced asm("NOP")
 	 // same same 
 		}
 
@@ -149,30 +151,31 @@ void onfi_interface::get_data(uint8_t* data_received,uint16_t num_data)
 		set_default_pin_values();
 		set_datalines_direction_input();
 
-		*jumper_address &= ~CE_mask;
-		asm("nop");
+		gpioWrite(CE_PIN, 0);
+		gpioDelay(1); // Replaced asm("nop")
 
 		// now take RE# to low
-		*jumper_address &= ~RE_mask;
+		gpioWrite(RE_PIN, 0);
 		// now take DQS to low
 		// set DQS as output
-		*jumper_address |= DQS_mask;
-		*jumper_direction |= (DQS_mask+DQSc_mask);
-		*jumper_address &= ~DQS_mask;
-		asm("nop");
-		*jumper_address |= RE_mask;
-		asm("nop");
+		gpioWrite(DQS_PIN, 1);
+		gpioSetMode(DQS_PIN, PI_OUTPUT);
+		gpioSetMode(DQSc_PIN, PI_OUTPUT);
+		gpioWrite(DQS_PIN, 0);
+		gpioDelay(1); // Replaced asm("nop")
+		gpioWrite(RE_PIN, 1);
+		gpioDelay(1); // Replaced asm("nop")
 		// now in a loop read the data
 		uint16_t i=0;
 		for( i=0;i<num_data;i+=1)
 		{
 			// read the data
-			data_received[i] = *jumper_address & DQ_mask;
+			data_received[i] = read_dq_pins();
 
-			*jumper_address ^= RE_mask;
-			*jumper_address ^= DQS_mask;
+			gpioWrite(RE_PIN, !gpioRead(RE_PIN)); // Toggle RE
+			gpioWrite(DQS_PIN, !gpioRead(DQS_PIN)); // Toggle DQS
 		}
-		*jumper_address |= RE_mask;
+		gpioWrite(RE_PIN, 1);
 
 		// set the pins as output
 		set_datalines_direction_default();
@@ -235,7 +238,7 @@ void onfi_interface::convert_pagenumber_to_columnrow_address(unsigned int my_blo
 void onfi_interface::set_features(uint8_t address, uint8_t* data_to_send,bool verbose, uint8_t command)
 {
 	// check if it is out of Busy cycle
-	while((*jumper_address & RB_mask)==0);
+	while(gpioRead(RB_PIN)==0);
 
 	//send command
 	send_command(command);
@@ -251,7 +254,7 @@ void onfi_interface::set_features(uint8_t address, uint8_t* data_to_send,bool ve
 	tWB;
 
 	// check if it is out of Busy cycle
-	while((*jumper_address & RB_mask)==0);
+	while(gpioRead(RB_PIN)==0);
 }
 
 //The GET FEATURES (EEh) command reads the subfeature parameters (P1-P4) from the
@@ -261,7 +264,7 @@ void onfi_interface::set_features(uint8_t address, uint8_t* data_to_send,bool ve
 void onfi_interface::get_features(uint8_t address, uint8_t* data_received,bool verbose, uint8_t command)
 {
 	// check if it is out of Busy cycle
-	while((*jumper_address & RB_mask)==0);
+	while(gpioRead(RB_PIN)==0);
 
 	//send command
 	send_command(command);
@@ -271,8 +274,8 @@ void onfi_interface::get_features(uint8_t address, uint8_t* data_received,bool v
 	//now we wait
 	tWB;
 	// check if it is out of Busy cycle
-	while((*jumper_address & RB_mask)==0);
-	asm("nop");
+	while(gpioRead(RB_PIN)==0);
+	gpioDelay(1); // Replaced asm("nop")
 
 	get_data(data_received,4);
 }
@@ -282,7 +285,7 @@ void onfi_interface::get_features(uint8_t address, uint8_t* data_received,bool v
 __attribute__((always_inline)) void onfi_interface::delay_function(uint32_t loop_count)
 {
 	for(;loop_count>0;loop_count--)
-		asm("nop");
+		gpioDelay(1); // Replaced asm("nop")
 }
 
 void onfi_interface::profile_time()
@@ -301,4 +304,3 @@ void onfi_interface::profile_time()
 #endif
 	}
 }
-

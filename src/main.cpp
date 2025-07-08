@@ -77,8 +77,7 @@ static bool test_multi_page_program(onfi_interface &onfi_instance, bool verbose)
 {
         unsigned int block = 0x01;
 
-        onfi_instance.program_pages_in_a_block(block, false, false,
-                                               slc_page_indices, 20, verbose);
+        onfi_instance.program_pages_in_a_block(block, false, false, slc_page_indices, 20, verbose);
         return onfi_instance.verify_program_pages_in_a_block(block, false,
                                                              slc_page_indices,
                                                              20, verbose);

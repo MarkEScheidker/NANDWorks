@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <fstream>
 #include <iostream>
+#include <pigpio.h>
 
 #include "hardware_locations.h"
 
@@ -46,37 +47,25 @@ private:
 define masks and addresses here
 */
 protected:
-	// these are protected so that they can be accessed from onfi_interface class
-	volatile uint32_t* jumper_address;
-	volatile uint32_t* jumper_direction;
-	volatile uint32_t* push_button;
-	volatile uint32_t* red_leds;
-	volatile unsigned int* interval_timer;
-
-
 	std::fstream time_info_file;
-	// struct timeval tvInitial,tvFinal;
-	struct timespec tvInitialns,tvFinalns;
 
 	// this is the debug file that logs debug messages for hardware interface
 	std::fstream interface_debug_file;
-	// following is the file descriptor for mmap()
-	int fd;
-	// this will have the base address of the peripheral where the bridge is
-	void* bridge_base_virtual;
 
 public:
+	interface() {
+		if (gpioInitialise() < 0) {
+			std::cerr << "pigpio initialisation failed\n";
+			exit(1);
+		}
+	}
+
+	~interface() {
+		gpioTerminate();
+	}
 
 	default_interface_type interface_type;
 	chip_type flash_chip;
-
-	/**
-	following function opens a file /dev/mem if not opened already
-	.. and returns the file dresciptor
-	.. fd input parameter is the file descriptor
-	.. this function opens the /dev/mem/ file and returns the file descriptor
-	*/
-	int open_physical(int fd,bool verbose = false);
 
 	/**
 	this function opens a file to log debug information for interface
@@ -87,33 +76,6 @@ public:
 	this function closes the debug file that was open for logging
 	*/
 	void close_interface_debug_file(bool verbose = false);
-
-	/**
-	this function closes a file passed as argument. will be used for closing the physical interface
-	*/
-	void close_physical(int fd, bool verbose = false);
-
-	/**
-	this function maps the provided physical address to a virtual address and returns virtual address
-	.. generally the base address is provided and offset of specific devices are added on virtual base
-	*/
-	void* map_physical(int fd,uint32_t base, uint32_t span, bool verbose = false);
-
-	/**
-	undo mapping
-	*/
-	void unmap_physical(void* virtual_base, uint32_t span, bool verbose = false);
-
-	/**
-	 this function returns the virtual address of the base of bridge
-	 */
-	void* get_base_bridge(int *fd);
-
-	/**
-	following function gets the physical address of differnt peripherals
-	.. these peripherals are protected members in thet class
-	*/
-	void convert_peripheral_address(void* bridge_base_virtual, bool verbose = false);
 
 	/**
 	this function turns on the LEDs
@@ -241,6 +203,8 @@ this function is to test the LEDs
 	\make sure to call set_default_pin_values()
 	*/
 	void send_data(uint8_t* data_to_send,uint16_t num_data);
+	void set_dq_pins(uint8_t data);
+	uint8_t read_dq_pins();
 };
 
 #endif

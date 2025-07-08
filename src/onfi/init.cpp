@@ -5,6 +5,8 @@
 #include <cstdint>
 #include <iomanip>
 #include <algorithm>
+#include <pigpio.h>
+
 using namespace std;
 
 void onfi_interface::get_started(param_type ONFI_OR_JEDEC)
@@ -70,47 +72,21 @@ void onfi_interface::initialize_onfi(bool verbose)
 	// open the data file
 	open_onfi_data_file();
 
-	//let us get the base address of the bridge
-	fd = -1;
-	bridge_base_virtual = get_base_bridge(&fd);
-	if(!bridge_base_virtual)
-	{
-#if DEBUG_ONFI
-	if(onfi_debug_file)
-		onfi_debug_file<<"E: Converting to virtual failed"<<endl;
-	else
-		cout<<"E: Converting to virtual failed"<<endl;
-#else
-	if(verbose) cout<<"E: Converting to virtual failed"<<endl;
-#endif
-	}else
-	{
-#if DEBUG_ONFI
-        if(onfi_debug_file)
-                onfi_debug_file<<"I: Converting to virtual successful. The base address is "<<std::hex<<reinterpret_cast<uintptr_t>(bridge_base_virtual)<<endl;
-        else
-                cout<<"I: Converting to virtual successful. The base address is "<<std::hex<<reinterpret_cast<uintptr_t>(bridge_base_virtual)<<endl;
-#else
-        if(verbose) cout<<"I: Converting to virtual successful. The base address is "<<std::hex<<reinterpret_cast<uintptr_t>(bridge_base_virtual)<<endl;
-#endif
-	}
-	// let us convert the address of the peripherals
-	convert_peripheral_address(bridge_base_virtual);
+	// No need for bridge_base_virtual or fd with pigpio
 
 #if DEBUG_ONFI
 	if(onfi_debug_file)
-		onfi_debug_file<<"I: Successful conversion of all the peripheral addresses"<<endl;
+		onfi_debug_file<<"I: Successful initialization of pigpio and pin modes"<<endl;
 	else
-		cout<<"I: Successful conversion of all the peripheral addresses"<<endl;
+		cout<<"I: Successful initialization of pigpio and pin modes"<<endl;
 #else
-	cout<<"I: Successful conversion of all the peripheral addresses"<<endl;
+	if(verbose) cout<<"I: Successful initialization of pigpio and pin modes"<<endl;
 #endif
 }
 
 void onfi_interface::deinitialize_onfi(bool verbose)
 {
-	unmap_physical(bridge_base_virtual,LW_BRIDGE_SPAN,verbose);
-	close_physical(fd,verbose);
+	// No need for unmap_physical or close_physical with pigpio
 }
 // this function can be used to test the LEDs if they are properly set up
 //  since it is called as a part of onfi_interface, if this works
@@ -127,8 +103,7 @@ void onfi_interface::test_onfi_leds(bool verbose)
 #endif
 	//just a simple delay for LEDs to stay ON
 	turn_leds_on();
-	uint32_t delay_ = 20000;
-	while(delay_--);
+	gpioDelay(20000); // 20ms delay
 	turn_leds_off();
 
 #if DEBUG_ONFI
@@ -161,11 +136,10 @@ void onfi_interface::device_initialization(bool verbose)
 	set_ce_low();
 
 	//insert delay here
-	uint16_t i=0;
-	for(i=0;i<90;i++);	//50 us max
+	gpioDelay(50); // 50 us max
 
 	// wait for R/B signal to go high
-	while((*jumper_address & RB_mask)==0);
+	while(gpioRead(RB_PIN)==0);
 
 	// now issue RESET command
 #if DEBUG_ONFI
@@ -206,7 +180,5 @@ void onfi_interface::reset_device()
 	// .. but we should wait for tWB = 200ns before the RB signal is valid
 	tWB;	// tWB = 200ns
 
-	while((*jumper_address & RB_mask)==0);
+	while(gpioRead(RB_PIN)==0);
 }
-
-

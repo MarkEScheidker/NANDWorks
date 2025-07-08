@@ -5,16 +5,18 @@
 #include <cstdint>
 #include <iomanip>
 #include <algorithm>
+#include <pigpio.h>
+
 using namespace std;
 
 void onfi_interface::disable_erase()
 {
 	// check to see if the device is busy
 	// .. wait if busy
-	while((*jumper_address&RB_mask)==0x00);
+	while(gpioRead(RB_PIN)==0x00);
 
 	// wp to low
-	*jumper_address &= ~WP_mask;	
+	gpioWrite(WP_PIN, 0);	
 	
 	//insert delay here
 	uint8_t i=0;
@@ -25,10 +27,10 @@ void onfi_interface::enable_erase()
 {
 	// check to see if the device is busy
 	// .. wait if busy
-	while((*jumper_address&RB_mask)==0x00);
+	while(gpioRead(RB_PIN)==0x00);
 
 	// wp to high
-	*jumper_address |= WP_mask;
+	gpioWrite(WP_PIN, 1);
 	
 	//insert delay here
 	tWW;
@@ -45,10 +47,10 @@ void onfi_interface::erase_block(unsigned int my_block_number, bool verbose)
 	uint8_t *row_address = my_test_block_address+2;
 
 	enable_erase();
-	*jumper_direction &= ~RB_mask;
+	gpioSetMode(RB_PIN, PI_INPUT);
 
 	// check if it is out of Busy cycle
-	while((*jumper_address & RB_mask)==0);
+	while(gpioRead(RB_PIN)==0);
 
 	send_command(0x60);
 	send_addresses(row_address,3);
@@ -62,7 +64,7 @@ void onfi_interface::erase_block(unsigned int my_block_number, bool verbose)
 	
 
 	// check if it is out of Busy cycle
-	while((*jumper_address & RB_mask)==0);
+	while(gpioRead(RB_PIN)==0);
 
 #if PROFILE_TIME
 	END_TIME;
@@ -126,10 +128,10 @@ void onfi_interface::partial_erase_block(unsigned int my_block_number, unsigned 
 	uint8_t *row_address = my_test_block_address+2;
 
 	enable_erase();
-	*jumper_direction &= ~RB_mask;
+	gpioSetMode(RB_PIN, PI_INPUT);
 
 	// check if it is out of Busy cycle
-	while((*jumper_address & RB_mask)==0);
+	while(gpioRead(RB_PIN)==0);
 
 	send_command(0x60);
 	send_addresses(row_address,3);
@@ -152,7 +154,7 @@ void onfi_interface::partial_erase_block(unsigned int my_block_number, unsigned 
 #endif	
 
 	// check if it is out of Busy cycle
-	while((*jumper_address & RB_mask)==0);
+	while(gpioRead(RB_PIN)==0);
 
 #if DEBUG_ONFI
 	if(onfi_debug_file)
@@ -406,7 +408,7 @@ void onfi_interface::convert_to_slc_set_features(unsigned int my_block_number)
 	// to convert to SLC using set features, we have to first make sure
 	// .. at least half the pages are programmed
 	// .. let us just program all the pages in the block
-	program_pages_in_a_block(my_block_number,true);
+	program_pages_in_a_block(my_block_number, true, false, nullptr, 0, false);
 
 	// now that we have programmed the block,
 	// .. we will issue set_features command
@@ -428,19 +430,6 @@ void onfi_interface::revert_to_mlc_set_features()
 	set_features(0x91,parameters);
 }
 
-void onfi_interface::test_device_voltage_high()
-{
-	*jumper_direction |= (RE_mask);
-	*jumper_address |= (RE_mask);
-}
-
-
-void onfi_interface::test_device_voltage_low()
-{
-	*jumper_direction |= (RE_mask);
-	*jumper_address &= ~(RE_mask);
-}
-
 void onfi_interface::convert_to_slc(unsigned int my_block_number, bool first_time)
 {
 
@@ -454,7 +443,7 @@ void onfi_interface::convert_to_slc(unsigned int my_block_number, bool first_tim
 	if(first_time)
 	{
 		erase_block(my_block_number);
-		program_pages_in_a_block(my_block_number,true);
+		program_pages_in_a_block(my_block_number, true, false, nullptr, 0, false);
 	}
 	
 	send_command(0xda);
@@ -463,7 +452,7 @@ void onfi_interface::convert_to_slc(unsigned int my_block_number, bool first_tim
 	send_addresses(my_test_block_address+2);
 	send_command(0xd0);
 	tWB;
-	while((*jumper_address & RB_mask)==0);
+	while(gpioRead(RB_PIN)==0);
 
 	//perform erase operation to init
 	if(first_time) erase_block(my_block_number);
@@ -481,9 +470,5 @@ void onfi_interface::revert_to_mlc(unsigned int my_block_number)
 	send_addresses(my_test_block_address+2);
 	send_command(0xd0);
 	tWB;
-	while((*jumper_address & RB_mask)==0);
+	while(gpioRead(RB_PIN)==0);
 }
-
-// this function introduces delay
-// .. the delay is caused using a for loop
-
