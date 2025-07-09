@@ -66,6 +66,7 @@ void onfi_interface::open_time_profile_file()
 // .. please change this if the device has multiple dies
 void onfi_interface::initialize_onfi(bool verbose)
 {
+	cout << "Entering initialize_onfi()" << endl;
 	open_interface_debug_file();
 	//open the ONFI debug file
 	open_onfi_debug_file();
@@ -129,16 +130,21 @@ void onfi_interface::device_initialization(bool verbose)
 #else
 	if(verbose) cout<<"I: Initializing device with a reset cycle"<<endl;
 #endif	
+	cout << "Setting pin direction inactive" << endl;
 	set_pin_direction_inactive();
+	cout << "Setting default pin values" << endl;
 	set_default_pin_values();
 
 	// we need to set CE to low for RESET to work
+	cout << "Setting CE low" << endl;
 	set_ce_low();
 
 	//insert delay here
+	cout << "Delaying for 50us" << endl;
 	gpioDelay(50); // 50 us max
 
 	// wait for R/B signal to go high
+	cout << "Waiting for R/B signal to go high" << endl;
 	while(gpioRead(RB_PIN)==0);
 
 	// now issue RESET command

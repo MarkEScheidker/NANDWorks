@@ -62,14 +62,14 @@ The firmware expects the DE1‑SoC board's GPIO pins to be wired to the NAND dev
 
 | Signal | GPIO Bit |
 | ------ | -------- |
-| `DQ[7:0]` | Bits `0-7` |
-| `WP#` | Bit `8` |
-| `WE#` | Bit `9` |
-| `ALE` | Bit `10` |
-| `CLE` | Bit `11` |
-| `CE#` | Bit `12` |
-| `RE#` | Bit `13` |
-| `R/B#` | Bit `14` |
+| `DQ[7:0]` | `io0`-`io7` (21, 20, 16, 12, 25, 24, 23, 18) |
+| `WP#` | 26 |
+| `WE#` | 19 |
+| `ALE` | 13 |
+| `CLE` | 11 |
+| `CE#` | 22 |
+| `RE#` | 27 |
+| `R/B#` | 17 |
 
 Timing parameters are implemented using simple software delays; refer to `hardware_locations.h` for the exact macros.  The board must expose its lightweight HPS‑to‑FPGA bridge at address `0xFF200000` so that the driver can map it via `/dev/mem`.
 

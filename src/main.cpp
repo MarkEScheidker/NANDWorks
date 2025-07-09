@@ -111,6 +111,7 @@ static void usage(const char *prog)
 
 int main(int argc, char **argv)
 {
+        cout << "Starting main function" << endl;
         bool verbose = false;
         for(int i = 1; i < argc; ++i)
         {
@@ -125,31 +126,38 @@ int main(int argc, char **argv)
 
         // create the interface object and initialize everything
         onfi_interface onfi_instance;
+        cout << "Calling get_started()" << endl;
         onfi_instance.get_started();
+        cout << "Finished get_started()" << endl;
 
         int pass = 0;
         int fail = 0;
 
+        cout << "Running LED test" << endl;
         if(run_test("LED test", test_leds, onfi_instance, verbose))
                 ++pass;
         else
                 ++fail;
 
+        cout << "Running Block erase test" << endl;
         if(run_test("Block erase", test_block_erase, onfi_instance, verbose))
                 ++pass;
         else
                 ++fail;
 
+        cout << "Running Single page program test" << endl;
         if(run_test("Single page program", test_single_page_program, onfi_instance, verbose))
                 ++pass;
         else
                 ++fail;
 
+        cout << "Running Multiple page program test" << endl;
         if(run_test("Multiple page program", test_multi_page_program, onfi_instance, verbose))
                 ++pass;
         else
                 ++fail;
 
+        cout << "Running Read pages test" << endl;
         if(run_test("Read pages", test_page_reads, onfi_instance, verbose))
                 ++pass;
         else

@@ -28,6 +28,18 @@ Running `./main` without arguments performs a small set of sanity tests. Pass `-
 
 GPIO assignments and timing parameters are defined in `include/hardware_locations.h`. The DE1‑SoC GPIO pins must be wired to the NAND device as specified there. Timing is implemented with simple software delays.
 
+| Signal | GPIO Bit |
+| ------ | -------- |
+| `DQ[7:0]` | `io0`-`io7` (21, 20, 16, 12, 25, 24, 23, 18) |
+| `WP#` | 26 |
+| `WE#` | 19 |
+| `ALE` | 13 |
+| `CLE` | 11 |
+| `CE#` | 22 |
+| `RE#` | 27 |
+| `R/B#` | 17 |
+
+
 ## Features
 
 The code supports a wide range of NAND operations:

@@ -8,6 +8,8 @@
 
 #include "hardware_locations.h"
 
+using namespace std;
+
 /// following flag keeps the debug information active
 #define DEBUG_INTERFACE false
 
@@ -54,6 +56,7 @@ protected:
 
 public:
 	interface() {
+		cout << "Entering interface constructor" << endl;
 		if (gpioInitialise() < 0) {
 			std::cerr << "pigpio initialisation failed\n";
 			exit(1);

@@ -15,22 +15,22 @@
 #define GET_TIME_ELAPSED (end_tick - start_tick)
 
 // Placeholder BCM GPIO pin numbers (adjust as per your wiring)
-#define DQ0_PIN 2
-#define DQ1_PIN 3
-#define DQ2_PIN 4
-#define DQ3_PIN 17
-#define DQ4_PIN 27
-#define DQ5_PIN 22
-#define DQ6_PIN 10
-#define DQ7_PIN 9
+#define DQ0_PIN 21
+#define DQ1_PIN 20
+#define DQ2_PIN 16
+#define DQ3_PIN 12
+#define DQ4_PIN 25
+#define DQ5_PIN 24
+#define DQ6_PIN 23
+#define DQ7_PIN 18
 
-#define WP_PIN 11
-#define CLE_PIN 5
-#define ALE_PIN 6
-#define RE_PIN 13
+#define WP_PIN 26
+#define CLE_PIN 11
+#define ALE_PIN 13
+#define RE_PIN 27
 #define WE_PIN 19
-#define CE_PIN 26
-#define RB_PIN 21
+#define CE_PIN 22
+#define RB_PIN 17
 #define DQS_PIN 20
 #define DQSc_PIN 16
 
