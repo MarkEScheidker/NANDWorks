@@ -145,7 +145,16 @@ void onfi_interface::device_initialization(bool verbose)
 
 	// wait for R/B signal to go high
 	cout << "Waiting for R/B signal to go high" << endl;
-	while(gpioRead(RB_PIN)==0);
+	int timeout = 0;
+	while(gpioRead(RB_PIN)==0)
+	{
+		timeout++;
+		if(timeout > 1000000)
+		{
+			cout << "Timed out waiting for R/B to go high" << endl;
+			break;
+		}
+	}
 
 	// now issue RESET command
 #if DEBUG_ONFI
@@ -186,5 +195,14 @@ void onfi_interface::reset_device()
 	// .. but we should wait for tWB = 200ns before the RB signal is valid
 	tWB;	// tWB = 200ns
 
-	while(gpioRead(RB_PIN)==0);
+	int timeout = 0;
+	while(gpioRead(RB_PIN)==0)
+	{
+		timeout++;
+		if(timeout > 1000000)
+		{
+			cout << "Timed out waiting for R/B to go high" << endl;
+			break;
+		}
+	}
 }

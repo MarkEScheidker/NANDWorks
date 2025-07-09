@@ -31,14 +31,14 @@
 #define WE_PIN 19
 #define CE_PIN 22
 #define RB_PIN 17
-#define DQS_PIN 20
-#define DQSc_PIN 16
+#define DQS_PIN 5 // Changed from 20 to 5 to resolve conflict with DQ1_PIN
+#define DQSc_PIN 6 // Changed from 16 to 6 to resolve conflict with DQ2_PIN
 
 // Red LEDs (adjust as per your wiring)
 #define RLED0_PIN 14
 #define RLED1_PIN 15
-#define RLED2_PIN 18
-#define RLED3_PIN 23
+#define RLED2_PIN 7 // Changed from 18 to 7 to resolve conflict with DQ7_PIN
+#define RLED3_PIN 8 // Changed from 23 to 8 to resolve conflict with DQ6_PIN
 
 // Timing delays in microseconds (adjust as needed based on NAND datasheet)
 // These are rough estimates and may need fine-tuning
@@ -49,7 +49,7 @@
 #define tRR gpioDelay(1); // 40ns -> 0.04us, using 1us for safety
 #define tRHW gpioDelay(1); // 200ns -> 0.2us, using 1us for safety
 #define tCCS gpioDelay(1); // 200ns -> 0.2us, using 1us for safety
-#define tADL gpioDelay(1); // 300ns -> 0.3us, using 1us for safety
+#define tADL gpioDelay(1); // 300ns -> 0.3us, using 1us for safety 
 #define tWHR gpioDelay(1); // 120ns -> 0.12us, using 1us for safety
 
 #endif

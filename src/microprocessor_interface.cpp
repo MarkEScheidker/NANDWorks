@@ -65,6 +65,7 @@ __attribute__((always_inline)) void interface::set_pin_direction_inactive()
 
     // Set RB_PIN to input
     gpioSetMode(RB_PIN, PI_INPUT);
+    gpioSetPullUpDown(RB_PIN, PI_PUD_UP);
 
     // Set DQ pins to output and low
     gpioSetMode(DQ0_PIN, PI_OUTPUT); gpioWrite(DQ0_PIN, 0);
