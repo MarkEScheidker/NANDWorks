@@ -1,55 +1,72 @@
-#ifndef HARDWARE_LOCATIONS
-#define HARDWARE_LOCATIONS
+#ifndef HARDWARE_LOCATIONS_H
+#define HARDWARE_LOCATIONS_H
 
 #include <fstream>
 #include <pigpio.h>
 
+// Enables/disables detailed timing profiles for operations.
 #define PROFILE_TIME true
 
+// Forces a function to be inlined.
 #define FORCE_INLINE __attribute__((always_inline))
 
-// Timing macros using pigpio
+// Timing macros using pigpio for performance measurement.
 #define START_TIME do { uint32_t start_tick = gpioTick();
 #define END_TIME   uint32_t end_tick = gpioTick(); time_info_file << "  took " << (end_tick - start_tick) << " microseconds\n"; } while(0);
 #define PRINT_TIME // Handled within END_TIME
 #define GET_TIME_ELAPSED (end_tick - start_tick)
 
-// Placeholder BCM GPIO pin numbers (adjust as per your wiring)
-#define DQ0_PIN 21
-#define DQ1_PIN 20
-#define DQ2_PIN 16
-#define DQ3_PIN 12
-#define DQ4_PIN 25
-#define DQ5_PIN 24
-#define DQ6_PIN 23
-#define DQ7_PIN 18
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// Pin Definitions
+//
+// This section centralizes all GPIO pin assignments for the project.
+// Each pin is defined with a clear name, its BCM number, and a comment explaining its purpose
+// and connection on the NAND flash memory interface.
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-#define WP_PIN 26
-#define CLE_PIN 11
-#define ALE_PIN 13
-#define RE_PIN 27
-#define WE_PIN 19
-#define CE_PIN 22
-#define RB_PIN 17
-#define DQS_PIN 20
-#define DQSc_PIN 16
+// Data Quentin (DQ) Pins: Bidirectional data bus for transferring commands, addresses, and data.
+#define GPIO_DQ0 21  // Data Bus Line 0
+#define GPIO_DQ1 20  // Data Bus Line 1
+#define GPIO_DQ2 16  // Data Bus Line 2
+#define GPIO_DQ3 12  // Data Bus Line 3
+#define GPIO_DQ4 25  // Data Bus Line 4
+#define GPIO_DQ5 24  // Data Bus Line 5
+#define GPIO_DQ6 23  // Data Bus Line 6
+#define GPIO_DQ7 18  // Data Bus Line 7
 
-// Red LEDs (adjust as per your wiring)
-#define RLED0_PIN 14
-#define RLED1_PIN 15
-#define RLED2_PIN 18
-#define RLED3_PIN 23
+// Control Signal Pins: Manage the flow of data and commands to the NAND flash.
+#define GPIO_WP  26  // Write Protect: Prevents writing to the memory array. Active low.
+#define GPIO_CLE 11  // Command Latch Enable: Signals that a command is on the data bus. Active high.
+#define GPIO_ALE 13  // Address Latch Enable: Signals that an address is on the data bus. Active high.
+#define GPIO_RE  27  // Read Enable: Strobes data out of the NAND flash. Active low.
+#define GPIO_WE  19  // Write Enable: Strobes data into the NAND flash. Active low.
+#define GPIO_CE  22  // Chip Enable: Activates the NAND flash chip. Active low.
+#define GPIO_RB  17  // Ready/Busy: Indicates the status of the NAND flash. Low means busy.
 
-// Timing delays in microseconds (adjust as needed based on NAND datasheet)
-// These are rough estimates and may need fine-tuning
-#define SAMPLE_TIME gpioDelay(1); // ~1us, adjust for tDS
-#define HOLD_TIME gpioDelay(1); // ~1us, adjust for tDH
-#define tWW gpioDelay(100); // 100ns -> 0.1us, using 1us for safety
-#define tWB gpioDelay(1); // 200ns -> 0.2us, using 1us for safety
-#define tRR gpioDelay(1); // 40ns -> 0.04us, using 1us for safety
-#define tRHW gpioDelay(1); // 200ns -> 0.2us, using 1us for safety
-#define tCCS gpioDelay(1); // 200ns -> 0.2us, using 1us for safety
-#define tADL gpioDelay(1); // 300ns -> 0.3us, using 1us for safety
-#define tWHR gpioDelay(1); // 120ns -> 0.12us, using 1us for safety
+// Data Strobe Pins: Used for synchronizing data transfer in synchronous mode.
+#define GPIO_DQS  5  // Data Strobe: Toggles to signal valid data.
+#define GPIO_DQSC 6  // Data Strobe Complement: The inverse of DQS.
 
-#endif
+// LED Indicator Pins: Provide visual feedback on the system's status.
+#define GPIO_RLED0 14 // Red LED 0
+#define GPIO_RLED1 15 // Red LED 1
+#define GPIO_RLED2 7  // Red LED 2
+#define GPIO_RLED3 8  // Red LED 3
+
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// Timing Delays
+//
+// These macros define timing delays required for NAND flash operations, based on the device's
+// datasheet. The values are in microseconds and may need fine-tuning.
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#define SAMPLE_TIME gpioDelay(1) // ~1us, adjust for tDS (Data Setup Time)
+#define HOLD_TIME   gpioDelay(1) // ~1us, adjust for tDH (Data Hold Time)
+#define tWW         gpioDelay(100) // 100ns -> 0.1us, using 1us for safety (Write to Write delay)
+#define tWB         gpioDelay(1)   // 200ns -> 0.2us, using 1us for safety (Write Busy)
+#define tRR         gpioDelay(1)   // 40ns -> 0.04us, using 1us for safety (Read to Read delay)
+#define tRHW        gpioDelay(1)   // 200ns -> 0.2us, using 1us for safety (Read High to Write)
+#define tCCS        gpioDelay(1)   // 200ns -> 0.2us, using 1us for safety (Chip Select Setup)
+#define tADL        gpioDelay(1)   // 300ns -> 0.3us, using 1us for safety (Address to Data Latch)
+#define tWHR        gpioDelay(1)   // 120ns -> 0.12us, using 1us for safety (Write High to Read)
+
+#endif // HARDWARE_LOCATIONS_H
