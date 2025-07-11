@@ -38,10 +38,10 @@ int main() {
     // Clear potential leftover input
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
-    for (const auto& pin_info : pins) {
+    for (const auto &pin_info: pins) {
         std::cout << std::endl;
         std::cout << "Testing Pin: " << pin_info.name << " (GPIO " << pin_info.pin << ")" << std::endl;
-        
+
         gpioSetMode(pin_info.pin, PI_OUTPUT);
 
         std::cout << "Pin is OFF. ";
