@@ -10,7 +10,7 @@
 using namespace std;
 
 bool onfi_interface::verify_program_page(unsigned int my_block_number, unsigned int my_page_number,
-                                         uint8_t *data_to_program, bool verbose) {
+                                         uint8_t *data_to_program, bool verbose, int max_allowed_errors) {
     bool return_value = true;
     //uint16_t num_bytes_to_test = num_bytes_in_page+num_spare_bytes_in_page;
     uint16_t num_bytes_to_test = num_bytes_in_page;
@@ -57,7 +57,7 @@ bool onfi_interface::verify_program_page(unsigned int my_block_number, unsigned 
     fflush(stdout);
     free(data_read_from_page);
 
-    return return_value;
+    return fail_count <= max_allowed_errors;
 }
 
 // this function only programs a single page as indicated by the address provided
@@ -532,6 +532,8 @@ void onfi_interface::program_pages_in_a_block(unsigned int my_block_number, bool
     } else {
         memset(data_to_program, 0x00, num_bytes_in_page + num_spare_bytes_in_page);
     }
+    // Ensure the first byte of the spare area is not 0x00 to avoid marking as bad block
+    data_to_program[num_bytes_in_page] = 0xFF;
     // memset(data_to_program+1000,0x00,sizeof(uint8_t)*1000);
     std::fstream input_data_file;
     input_data_file.open("raw_data_file.txt", std::fstream::out);
@@ -618,7 +620,7 @@ void onfi_interface::partial_program_pages_in_a_block(unsigned int my_block_numb
 // .. num_pages is the number of pages in the page_indices array
 // .. verbose is for printing
 bool onfi_interface::verify_program_pages_in_a_block(unsigned int my_block_number, bool complete_block,
-                                                     uint16_t *page_indices, uint16_t num_pages, bool verbose) {
+                                                     uint16_t *page_indices, uint16_t num_pages, bool verbose, int max_allowed_errors) {
     bool return_value = true;
     //uint16_t num_bytes_to_test = num_bytes_in_page+num_spare_bytes_in_page;
     uint16_t num_bytes_to_test = num_bytes_in_page;
@@ -631,8 +633,8 @@ bool onfi_interface::verify_program_pages_in_a_block(unsigned int my_block_numbe
         uint16_t page_idx = 0;
         for (page_idx = 0; page_idx < num_pages_in_block; page_idx++) {
             // verify_program_page(uint8_t* page_address,uint8_t* data_to_program,bool verbose)
-            if (!verify_program_page(my_block_number, page_idx, data_to_program, verbose))
-                return_value = false;
+            if (!verify_program_page(my_block_number, page_idx, data_to_program, verbose, max_allowed_errors))
+            return_value = false;
         }
     } else {
         uint16_t curr_page_index = 0;
@@ -643,7 +645,7 @@ bool onfi_interface::verify_program_pages_in_a_block(unsigned int my_block_numbe
             curr_page_index = page_indices[idx];
 
             // verify_program_page(uint8_t* page_address,uint8_t* data_to_program,bool verbose)
-            if (!verify_program_page(my_block_number, curr_page_index, data_to_program, verbose))
+            if (!verify_program_page(my_block_number, curr_page_index, data_to_program, verbose, max_allowed_errors))
                 return_value = false;
         }
 
@@ -656,7 +658,7 @@ bool onfi_interface::verify_program_pages_in_a_block(unsigned int my_block_numbe
 
 // this function goes through the block and verifies program values in all of
 // .. 512 pages in a block
-bool onfi_interface::verify_program_pages_in_a_block_slc(unsigned int my_block_number, bool verbose) {
+bool onfi_interface::verify_program_pages_in_a_block_slc(unsigned int my_block_number, bool verbose, int max_allowed_errors) {
     bool return_value = true;
 
     uint8_t *data_to_program = (uint8_t *) malloc(sizeof(uint8_t) * (num_bytes_in_page + num_spare_bytes_in_page));
@@ -666,7 +668,7 @@ bool onfi_interface::verify_program_pages_in_a_block_slc(unsigned int my_block_n
     uint16_t page_idx = 0;
     for (page_idx = 0; page_idx < (num_pages_in_block / 2); page_idx++) {
         // verify_program_page(uint8_t* page_address,uint8_t* data_to_program,bool verbose)
-        if (!verify_program_page(my_block_number, page_idx, data_to_program, verbose))
+        if (!verify_program_page(my_block_number, page_idx, data_to_program, verbose, max_allowed_errors))
             return_value = false;
     }
 

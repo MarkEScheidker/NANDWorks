@@ -492,7 +492,6 @@ bool onfi_interface::is_bad_block(unsigned int my_block_number) {
         //this is a bad block
         return true;
     } else {
-        fprintf(stderr, "E: Some data found while testing bad block: ");
         // may still not be a bad block
         return false;
     }

@@ -277,7 +277,7 @@ public:
 	.. .. if including spare  = 1, then length of data_to_program should be (num of bytes in pages + num of spare bytes)
 	.. verbose is for priting messages
 	*/
-	bool verify_program_page(unsigned int my_block_number, unsigned int my_page_number,uint8_t* data_to_program,bool verbose = false);
+	    bool verify_program_page(unsigned int my_block_number, unsigned int my_page_number,uint8_t* data_to_program,bool verbose = false, int max_allowed_errors = 0);
 
 	/**
 	let us program pages in the block with all 0s
@@ -330,8 +330,8 @@ public:
 	.. num_pages is the number of pages in the page_indices array
 	.. verbose is for printing
 	*/
-	bool verify_program_pages_in_a_block(unsigned int my_block_number,bool complete_block,uint16_t* page_indices,uint16_t num_pages,bool verbose);
-	bool verify_program_pages_in_a_block_slc(unsigned int my_block_number,bool verbose = false);
+	    bool verify_program_pages_in_a_block(unsigned int my_block_number,bool complete_block,uint16_t* page_indices,uint16_t num_pages,bool verbose, int max_allowed_errors = 0);
+	    bool verify_program_pages_in_a_block_slc(unsigned int my_block_number,bool verbose = false, int max_allowed_errors = 0);
 
 	/**
 	this function reads the single page address provided
