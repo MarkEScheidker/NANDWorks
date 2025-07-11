@@ -18,7 +18,7 @@ void onfi_interface::read_page(unsigned int my_block_number, unsigned int my_pag
 	uint8_t address[address_length];
 	convert_pagenumber_to_columnrow_address(my_block_number, my_page_number, address);
 	// make sure none of the LUNs are busy
-	while(gpioRead(RB_PIN)==0);
+	while(gpioRead(GPIO_RB)==0);
 
 	if(flash_chip==toshiba_tlc_toggle)
 		send_command(0x0);
@@ -37,7 +37,7 @@ void onfi_interface::read_page(unsigned int my_block_number, unsigned int my_pag
 	tWB;
 
 	// check for RDY signal
-	while(gpioRead(RB_PIN)==0);
+	while(gpioRead(GPIO_RB)==0);
 #if PROFILE_TIME
 	END_TIME;
 	if(verbose) fprintf(stdout,"Read page completed \n");

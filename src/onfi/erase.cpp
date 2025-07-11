@@ -13,10 +13,10 @@ void onfi_interface::disable_erase()
 {
 	// check to see if the device is busy
 	// .. wait if busy
-	while(gpioRead(RB_PIN)==0x00);
+	while(gpioRead(GPIO_RB)==0x00);
 
 	// wp to low
-	gpioWrite(WP_PIN, 0);	
+	gpioWrite(GPIO_WP, 0);	
 	
 	//insert delay here
 	uint8_t i=0;
@@ -27,10 +27,10 @@ void onfi_interface::enable_erase()
 {
 	// check to see if the device is busy
 	// .. wait if busy
-	while(gpioRead(RB_PIN)==0x00);
+	while(gpioRead(GPIO_RB)==0x00);
 
 	// wp to high
-	gpioWrite(WP_PIN, 1);
+	gpioWrite(GPIO_WP, 1);
 	
 	//insert delay here
 	tWW;
@@ -47,10 +47,10 @@ void onfi_interface::erase_block(unsigned int my_block_number, bool verbose)
 	uint8_t *row_address = my_test_block_address+2;
 
 	enable_erase();
-	gpioSetMode(RB_PIN, PI_INPUT);
+	gpioSetMode(GPIO_RB, PI_INPUT);
 
 	// check if it is out of Busy cycle
-	while(gpioRead(RB_PIN)==0);
+	while(gpioRead(GPIO_RB)==0);
 
 	send_command(0x60);
 	send_addresses(row_address,3);
@@ -64,7 +64,7 @@ void onfi_interface::erase_block(unsigned int my_block_number, bool verbose)
 	
 
 	// check if it is out of Busy cycle
-	while(gpioRead(RB_PIN)==0);
+	while(gpioRead(GPIO_RB)==0);
 
 #if PROFILE_TIME
 	END_TIME;
@@ -128,10 +128,10 @@ void onfi_interface::partial_erase_block(unsigned int my_block_number, unsigned 
 	uint8_t *row_address = my_test_block_address+2;
 
 	enable_erase();
-	gpioSetMode(RB_PIN, PI_INPUT);
+	gpioSetMode(GPIO_RB, PI_INPUT);
 
 	// check if it is out of Busy cycle
-	while(gpioRead(RB_PIN)==0);
+	while(gpioRead(GPIO_RB)==0);
 
 	send_command(0x60);
 	send_addresses(row_address,3);
@@ -154,7 +154,7 @@ void onfi_interface::partial_erase_block(unsigned int my_block_number, unsigned 
 #endif	
 
 	// check if it is out of Busy cycle
-	while(gpioRead(RB_PIN)==0);
+	while(gpioRead(GPIO_RB)==0);
 
 #if DEBUG_ONFI
 	if(onfi_debug_file)
@@ -452,7 +452,7 @@ void onfi_interface::convert_to_slc(unsigned int my_block_number, bool first_tim
 	send_addresses(my_test_block_address+2);
 	send_command(0xd0);
 	tWB;
-	while(gpioRead(RB_PIN)==0);
+	while(gpioRead(GPIO_RB)==0);
 
 	//perform erase operation to init
 	if(first_time) erase_block(my_block_number);
@@ -470,5 +470,5 @@ void onfi_interface::revert_to_mlc(unsigned int my_block_number)
 	send_addresses(my_test_block_address+2);
 	send_command(0xd0);
 	tWB;
-	while(gpioRead(RB_PIN)==0);
+	while(gpioRead(GPIO_RB)==0);
 }

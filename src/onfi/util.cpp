@@ -94,12 +94,12 @@ void onfi_interface::get_data(uint8_t* data_received,uint16_t num_data)
 		// .. data can be received when on ready state (RDY signal)
 		// .. ensure RDY is high
 		// .. .. just keep spinning here checking for ready signal
-		while(gpioRead(RB_PIN)== 0x00);
+		while(gpioRead(GPIO_RB)== 0x00);
 
 		// .. data can be received following READ operation
 		// .. the procedure should be as follows
 		// .. .. CE should be low
-		gpioWrite(CE_PIN, 0);
+		gpioWrite(GPIO_CE, 0);
 		// .. make WE high
 		// .. .. WE should be high from before
 		// .. .. ALE and CLE should be low
@@ -113,7 +113,7 @@ void onfi_interface::get_data(uint8_t* data_received,uint16_t num_data)
 			// 	START_TIME;
 			// #endif
 			// set the RE to low for next cycle
-		gpioWrite(RE_PIN, 0);
+		gpioWrite(GPIO_RE, 0);
 
 			// tREA = 40ns
 			SAMPLE_TIME;
@@ -124,7 +124,7 @@ void onfi_interface::get_data(uint8_t* data_received,uint16_t num_data)
 			data_received[i] = read_dq_pins();
 
 			// .. data is available at DQ pins on the rising edge of RE pin (RE is also input to NAND)
-			gpioWrite(RE_PIN, 1);
+			gpioWrite(GPIO_RE, 1);
 			
 			// #if PROFILE_TIME
 			// 	fprintf(stderr,".. time profile from get_data() one word: ");
@@ -151,19 +151,19 @@ void onfi_interface::get_data(uint8_t* data_received,uint16_t num_data)
 		set_default_pin_values();
 		set_datalines_direction_input();
 
-		gpioWrite(CE_PIN, 0);
+		gpioWrite(GPIO_CE, 0);
 		gpioDelay(1); // Replaced asm("nop")
 
 		// now take RE# to low
-		gpioWrite(RE_PIN, 0);
+		gpioWrite(GPIO_RE, 0);
 		// now take DQS to low
 		// set DQS as output
-		gpioWrite(DQS_PIN, 1);
-		gpioSetMode(DQS_PIN, PI_OUTPUT);
-		gpioSetMode(DQSc_PIN, PI_OUTPUT);
-		gpioWrite(DQS_PIN, 0);
+		gpioWrite(GPIO_DQS, 1);
+		gpioSetMode(GPIO_DQS, PI_OUTPUT);
+		gpioSetMode(GPIO_DQSC, PI_OUTPUT);
+		gpioWrite(GPIO_DQS, 0);
 		gpioDelay(1); // Replaced asm("nop")
-		gpioWrite(RE_PIN, 1);
+		gpioWrite(GPIO_RE, 1);
 		gpioDelay(1); // Replaced asm("nop")
 		// now in a loop read the data
 		uint16_t i=0;
@@ -172,10 +172,10 @@ void onfi_interface::get_data(uint8_t* data_received,uint16_t num_data)
 			// read the data
 			data_received[i] = read_dq_pins();
 
-			gpioWrite(RE_PIN, !gpioRead(RE_PIN)); // Toggle RE
-			gpioWrite(DQS_PIN, !gpioRead(DQS_PIN)); // Toggle DQS
+			gpioWrite(GPIO_RE, !gpioRead(GPIO_RE)); // Toggle RE
+			gpioWrite(GPIO_DQS, !gpioRead(GPIO_DQS)); // Toggle DQS
 		}
-		gpioWrite(RE_PIN, 1);
+		gpioWrite(GPIO_RE, 1);
 
 		// set the pins as output
 		set_datalines_direction_default();
@@ -238,7 +238,7 @@ void onfi_interface::convert_pagenumber_to_columnrow_address(unsigned int my_blo
 void onfi_interface::set_features(uint8_t address, uint8_t* data_to_send,bool verbose, uint8_t command)
 {
 	// check if it is out of Busy cycle
-	while(gpioRead(RB_PIN)==0);
+	while(gpioRead(GPIO_RB)==0);
 
 	//send command
 	send_command(command);
@@ -254,7 +254,7 @@ void onfi_interface::set_features(uint8_t address, uint8_t* data_to_send,bool ve
 	tWB;
 
 	// check if it is out of Busy cycle
-	while(gpioRead(RB_PIN)==0);
+	while(gpioRead(GPIO_RB)==0);
 }
 
 //The GET FEATURES (EEh) command reads the subfeature parameters (P1-P4) from the
@@ -264,7 +264,7 @@ void onfi_interface::set_features(uint8_t address, uint8_t* data_to_send,bool ve
 void onfi_interface::get_features(uint8_t address, uint8_t* data_received,bool verbose, uint8_t command)
 {
 	// check if it is out of Busy cycle
-	while(gpioRead(RB_PIN)==0);
+	while(gpioRead(GPIO_RB)==0);
 
 	//send command
 	send_command(command);
@@ -274,7 +274,7 @@ void onfi_interface::get_features(uint8_t address, uint8_t* data_received,bool v
 	//now we wait
 	tWB;
 	// check if it is out of Busy cycle
-	while(gpioRead(RB_PIN)==0);
+	while(gpioRead(GPIO_RB)==0);
 	gpioDelay(1); // Replaced asm("nop")
 
 	get_data(data_received,4);

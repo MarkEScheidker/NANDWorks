@@ -107,7 +107,7 @@ void onfi_interface::program_page(unsigned int my_block_number, unsigned int my_
 
 	tWB;
 		// check if it is out of Busy cycle
-	while(gpioRead(RB_PIN)==0);
+	while(gpioRead(GPIO_RB)==0);
 #if PROFILE_TIME
 	END_TIME;
 	PRINT_TIME;
@@ -195,7 +195,7 @@ void onfi_interface::program_page_tlc_toshiba_subpage(unsigned int my_block_numb
 
 	tWB;
 		// check if it is out of Busy cycle
-	while(gpioRead(RB_PIN)==0);
+	while(gpioRead(GPIO_RB)==0);
 #if PROFILE_TIME
 	END_TIME;
 	PRINT_TIME;
@@ -286,7 +286,7 @@ void onfi_interface::program_page_tlc_toshiba(unsigned int my_block_number,unsig
 
 	tWB;
 		// check if it is out of Busy cycle
-	while(gpioRead(RB_PIN)==0);
+	while(gpioRead(GPIO_RB)==0);
 #if PROFILE_TIME
 	END_TIME;
 	PRINT_TIME;
@@ -339,7 +339,7 @@ void onfi_interface::program_page_tlc_toshiba(unsigned int my_block_number,unsig
 
 	tWB;
 		// check if it is out of Busy cycle
-	while(gpioRead(RB_PIN)==0);
+	while(gpioRead(GPIO_RB)==0);
 #if PROFILE_TIME
 	END_TIME;
 	PRINT_TIME;
@@ -391,7 +391,7 @@ void onfi_interface::program_page_tlc_toshiba(unsigned int my_block_number,unsig
 
 	tWB;
 		// check if it is out of Busy cycle
-	while(gpioRead(RB_PIN)==0);
+	while(gpioRead(GPIO_RB)==0);
 #if PROFILE_TIME
 	END_TIME;
 	PRINT_TIME;
@@ -474,7 +474,7 @@ void onfi_interface::partial_program_page(unsigned int my_block_number, unsigned
 	PRINT_TIME;
 #endif
 	// check if it is out of Busy cycle
-	while(gpioRead(RB_PIN)==0);
+	while(gpioRead(GPIO_RB)==0);
 
 	uint8_t status;
 	read_status(&status);
