@@ -108,10 +108,8 @@ void onfi_interface::get_data(uint8_t *data_received, uint16_t num_data) {
             // set the RE to low for next cycle
             gpioWrite(GPIO_RE, 0);
 
-            // tREA = 40ns
-            SAMPLE_TIME;
-            gpioDelay(1); // Replaced asm("NOP")
-            gpioDelay(1); // Replaced asm("NOP")
+            // The time for the function calls themselves is sufficient delay
+            // for tREA on a non-realtime OS.
 
             // read the data
             data_received[i] = read_dq_pins();
@@ -124,8 +122,7 @@ void onfi_interface::get_data(uint8_t *data_received, uint16_t num_data) {
             // 	END_TIME;
             // 	PRINT_TIME;
             // #endif
-            // tREH
-            gpioDelay(1); // Replaced asm("NOP")
+            // tREH is met by the loop overhead
             // same same
         }
 

@@ -42,6 +42,10 @@ void onfi_interface::get_started(param_type ONFI_OR_JEDEC) {
     }
 
     read_parameters(ONFI_OR_JEDEC, bytewise, true);
+
+    // Set timing mode to 4 (25ns tRC/tWC)
+    uint8_t timing_mode_data[4] = {0x04, 0x00, 0x00, 0x00};
+    set_features(0x01, timing_mode_data, true);
 }
 
 void onfi_interface::open_onfi_debug_file() {
