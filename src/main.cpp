@@ -147,7 +147,39 @@ static bool test_bad_block_scan(onfi_interface &onfi_instance, bool verbose) {
         cout << endl;
     }
     return true;
-    return true;
+}
+
+static bool test_random_program_read_verify_erase(onfi_interface &onfi_instance, bool verbose) {
+    unsigned int block = rand() % onfi_instance.num_blocks;
+    unsigned int page = rand() % onfi_instance.num_pages_in_block;
+
+    size_t page_size = onfi_instance.num_bytes_in_page + onfi_instance.num_spare_bytes_in_page;
+    uint8_t *pattern = new uint8_t[page_size];
+    for (size_t i = 0; i < page_size; ++i) {
+        pattern[i] = static_cast<uint8_t>(rand() % 256); // Random data
+    }
+    // Ensure the first byte of the spare area is not 0x00 to avoid marking as bad block
+    pattern[onfi_instance.num_bytes_in_page] = 0xFF;
+
+    if (verbose) {
+        cout << "Testing random program/read/verify/erase on block " << block << " page " << page << endl;
+    }
+
+    // Erase the block before programming
+    onfi_instance.erase_block(block, verbose);
+
+    // Program the page with random data
+    onfi_instance.program_page(block, page, pattern, true, verbose);
+
+    // Verify the programmed page
+    bool program_ok = onfi_instance.verify_program_page(block, page, pattern, verbose, MAX_ALLOWED_ERRORS);
+
+    // Erase the block after verification
+    onfi_instance.erase_block(block, verbose);
+    bool erase_ok = onfi_instance.verify_block_erase(block, true, nullptr, 0, verbose);
+
+    delete[] pattern;
+    return program_ok && erase_ok;
 }
 
 static bool test_spare_area_io(onfi_interface &onfi_instance, bool verbose) {
@@ -204,8 +236,56 @@ static bool test_spare_area_io(onfi_interface &onfi_instance, bool verbose) {
     return ok;
 }
 
+static bool test_device_init_reset(onfi_interface &onfi_instance, bool verbose) {
+    if (verbose) {
+        cout << "Testing device initialization and reset" << endl;
+    }
+    // device_initialization is already called in get_started(), but we can call it again for testing
+    onfi_instance.device_initialization(verbose);
+    onfi_instance.reset_device();
+    // No direct return value for status, rely on verbose output and lack of crash
+    return true;
+}
 
+static bool test_onfi_id_parameters(onfi_interface &onfi_instance, bool verbose) {
+    if (verbose) {
+        cout << "Testing ONFI ID and parameter reading" << endl;
+    }
+    onfi_instance.read_id();
+    onfi_instance.read_parameters(ONFI, false, verbose); // Assuming ONFI and not bytewise
+    return true;
+}
 
+static bool test_partial_erase(onfi_interface &onfi_instance, bool verbose) {
+    unsigned int block = rand() % onfi_instance.num_blocks;
+    unsigned int page = rand() % onfi_instance.num_pages_in_block; // Page number is still needed for partial_erase_block signature
+
+    size_t page_size = onfi_instance.num_bytes_in_page + onfi_instance.num_spare_bytes_in_page;
+    uint8_t *pattern_program = new uint8_t[page_size];
+    memset(pattern_program, 0xAA, page_size); // Pattern to program before partial erase
+
+    if (verbose) {
+        cout << "Testing partial erase on block " << block << ", using page " << page << " for address." << endl;
+    }
+
+    // Erase the block first to ensure a clean state
+    onfi_instance.erase_block(block, verbose);
+
+    // Program all pages in the block with a known pattern
+    for (unsigned int p = 0; p < onfi_instance.num_pages_in_block; ++p) {
+        onfi_instance.program_page(block, p, pattern_program, true, verbose);
+    }
+
+    // Perform partial erase on the block (using a page address for the command)
+    onfi_instance.partial_erase_block(block, page, 30000, verbose);
+
+    // Verify that the entire block is erased (all 0xFFs)
+    bool block_erased_ok = onfi_instance.verify_block_erase(block, true, nullptr, 0, verbose);
+
+    delete[] pattern_program;
+
+    return block_erased_ok;
+}
 
 // Convenience wrapper to print PASS/FAIL for each test case
 static bool run_test(const char *name,
@@ -246,6 +326,18 @@ int main(int argc, char **argv) {
 
     cout << "\n--- Running LED Test ---" << endl;
     if (run_test("LED Test", test_leds, onfi_instance, verbose))
+        ++pass;
+    else
+        ++fail;
+
+    cout << "\n--- Running Device Init/Reset Test ---" << endl;
+    if (run_test("Device Init/Reset Test", test_device_init_reset, onfi_instance, verbose))
+        ++pass;
+    else
+        ++fail;
+
+    cout << "\n--- Running ONFI ID and Parameters Test ---" << endl;
+    if (run_test("ONFI ID and Parameters Test", test_onfi_id_parameters, onfi_instance, verbose))
         ++pass;
     else
         ++fail;
@@ -292,7 +384,17 @@ int main(int argc, char **argv) {
     else
         ++fail;
 
-    
+    cout << "\n--- Running Random Program/Read/Verify/Erase Test ---" << endl;
+    if (run_test("Random Program/Read/Verify/Erase Test", test_random_program_read_verify_erase, onfi_instance, verbose))
+        ++pass;
+    else
+        ++fail;
+
+    cout << "\n--- Running Partial Erase Test ---" << endl;
+    if (run_test("Partial Erase Test", test_partial_erase, onfi_instance, verbose))
+        ++pass;
+    else
+        ++fail;
 
     cout << "\n--- Test Summary ---" << endl;
     cout << "Total Tests: " << (pass + fail) << endl;

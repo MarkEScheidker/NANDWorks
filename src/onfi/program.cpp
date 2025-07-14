@@ -26,11 +26,20 @@ bool onfi_interface::verify_program_page(unsigned int my_block_number, unsigned 
 
     //now iterate through each of them to see if they are correct
     uint16_t byte_id = 0;
-    uint16_t fail_count = 0;
+    uint16_t byte_fail_count = 0;
+    uint32_t bit_fail_count = 0;
     for (byte_id = 0; byte_id < (num_bytes_to_test); byte_id++) {
         if (data_read_from_page[byte_id] != data_to_program[byte_id]) {
-            fail_count++;
+            byte_fail_count++;
             return_value = false;
+
+            // Calculate bit differences
+            uint8_t diff = data_read_from_page[byte_id] ^ data_to_program[byte_id];
+            for (int i = 0; i < 8; ++i) {
+                if ((diff >> i) & 1) {
+                    bit_fail_count++;
+                }
+            }
 
             if (verbose) {
 #if DEBUG_ONFI
@@ -44,20 +53,25 @@ bool onfi_interface::verify_program_page(unsigned int my_block_number, unsigned 
             }
         }
     }
-    if (fail_count)
+    if (byte_fail_count) {
         cout << "For page " << my_page_number << " of block " << my_block_number
-                << ", program operation failed at " << std::dec << fail_count << " bytes ("
-                << std::fixed << std::setprecision(2)
-                << (static_cast<double>(fail_count) * 100.0 / num_bytes_to_test)
-                << "% of page)." << endl;
-    else
+                << ", program operation failed at " << std::dec << byte_fail_count << " bytes (" << std::fixed << std::setprecision(2)
+                << (static_cast<double>(byte_fail_count) * 100.0 / num_bytes_to_test)
+                << "%) and " << bit_fail_count << " bits." << endl;
+    } else {
         cout << "For page " << my_page_number << " of block " << my_block_number
                 << ", program operation did not fail." << endl;
+    }
 
     fflush(stdout);
     free(data_read_from_page);
 
-    return fail_count <= max_allowed_errors;
+    return byte_fail_count <= max_allowed_errors;
+
+    fflush(stdout);
+    free(data_read_from_page);
+
+    return byte_fail_count <= max_allowed_errors;
 }
 
 // this function only programs a single page as indicated by the address provided
