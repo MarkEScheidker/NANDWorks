@@ -28,4 +28,4 @@ $(OBJ_DIR)/%.o: src/%.cpp | $(OBJ_DIR)
 	$(CXX) -c $< $(CXXFLAGS) -o $@
 
 clean:
-	rm -rf $(OBJ_DIR) $(TARGET)
+	rm -rf $(OBJ_DIR) $(TARGETS)
