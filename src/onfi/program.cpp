@@ -584,6 +584,8 @@ void onfi_interface::program_pages_in_a_block(unsigned int my_block_number, bool
         }
 
         delete[] page_indices_sorted;
+
+        delete[] page_indices_sorted;
     }
 
     free(data_to_program);
@@ -620,6 +622,7 @@ void onfi_interface::partial_program_pages_in_a_block(unsigned int my_block_numb
 
             partial_program_page(my_block_number, curr_page_index, loop_count, data_to_program, true, verbose);
         }
+        delete[] page_indices_sorted;
         delete[] page_indices_sorted;
     }
 

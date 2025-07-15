@@ -42,6 +42,7 @@ private:
 	// private items go here
 	std::fstream onfi_debug_file;
 	std::fstream onfi_data_file;
+	std::fstream time_info_file;
 
 public:
 	// public items go here: this should be almost all the required functions

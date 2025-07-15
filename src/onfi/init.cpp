@@ -87,6 +87,19 @@ void onfi_interface::initialize_onfi(bool verbose) {
 }
 
 void onfi_interface::deinitialize_onfi(bool verbose) {
+#if DEBUG_ONFI
+    if (onfi_debug_file.is_open()) {
+        onfi_debug_file.close();
+    }
+#endif
+    if (onfi_data_file.is_open()) {
+        onfi_data_file.close();
+    }
+#if PROFILE_TIME
+    if (time_info_file.is_open()) {
+        time_info_file.close();
+    }
+#endif
     // No need for unmap_physical or close_physical with pigpio
 }
 
