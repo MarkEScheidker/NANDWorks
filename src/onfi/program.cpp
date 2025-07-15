@@ -67,11 +67,6 @@ bool onfi_interface::verify_program_page(unsigned int my_block_number, unsigned 
     free(data_read_from_page);
 
     return byte_fail_count <= max_allowed_errors;
-
-    fflush(stdout);
-    free(data_read_from_page);
-
-    return byte_fail_count <= max_allowed_errors;
 }
 
 // this function only programs a single page as indicated by the address provided
@@ -344,7 +339,8 @@ void onfi_interface::program_page_tlc_toshiba(unsigned int my_block_number, unsi
         if (status & 0x01) {
             fprintf(stdout, "Failed Program Operation of second subpage: %d,%d,%d\n", page_address[2], page_address[3],
                     page_address[4]);
-        } else {
+        }
+        else {
 #if DEBUG_ONFI
             if (onfi_debug_file) onfi_debug_file << "Program Operation Completed of second subpage" << endl;
             else fprintf(stdout, "Program Operation Completed of second subpage\n");
@@ -584,8 +580,6 @@ void onfi_interface::program_pages_in_a_block(unsigned int my_block_number, bool
         }
 
         delete[] page_indices_sorted;
-
-        delete[] page_indices_sorted;
     }
 
     free(data_to_program);
@@ -622,7 +616,6 @@ void onfi_interface::partial_program_pages_in_a_block(unsigned int my_block_numb
 
             partial_program_page(my_block_number, curr_page_index, loop_count, data_to_program, true, verbose);
         }
-        delete[] page_indices_sorted;
         delete[] page_indices_sorted;
     }
 
