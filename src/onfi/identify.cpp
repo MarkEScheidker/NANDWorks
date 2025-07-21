@@ -13,7 +13,7 @@ void onfi_interface::read_id() {
     uint8_t address_to_read;
 
     // let us read the unique ID programmed into the device
-    num_bytes = 64;
+    num_bytes = 32; // ONFI unique ID is 32 bytes
     address_to_read = 0x0;
     send_command(0xED);
     send_addresses(&address_to_read);
@@ -24,14 +24,9 @@ void onfi_interface::read_id() {
     tRR;
 
     get_data(my_unique_id, num_bytes);
-    if(DEBUG_ONFI) printf("-------------------------------------------------\n");
-    if(DEBUG_ONFI) printf("The Unique ID is: ");
-    for (uint8_t idx = 0; idx < num_bytes; idx++) {
-        if(DEBUG_ONFI) printf("0x%x ,", my_unique_id[idx]);
-    }
-    if(DEBUG_ONFI) printf("\n");
+    memcpy(unique_id, my_unique_id, num_bytes);
+    unique_id[num_bytes] = '\0'; // Null-terminate the string
     free(my_unique_id);
-    if(DEBUG_ONFI) printf("-------------------------------------------------\n");
 
     // let us read the ID at address 00
     num_bytes = 8;
@@ -236,6 +231,7 @@ void onfi_interface::read_parameters(param_type ONFI_OR_JEDEC, bool bytewise, bo
 
     // following function is irrelevant for JEDEC Page
     decode_ONFI_version(ONFI_parameters[4], ONFI_parameters[5], &ret_whole, &ret_decimal);
+    snprintf(onfi_version, sizeof(onfi_version), "%c.%c", ret_whole, ret_decimal);
 
     set_page_size(ONFI_parameters[83], ONFI_parameters[82], ONFI_parameters[81], ONFI_parameters[80]);
     set_page_size_spare(ONFI_parameters[85], ONFI_parameters[84]);
@@ -244,6 +240,14 @@ void onfi_interface::read_parameters(param_type ONFI_OR_JEDEC, bool bytewise, bo
 
     num_column_cycles = (ONFI_parameters[101] & 0xf0) >> 4;
     num_row_cycles = (ONFI_parameters[101] & 0x0f);
+
+    // Extract manufacturer information (Bytes 32-43)
+    memcpy(manufacturer_id, &ONFI_parameters[32], 12);
+    manufacturer_id[12] = '\0'; // Null-terminate the string
+
+    // Extract device model (Bytes 44-63)
+    memcpy(device_model, &ONFI_parameters[44], 20);
+    device_model[20] = '\0'; // Null-terminate the string
 
 
     #if DEBUG_ONFI

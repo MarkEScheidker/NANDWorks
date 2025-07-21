@@ -67,6 +67,11 @@ public:
 	uint8_t num_column_cycles;
 	uint8_t num_row_cycles;
 
+	char manufacturer_id[13];
+	char device_model[21];
+	char onfi_version[5];
+	char unique_id[33]; // 32 bytes for unique ID + null terminator
+
 
 	/**
 	This function initializes everything and gets thing started.

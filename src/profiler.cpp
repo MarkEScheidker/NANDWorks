@@ -8,6 +8,8 @@
 #include <algorithm>
 #include <cmath>
 #include <iomanip>
+#include <random>
+#include <chrono>
 
 struct BenchmarkResult {
     std::string name;
@@ -119,37 +121,42 @@ BenchmarkResult benchmark_onfi_identify(onfi_interface& onfi) {
     return {"onfi_identify", calculate_mean(timings), calculate_median(timings), calculate_stddev(timings)};
 }
 
-BenchmarkResult benchmark_onfi_read_page(onfi_interface& onfi) {
+BenchmarkResult benchmark_onfi_read_page(onfi_interface& onfi, std::default_random_engine& generator, std::uniform_int_distribution<uint16_t>& block_distribution, std::uniform_int_distribution<uint16_t>& page_distribution) {
     std::cout << "Benchmarking onfi_read_page..." << std::endl;
     std::vector<uint64_t> timings;
     for (int i = 0; i < 100; ++i) {
+        uint16_t random_block = block_distribution(generator);
+        uint16_t random_page = page_distribution(generator);
         uint64_t start_time = get_timestamp_ns();
-        onfi.read_page(0, 0);
+        onfi.read_page(random_block, random_page);
         uint64_t end_time = get_timestamp_ns();
         timings.push_back(end_time - start_time);
     }
     return {"onfi_read_page", calculate_mean(timings), calculate_median(timings), calculate_stddev(timings)};
 }
 
-BenchmarkResult benchmark_onfi_write_page(onfi_interface& onfi) {
+BenchmarkResult benchmark_onfi_write_page(onfi_interface& onfi, std::default_random_engine& generator, std::uniform_int_distribution<uint16_t>& block_distribution, std::uniform_int_distribution<uint16_t>& page_distribution) {
     std::cout << "Benchmarking onfi_write_page..." << std::endl;
     std::vector<uint64_t> timings;
     uint8_t data[onfi.num_bytes_in_page];
     for (int i = 0; i < 100; ++i) {
+        uint16_t random_block = block_distribution(generator);
+        uint16_t random_page = page_distribution(generator);
         uint64_t start_time = get_timestamp_ns();
-        onfi.program_page(0, 0, data);
+        onfi.program_page(random_block, random_page, data);
         uint64_t end_time = get_timestamp_ns();
         timings.push_back(end_time - start_time);
     }
     return {"onfi_write_page", calculate_mean(timings), calculate_median(timings), calculate_stddev(timings)};
 }
 
-BenchmarkResult benchmark_onfi_erase_block(onfi_interface& onfi) {
+BenchmarkResult benchmark_onfi_erase_block(onfi_interface& onfi, std::default_random_engine& generator, std::uniform_int_distribution<uint16_t>& block_distribution) {
     std::cout << "Benchmarking onfi_erase_block..." << std::endl;
     std::vector<uint64_t> timings;
     for (int i = 0; i < 100; ++i) {
+        uint16_t random_block = block_distribution(generator);
         uint64_t start_time = get_timestamp_ns();
-        onfi.erase_block(0);
+        onfi.erase_block(random_block);
         uint64_t end_time = get_timestamp_ns();
         timings.push_back(end_time - start_time);
     }
@@ -166,6 +173,27 @@ void print_summary(const std::vector<BenchmarkResult>& results) {
     }
 }
 
+void print_chip_info(const onfi_interface& onfi) {
+    std::cout << "\n--- ONFI Chip Information ---" << std::endl;
+    std::cout << std::left << std::setw(30) << "Parameter" << "Value" << std::endl;
+    std::cout << std::string(50, '-') << std::endl;
+    std::cout << std::left << std::setw(30) << "Bytes per Page:" << onfi.num_bytes_in_page << std::endl;
+    std::cout << std::left << std::setw(30) << "Spare Bytes per Page:" << onfi.num_spare_bytes_in_page << std::endl;
+    std::cout << std::left << std::setw(30) << "Pages per Block:" << onfi.num_pages_in_block << std::endl;
+    std::cout << std::left << std::setw(30) << "Number of Blocks:" << onfi.num_blocks << std::endl;
+    std::cout << std::left << std::setw(30) << "Column Address Cycles:" << (int)onfi.num_column_cycles << std::endl;
+    std::cout << std::left << std::setw(30) << "Row Address Cycles:" << (int)onfi.num_row_cycles << std::endl;
+    std::cout << std::left << std::setw(30) << "Manufacturer ID:" << onfi.manufacturer_id << std::endl;
+    std::cout << std::left << std::setw(30) << "Device Model:" << onfi.device_model << std::endl;
+    std::cout << std::left << std::setw(30) << "ONFI Version:" << onfi.onfi_version << std::endl;
+    std::cout << std::left << std::setw(30) << "Unique ID:" ;
+    for (int i = 0; i < 32; ++i) {
+        std::cout << std::hex << std::setw(2) << std::setfill('0') << (int)onfi.unique_id[i];
+    }
+    std::cout << std::dec << std::endl;
+    std::cout << std::string(50, '-') << std::endl;
+}
+
 int main() {
     onfi_interface onfi;
     std::vector<BenchmarkResult> results;
@@ -174,18 +202,32 @@ int main() {
     std::cout << "This tool measures the execution time of various functions." << std::endl;
     std::cout << std::endl;
 
+    // Initialize random number generator
+    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+    std::default_random_engine generator(seed);
+
     results.push_back(benchmark_gpio_init());
     results.push_back(benchmark_gpio_set_direction());
     results.push_back(benchmark_gpio_set_high());
     results.push_back(benchmark_gpio_set_low());
     results.push_back(benchmark_onfi_init(onfi));
     results.push_back(benchmark_onfi_identify(onfi));
-    results.push_back(benchmark_onfi_read_page(onfi));
-    results.push_back(benchmark_onfi_write_page(onfi));
-    results.push_back(benchmark_onfi_erase_block(onfi));
+
+    // Get chip parameters after identification
+    uint16_t num_blocks = onfi.num_blocks;
+    uint16_t num_pages_in_block = onfi.num_pages_in_block;
+
+    // Define distributions for random block and page numbers
+    std::uniform_int_distribution<uint16_t> block_distribution(0, num_blocks - 1);
+    std::uniform_int_distribution<uint16_t> page_distribution(0, num_pages_in_block - 1);
+
+    results.push_back(benchmark_onfi_read_page(onfi, generator, block_distribution, page_distribution));
+    results.push_back(benchmark_onfi_write_page(onfi, generator, block_distribution, page_distribution));
+    results.push_back(benchmark_onfi_erase_block(onfi, generator, block_distribution));
 
     std::cout << std::endl;
     print_summary(results);
+    print_chip_info(onfi);
 
     return 0;
 }
