@@ -2,7 +2,8 @@
 #define HARDWARE_LOCATIONS_H
 
 #include <fstream>
-#include <pigpio.h>
+#include "timing.h"
+#include "gpio.h"
 
 // Enables/disables detailed timing profiles for operations.
 #define PROFILE_TIME true
@@ -10,9 +11,9 @@
 // Forces a function to be inlined.
 #define FORCE_INLINE __attribute__((always_inline))
 
-// Timing macros using pigpio for performance measurement.
-#define START_TIME do { uint32_t start_tick = gpioTick();
-#define END_TIME   uint32_t end_tick = gpioTick(); time_info_file << "  took " << (end_tick - start_tick) << " microseconds\n"; } while(0);
+// Timing macros using nanosecond precision.
+#define START_TIME do { uint64_t start_tick = get_timestamp_ns();
+#define END_TIME   uint64_t end_tick = get_timestamp_ns(); time_info_file << "  took " << (end_tick - start_tick) / 1000 << " microseconds\n"; } while(0);
 #define PRINT_TIME // Handled within END_TIME
 #define GET_TIME_ELAPSED (end_tick - start_tick)
 
@@ -57,16 +58,16 @@
 // Timing Delays
 //
 // These macros define timing delays required for NAND flash operations, based on the device's
-// datasheet. The values are in microseconds and may need fine-tuning.
+// datasheet. The values are in nanoseconds.
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#define SAMPLE_TIME gpioDelay(1) // ~1us, adjust for tDS (Data Setup Time)
-#define HOLD_TIME   gpioDelay(1) // ~1us, adjust for tDH (Data Hold Time)
-#define tWW         gpioDelay(100) // 100ns -> 0.1us, using 1us for safety (Write to Write delay)
-#define tWB         gpioDelay(1)   // 200ns -> 0.2us, using 1us for safety (Write Busy)
-#define tRR         gpioDelay(1)   // 40ns -> 0.04us, using 1us for safety (Read to Read delay)
-#define tRHW        gpioDelay(1)   // 200ns -> 0.2us, using 1us for safety (Read High to Write)
-#define tCCS        gpioDelay(1)   // 200ns -> 0.2us, using 1us for safety (Chip Select Setup)
-#define tADL        gpioDelay(1)   // 300ns -> 0.3us, using 1us for safety (Address to Data Latch)
-#define tWHR        gpioDelay(1)   // 120ns -> 0.12us, using 1us for safety (Write High to Read)
+#define SAMPLE_TIME busy_wait_ns(10) // tDS (Data Setup Time)
+#define HOLD_TIME   busy_wait_ns(10) // tDH (Data Hold Time)
+#define tWW         busy_wait_ns(100) // 100ns (Write to Write delay)
+#define tWB         busy_wait_ns(200) // 200ns (Write Busy)
+#define tRR         busy_wait_ns(40)  // 40ns (Read to Read delay)
+#define tRHW        busy_wait_ns(200) // 200ns (Read High to Write)
+#define tCCS        busy_wait_ns(200) // 200ns (Chip Select Setup)
+#define tADL        busy_wait_ns(300) // 300ns (Address to Data Latch)
+#define tWHR        busy_wait_ns(120) // 120ns (Write High to Read)
 
 #endif // HARDWARE_LOCATIONS_H

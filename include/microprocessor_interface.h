@@ -4,11 +4,8 @@
 #include <stdint.h>
 #include <fstream>
 #include <iostream>
-#include <pigpio.h>
-
+#include "gpio.h"
 #include "hardware_locations.h"
-
-using namespace std;
 
 /// following flag keeps the debug information active
 #define DEBUG_INTERFACE false
@@ -52,16 +49,16 @@ protected:
 
 public:
     interface() {
-        cout << "Entering interface constructor" << endl;
-        if (gpioInitialise() < 0) {
-            std::cerr << "pigpio initialisation failed\n";
+        if (!gpio_init()) {
+            std::cerr << "GPIO initialisation failed\n";
             exit(1);
         }
     }
 
     ~interface() {
-        gpioTerminate();
+        // The bcm2835 library doesn't require explicit termination in the same way as pigpio
     }
+
 
     default_interface_type interface_type;
     chip_type flash_chip;

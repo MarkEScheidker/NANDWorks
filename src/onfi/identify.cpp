@@ -1,13 +1,12 @@
 #include "onfi_interface.h"
+#include "gpio.h"
+#include "timing.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <cstring>
 #include <cstdint>
 #include <iomanip>
 #include <algorithm>
-#include <pigpio.h>
-
-using namespace std;
 
 void onfi_interface::read_id() {
     uint8_t num_bytes;
@@ -21,7 +20,7 @@ void onfi_interface::read_id() {
     uint8_t *my_unique_id = (uint8_t *) (malloc(num_bytes * sizeof(uint8_t)));
     tRR;
     //wait for RB# signal to be high
-    while (gpioRead(GPIO_RB) == 0);
+    while (gpio_read(GPIO_RB) == 0);
     tRR;
 
     get_data(my_unique_id, num_bytes);
@@ -139,7 +138,7 @@ void onfi_interface::read_id() {
 // my_test_block_address is an array [c1,c2,r1,r2,r3]
 void onfi_interface::read_parameters(param_type ONFI_OR_JEDEC, bool bytewise, bool verbose) {
     // make sure none of the LUNs are busy
-    while (gpioRead(GPIO_RB) == 0);
+    while (gpio_read(GPIO_RB) == 0);
 
     uint8_t address_to_send = 0x00;
     std::string type_parameter = "ONFI";
@@ -150,23 +149,23 @@ void onfi_interface::read_parameters(param_type ONFI_OR_JEDEC, bool bytewise, bo
 
 #if DEBUG_ONFI
     if (onfi_debug_file)
-        onfi_debug_file << "I: Reading " << type_parameter << " parameters" << endl;
+        onfi_debug_file << "I: Reading " << type_parameter << " parameters" << std::endl;
     else
-        cout << "I: Reading " << type_parameter << " parameters" << endl;
+        std::cout << "I: Reading " << type_parameter << " parameters" << std::endl;
 #else
-	if(verbose) cout<<"I: Reading "<<type_parameter<<" parameters"<<endl;
+	if(verbose) std::cout<<"I: Reading "<<type_parameter<<" parameters"<<std::endl;
 #endif
 
     // make sure none of the LUNs are busy
-    while (gpioRead(GPIO_RB) == 0);
+    while (gpio_read(GPIO_RB) == 0);
 
 #if DEBUG_ONFI
     if (onfi_debug_file)
-        onfi_debug_file << "I: .. sending command" << endl;
+        onfi_debug_file << "I: .. sending command" << std::endl;
     else
-        cout << "I: .. sending command" << endl;
+        std::cout << "I: .. sending command" << std::endl;
 #else
-	if(verbose) cout<<"I: .. sending command"<<endl;
+	if(verbose) std::cout<<"I: .. sending command"<<std::endl;
 #endif
     // read ID command
     send_command(0xEC);
@@ -174,26 +173,26 @@ void onfi_interface::read_parameters(param_type ONFI_OR_JEDEC, bool bytewise, bo
 
 #if DEBUG_ONFI
     if (onfi_debug_file)
-        onfi_debug_file << "I: .. sending address" << endl;
+        onfi_debug_file << "I: .. sending address" << std::endl;
     else
-        cout << "I: .. sending address" << endl;
+        std::cout << "I: .. sending address" << std::endl;
 #else
-	if(verbose) cout<<"I: .. sending address"<<endl;
+	if(verbose) std::cout<<"I: .. sending address"<<std::endl;
 #endif
     send_addresses(&address_to_send);
 
     //have some delay here and wait for busy signal again before reading the paramters
     // asm("nop"); // Replaced with pigpio delay if needed
     // make sure none of the LUNs are busy
-    while (gpioRead(GPIO_RB) == 0);
+    while (gpio_read(GPIO_RB) == 0);
 
 #if DEBUG_ONFI
     if (onfi_debug_file)
-        onfi_debug_file << "I: .. acquiring " << type_parameter << " parameters" << endl;
+        onfi_debug_file << "I: .. acquiring " << type_parameter << " parameters" << std::endl;
     else
-        cout << "I: .. acquiring " << type_parameter << " parameters" << endl;
+        std::cout << "I: .. acquiring " << type_parameter << " parameters" << std::endl;
 #else
-	if(verbose) cout<<"I: .. acquiring "<<type_parameter<<" parameters"<<endl;
+	if(verbose) std::cout<<"I: .. acquiring "<<type_parameter<<" parameters"<<std::endl;
 #endif
     // now read the 256-bytes of data
     uint16_t num_bytes_in_parameters = 256;
@@ -226,11 +225,11 @@ void onfi_interface::read_parameters(param_type ONFI_OR_JEDEC, bool bytewise, bo
 
 #if DEBUG_ONFI
     if (onfi_debug_file)
-        onfi_debug_file << "I: .. acquired " << type_parameter << " parameters" << endl;
+        onfi_debug_file << "I: .. acquired " << type_parameter << " parameters" << std::endl;
     else
-        cout << "I: .. acquired " << type_parameter << " parameters" << endl;
+        std::cout << "I: .. acquired " << type_parameter << " parameters" << std::endl;
 #else
-	if(verbose) cout<<"I: .. acquired "<<type_parameter<<" parameters"<<endl;
+	if(verbose) std::cout<<"I: .. acquired "<<type_parameter<<" parameters"<<std::endl;
 #endif
 
     uint8_t ret_whole, ret_decimal;
@@ -311,7 +310,7 @@ void onfi_interface::read_parameters(param_type ONFI_OR_JEDEC, bool bytewise, bo
         onfi_debug_file << my_temp;
 
         onfi_debug_file << "***********************************************";
-        onfi_debug_file << endl;
+        onfi_debug_file << std::endl;
     } else {
         fprintf(stdout, "Printing information from the %s paramters\n", type_parameter.c_str());
         fprintf(stdout, ".. The signature obtained from first 4-bytes are %c%c%c%c\n", ONFI_parameters[0],

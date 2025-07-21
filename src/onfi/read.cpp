@@ -1,13 +1,12 @@
 #include "onfi_interface.h"
+#include "gpio.h"
+#include "timing.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <cstring>
 #include <cstdint>
 #include <iomanip>
 #include <algorithm>
-#include <pigpio.h>
-
-using namespace std;
 
 void onfi_interface::read_page(unsigned int my_block_number, unsigned int my_page_number, uint8_t address_length,
                                bool verbose) {
@@ -17,7 +16,7 @@ void onfi_interface::read_page(unsigned int my_block_number, unsigned int my_pag
     uint8_t address[address_length];
     convert_pagenumber_to_columnrow_address(my_block_number, my_page_number, address);
     // make sure none of the LUNs are busy
-    while (gpioRead(GPIO_RB) == 0);
+    while (gpio_read(GPIO_RB) == 0);
 
     if (flash_chip == toshiba_tlc_toggle)
         send_command(0x0);
@@ -27,7 +26,7 @@ void onfi_interface::read_page(unsigned int my_block_number, unsigned int my_pag
 
 #if PROFILE_TIME
     time_info_file << "Reading page:..";
-    START_TIME;
+    uint64_t start_time = get_timestamp_ns();
 #endif
 
         send_command(0x30);
@@ -36,26 +35,26 @@ void onfi_interface::read_page(unsigned int my_block_number, unsigned int my_pag
         tWB;
 
         // check for RDY signal
-        while (gpioRead(GPIO_RB) == 0);
+        while (gpio_read(GPIO_RB) == 0);
 #if PROFILE_TIME
-    END_TIME;
+    uint64_t end_time = get_timestamp_ns();
     if (verbose) fprintf(stdout, "Read page completed \n");
-    PRINT_TIME;
+    time_info_file << "  took " << (end_time - start_time) / 1000 << " microseconds\n";
 #endif
     // tRR = 40ns
-    gpioDelay(1); // Replaced asm("NOP")
+    tRR;
 }
 
 // this function opens a file named time_info_file.txt
 // .. this file will log all the duration from the timing operations as necessary
 void onfi_interface::change_read_column(uint8_t *col_address) {
-    tRHW; // tRHW = 200ns
+    tRHW;
 
     send_command(0x05);
     send_addresses(col_address, 2);
     send_command(0xe0);
 
-    tCCS; //tCCS = 200ns
+    tCCS;
 }
 
 // function to disable Program and Erase operation
@@ -76,8 +75,8 @@ void onfi_interface::read_and_spit_page(unsigned int my_block_number, unsigned i
             col_address[1] = b_idx / 256;
             col_address[0] = b_idx % 256;
             change_read_column(col_address);
-            gpioDelay(1); // Replaced asm("NOP")
-            gpioDelay(1); // Replaced asm("NOP")
+            busy_wait_ns(1000);
+            busy_wait_ns(1000);
             get_data(data_read_from_page + b_idx, 1);
         }
     } else {
@@ -87,7 +86,7 @@ void onfi_interface::read_and_spit_page(unsigned int my_block_number, unsigned i
     if (verbose) {
 #if DEBUG_ONFI
         if (onfi_debug_file) {
-            onfi_debug_file << "Reading page (" << my_page_number << " of block " << my_block_number << " ):" << endl;
+            onfi_debug_file << "Reading page (" << my_page_number << " of block " << my_block_number << " ):" << std::endl;
         } else fprintf(stdout, "Reading page (%d of block %d):\n", my_page_number, my_block_number);
 #else
 			fprintf(stdout,"Reading page (%d of block %d):\n",my_page_number, my_block_number);
@@ -101,21 +100,21 @@ void onfi_interface::read_and_spit_page(unsigned int my_block_number, unsigned i
         if (onfi_data_file) {
             onfi_data_file << data_read_from_page[byte_id];
         } else {
-            cout << data_read_from_page[byte_id];
+            std::cout << data_read_from_page[byte_id];
         }
     }
 
     // just terminate the sequence with a newline
     if (onfi_data_file) {
-        onfi_data_file << endl;
+        onfi_data_file << std::endl;
     } else {
-        cout << endl;
+        std::cout << std::endl;
     }
 
     if (verbose) {
 #if DEBUG_ONFI
         if (onfi_debug_file) {
-            onfi_debug_file << ".. Reading page completed" << endl;
+            onfi_debug_file << ".. Reading page completed" << std::endl;
         } else fprintf(stdout, ".. Reading page completed\n");
 #else
 			fprintf(stdout,".. Reading page completed\n");
@@ -148,7 +147,7 @@ void onfi_interface::read_and_spit_page_tlc_toshiba(unsigned int my_block_number
 #if DEBUG_ONFI
         if (onfi_debug_file) {
             onfi_debug_file << "Reading LSB subpage of page (" << my_page_number << " of block " << my_block_number <<
-                    " ):" << endl;
+                    " ):" << std::endl;
         } else fprintf(stdout, "Reading LSB subpage of page (%d of block %d):\n", my_page_number, my_block_number);
 #else
 			fprintf(stdout,"Reading LSB subpage of page (%d of block %d):\n",my_page_number, my_block_number);
@@ -162,21 +161,22 @@ void onfi_interface::read_and_spit_page_tlc_toshiba(unsigned int my_block_number
         if (onfi_data_file) {
             onfi_data_file << data_read_from_page[byte_id];
         } else {
-            cout << data_read_from_page[byte_id];
+            std::cout << data_read_from_page[byte_id];
         }
     }
 
     // just terminate the sequence with a newline
     if (onfi_data_file) {
-        onfi_data_file << endl;
-    } else {
-        cout << endl;
+        onfi_data_file << std::endl;
+    }
+    else {
+        std::cout << std::endl;
     }
 
     if (verbose) {
 #if DEBUG_ONFI
         if (onfi_debug_file) {
-            onfi_debug_file << ".. Reading  LSB subpage of page completed" << endl;
+            onfi_debug_file << ".. Reading  LSB subpage of page completed" << std::endl;
         } else fprintf(stdout, ".. Reading  LSB subpage of page completed\n");
 #else
 			fprintf(stdout,".. Reading  LSB subpage of page completed\n");
@@ -198,7 +198,7 @@ void onfi_interface::read_and_spit_page_tlc_toshiba(unsigned int my_block_number
 #if DEBUG_ONFI
         if (onfi_debug_file) {
             onfi_debug_file << "Reading CSB subpage of page (" << my_page_number << " of block " << my_block_number <<
-                    " ):" << endl;
+                    " ):" << std::endl;
         } else fprintf(stdout, "Reading CSB subpage of page (%d of block %d):\n", my_page_number, my_block_number);
 #else
 			fprintf(stdout,"Reading CSB subpage of page (%d of block %d):\n",my_page_number, my_block_number);
@@ -211,21 +211,22 @@ void onfi_interface::read_and_spit_page_tlc_toshiba(unsigned int my_block_number
         if (onfi_data_file) {
             onfi_data_file << data_read_from_page[byte_id];
         } else {
-            cout << data_read_from_page[byte_id];
+            std::cout << data_read_from_page[byte_id];
         }
     }
 
     // just terminate the sequence with a newline
     if (onfi_data_file) {
-        onfi_data_file << endl;
-    } else {
-        cout << endl;
+        onfi_data_file << std::endl;
+    }
+    else {
+        std::cout << std::endl;
     }
 
     if (verbose) {
 #if DEBUG_ONFI
         if (onfi_debug_file) {
-            onfi_debug_file << ".. Reading  CSB subpage of page completed" << endl;
+            onfi_debug_file << ".. Reading  CSB subpage of page completed" << std::endl;
         } else fprintf(stdout, ".. Reading CSB subpage of page completed\n");
 #else
 			fprintf(stdout,".. Reading CSB subpage of page completed\n");
@@ -246,7 +247,7 @@ void onfi_interface::read_and_spit_page_tlc_toshiba(unsigned int my_block_number
 #if DEBUG_ONFI
         if (onfi_debug_file) {
             onfi_debug_file << "Reading MSB subpage of page (" << my_page_number << " of block " << my_block_number <<
-                    " ):" << endl;
+                    " ):" << std::endl;
         } else fprintf(stdout, "Reading MSB subpage of page (%d of block %d):\n", my_page_number, my_block_number);
 #else
 			fprintf(stdout,"Reading MSB subpage of page (%d of block %d):\n",my_page_number, my_block_number);
@@ -259,21 +260,22 @@ void onfi_interface::read_and_spit_page_tlc_toshiba(unsigned int my_block_number
         if (onfi_data_file) {
             onfi_data_file << data_read_from_page[byte_id];
         } else {
-            cout << data_read_from_page[byte_id];
+            std::cout << data_read_from_page[byte_id];
         }
     }
 
     // just terminate the sequence with a newline
     if (onfi_data_file) {
-        onfi_data_file << endl;
-    } else {
-        cout << endl;
+        onfi_data_file << std::endl;
+    }
+    else {
+        std::cout << std::endl;
     }
 
     if (verbose) {
 #if DEBUG_ONFI
         if (onfi_debug_file) {
-            onfi_debug_file << ".. Reading  MSB subpage of page completed" << endl;
+            onfi_debug_file << ".. Reading  MSB subpage of page completed" << std::endl;
         } else fprintf(stdout, ".. Reading  MSB subpage of page completed\n");
 #else
 			fprintf(stdout,".. Reading  MSB subpage of page completed\n");

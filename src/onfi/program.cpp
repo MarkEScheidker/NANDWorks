@@ -1,13 +1,12 @@
 #include "onfi_interface.h"
+#include "gpio.h"
+#include "timing.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <cstring>
 #include <cstdint>
 #include <iomanip>
 #include <algorithm>
-#include <pigpio.h>
-
-using namespace std;
 
 bool onfi_interface::verify_program_page(unsigned int my_block_number, unsigned int my_page_number,
                                          uint8_t *data_to_program, bool verbose, int max_allowed_errors) {
@@ -45,7 +44,7 @@ bool onfi_interface::verify_program_page(unsigned int my_block_number, unsigned 
 #if DEBUG_ONFI
                 if (onfi_debug_file) {
                     onfi_debug_file << std::hex << byte_id << "," << std::hex << 0 << "," << std::hex <<
-                            data_read_from_page[byte_id] << endl;
+                            data_read_from_page[byte_id] << std::endl;
                 } else fprintf(stdout, "P:%x,%x,%x\n", byte_id, 0, data_read_from_page[byte_id]);
 #else
 					fprintf(stdout,"P:%x,%x,%x\n",byte_id,0,data_read_from_page[byte_id]);
@@ -54,13 +53,13 @@ bool onfi_interface::verify_program_page(unsigned int my_block_number, unsigned 
         }
     }
     if (byte_fail_count) {
-        cout << "For page " << my_page_number << " of block " << my_block_number
+        std::cout << "For page " << my_page_number << " of block " << my_block_number
                 << ", program operation failed at " << std::dec << byte_fail_count << " bytes (" << std::fixed << std::setprecision(2)
                 << (static_cast<double>(byte_fail_count) * 100.0 / num_bytes_to_test)
-                << "%) and " << bit_fail_count << " bits." << endl;
+                << "%) and " << bit_fail_count << " bits." << std::endl;
     } else {
-        cout << "For page " << my_page_number << " of block " << my_block_number
-                << ", program operation did not fail." << endl;
+        std::cout << "For page " << my_page_number << " of block " << my_block_number
+                << ", program operation did not fail." << std::endl;
     }
 
     fflush(stdout);
@@ -89,7 +88,7 @@ void onfi_interface::program_page(unsigned int my_block_number, unsigned int my_
         char my_temp[100];
         sprintf(my_temp, "Inside Program Fn: Address is: %02x,%02x,%02x,%02x,%02x.", page_address[0], page_address[1],
                 page_address[2], page_address[3], page_address[4]);
-        onfi_debug_file << my_temp << endl;
+        onfi_debug_file << my_temp << std::endl;
     } else
         fprintf(stdout, "Inside Program Fn: Address is: %02x,%02x,%02x,%02x,%02x.", page_address[0], page_address[1],
                 page_address[2], page_address[3], page_address[4]);
@@ -106,16 +105,16 @@ void onfi_interface::program_page(unsigned int my_block_number, unsigned int my_
 
 #if PROFILE_TIME
     time_info_file << "program page: ";
-    START_TIME;
+    uint64_t start_time = get_timestamp_ns();
 #endif
         send_command(0x10);
 
         tWB;
         // check if it is out of Busy cycle
-        while (gpioRead(GPIO_RB) == 0);
+        while (gpio_read(GPIO_RB) == 0);
 #if PROFILE_TIME
-    END_TIME;
-    PRINT_TIME;
+    uint64_t end_time = get_timestamp_ns();
+    time_info_file << "  took " << (end_time - start_time) / 1000 << " microseconds\n";
 #endif
 
     uint8_t status;
@@ -127,7 +126,7 @@ void onfi_interface::program_page(unsigned int my_block_number, unsigned int my_
             fprintf(stdout, "Failed Program Operation: %d,%d,%d\n", page_address[2], page_address[3], page_address[4]);
         } else {
 #if DEBUG_ONFI
-            if (onfi_debug_file) onfi_debug_file << "Program Operation Completed" << endl;
+            if (onfi_debug_file) onfi_debug_file << "Program Operation Completed" << std::endl;
             else fprintf(stdout, "Program Operation Completed\n");
 #else
 	if(verbose) fprintf(stdout,"Program Operation Completed\n");
@@ -135,7 +134,7 @@ void onfi_interface::program_page(unsigned int my_block_number, unsigned int my_
         }
     } else {
 #if DEBUG_ONFI
-        if (onfi_debug_file) onfi_debug_file << "Program Operation, should not be here" << endl;
+        if (onfi_debug_file) onfi_debug_file << "Program Operation, should not be here" << std::endl;
         else fprintf(stdout, "Program Operation, should not be here\n");
 #else
 	if(verbose) fprintf(stdout,"Program Operation, should not be here\n");
@@ -169,7 +168,7 @@ void onfi_interface::program_page_tlc_toshiba_subpage(unsigned int my_block_numb
         char my_temp[100];
         sprintf(my_temp, "Inside Program Fn: Address is: %02x,%02x,%02x,%02x,%02x.", page_address[0], page_address[1],
                 page_address[2], page_address[3], page_address[4]);
-        onfi_debug_file << my_temp << endl;
+        onfi_debug_file << my_temp << std::endl;
     } else
         fprintf(stdout, "Inside Program Fn: Address is: %02x,%02x,%02x,%02x,%02x.", page_address[0], page_address[1],
                 page_address[2], page_address[3], page_address[4]);
@@ -187,17 +186,17 @@ void onfi_interface::program_page_tlc_toshiba_subpage(unsigned int my_block_numb
 
 #if PROFILE_TIME
     time_info_file << "program page: ";
-    START_TIME;
+    uint64_t start_time = get_timestamp_ns();
 #endif
         if (my_subpage_number < 3) send_command(0x1a);
         else send_command(0x10);
 
         tWB;
         // check if it is out of Busy cycle
-        while (gpioRead(GPIO_RB) == 0);
+        while (gpio_read(GPIO_RB) == 0);
 #if PROFILE_TIME
-    END_TIME;
-    PRINT_TIME;
+    uint64_t end_time = get_timestamp_ns();
+    time_info_file << "  took " << (end_time - start_time) / 1000 << " microseconds\n";
 #endif
 
     uint8_t status;
@@ -213,7 +212,7 @@ void onfi_interface::program_page_tlc_toshiba_subpage(unsigned int my_block_numb
         } else {
 #if DEBUG_ONFI
             if (onfi_debug_file) onfi_debug_file << "Program Operation Completed of " << my_subpage_number << " subpage"
-                                 << endl;
+                                 << std::endl;
             else fprintf(stdout, "Program Operation Completed of %u subpage\n", my_subpage_number);
 #else
         if(verbose) fprintf(stdout,"Program Operation Completed of %u subpage\n", my_subpage_number);
@@ -222,7 +221,7 @@ void onfi_interface::program_page_tlc_toshiba_subpage(unsigned int my_block_numb
     } else {
 #if DEBUG_ONFI
         if (onfi_debug_file) onfi_debug_file << "Program Operation of " << my_subpage_number <<
-                             " subpage, should not be here" << endl;
+                             " subpage, should not be here" << std::endl;
         else fprintf(stdout, "Program Operation of %u subpage, should not be here\n", my_subpage_number);
 #else
         if(verbose) fprintf(stdout,"Program Operation of %u subpage, should not be here\n", my_subpage_number);
@@ -254,7 +253,7 @@ void onfi_interface::program_page_tlc_toshiba(unsigned int my_block_number, unsi
         char my_temp[100];
         sprintf(my_temp, "Inside Program Fn: Address is: %02x,%02x,%02x,%02x,%02x.", page_address[0], page_address[1],
                 page_address[2], page_address[3], page_address[4]);
-        onfi_debug_file << my_temp << endl;
+        onfi_debug_file << my_temp << std::endl;
     } else
         fprintf(stdout, "Inside Program Fn: Address is: %02x,%02x,%02x,%02x,%02x.", page_address[0], page_address[1],
                 page_address[2], page_address[3], page_address[4]);
@@ -272,16 +271,16 @@ void onfi_interface::program_page_tlc_toshiba(unsigned int my_block_number, unsi
 
 #if PROFILE_TIME
     time_info_file << "program page: ";
-    START_TIME;
+    uint64_t start_time = get_timestamp_ns();
 #endif
         send_command(0x1a);
 
         tWB;
         // check if it is out of Busy cycle
-        while (gpioRead(GPIO_RB) == 0);
+        while (gpio_read(GPIO_RB) == 0);
 #if PROFILE_TIME
-    END_TIME;
-    PRINT_TIME;
+    uint64_t end_time = get_timestamp_ns();
+    time_info_file << "  took " << (end_time - start_time) / 1000 << " microseconds\n";
 #endif
 
     uint8_t status;
@@ -294,7 +293,7 @@ void onfi_interface::program_page_tlc_toshiba(unsigned int my_block_number, unsi
                     page_address[4]);
         } else {
 #if DEBUG_ONFI
-            if (onfi_debug_file) onfi_debug_file << "Program Operation Completed of first subpage" << endl;
+            if (onfi_debug_file) onfi_debug_file << "Program Operation Completed of first subpage" << std::endl;
             else fprintf(stdout, "Program Operation Completed of first subpage\n");
 #else
 	if(verbose) fprintf(stdout,"Program Operation Completed of first subpage\n");
@@ -302,7 +301,7 @@ void onfi_interface::program_page_tlc_toshiba(unsigned int my_block_number, unsi
         }
     } else {
 #if DEBUG_ONFI
-        if (onfi_debug_file) onfi_debug_file << "Program Operation of first subpage, should not be here" << endl;
+        if (onfi_debug_file) onfi_debug_file << "Program Operation of first subpage, should not be here" << std::endl;
         else fprintf(stdout, "Program Operation of first subpage, should not be here\n");
 #else
 	if(verbose) fprintf(stdout,"Program Operation of first subpage, should not be here\n");
@@ -320,16 +319,16 @@ void onfi_interface::program_page_tlc_toshiba(unsigned int my_block_number, unsi
 
 #if PROFILE_TIME
     time_info_file << "program page of second subpage: ";
-    START_TIME;
+    uint64_t start_time2 = get_timestamp_ns();
 #endif
         send_command(0x1a);
 
         tWB;
         // check if it is out of Busy cycle
-        while (gpioRead(GPIO_RB) == 0);
+        while (gpio_read(GPIO_RB) == 0);
 #if PROFILE_TIME
-    END_TIME;
-    PRINT_TIME;
+    uint64_t end_time2 = get_timestamp_ns();
+    time_info_file << "  took " << (end_time2 - start_time2) / 1000 << " microseconds\n";
 #endif
 
     read_status(&status);
@@ -342,7 +341,7 @@ void onfi_interface::program_page_tlc_toshiba(unsigned int my_block_number, unsi
         }
         else {
 #if DEBUG_ONFI
-            if (onfi_debug_file) onfi_debug_file << "Program Operation Completed of second subpage" << endl;
+            if (onfi_debug_file) onfi_debug_file << "Program Operation Completed of second subpage" << std::endl;
             else fprintf(stdout, "Program Operation Completed of second subpage\n");
 #else
 	if(verbose) fprintf(stdout,"Program Operation Completed of second subpage\n");
@@ -350,7 +349,7 @@ void onfi_interface::program_page_tlc_toshiba(unsigned int my_block_number, unsi
         }
     } else {
 #if DEBUG_ONFI
-        if (onfi_debug_file) onfi_debug_file << "Program Operation of second subpage, should not be here" << endl;
+        if (onfi_debug_file) onfi_debug_file << "Program Operation of second subpage, should not be here" << std::endl;
         else fprintf(stdout, "Program Operation of second subpage, should not be here\n");
 #else
 	if(verbose) fprintf(stdout,"Program Operation of second subpage, should not be here\n");
@@ -368,16 +367,16 @@ void onfi_interface::program_page_tlc_toshiba(unsigned int my_block_number, unsi
 
 #if PROFILE_TIME
     time_info_file << "program page of third subpage: ";
-    START_TIME;
+    uint64_t start_time3 = get_timestamp_ns();
 #endif
         send_command(0x10);
 
         tWB;
         // check if it is out of Busy cycle
-        while (gpioRead(GPIO_RB) == 0);
+        while (gpio_read(GPIO_RB) == 0);
 #if PROFILE_TIME
-    END_TIME;
-    PRINT_TIME;
+    uint64_t end_time3 = get_timestamp_ns();
+    time_info_file << "  took " << (end_time3 - start_time3) / 1000 << " microseconds\n";
 #endif
 
     read_status(&status);
@@ -389,7 +388,7 @@ void onfi_interface::program_page_tlc_toshiba(unsigned int my_block_number, unsi
                     page_address[4]);
         } else {
 #if DEBUG_ONFI
-            if (onfi_debug_file) onfi_debug_file << "Program Operation Completed of third subpage" << endl;
+            if (onfi_debug_file) onfi_debug_file << "Program Operation Completed of third subpage" << std::endl;
             else fprintf(stdout, "Program Operation Completed of third subpage\n");
 #else
 	if(verbose) fprintf(stdout,"Program Operation Completed of third subpage\n");
@@ -397,7 +396,7 @@ void onfi_interface::program_page_tlc_toshiba(unsigned int my_block_number, unsi
         }
     } else {
 #if DEBUG_ONFI
-        if (onfi_debug_file) onfi_debug_file << "Program Operation of third subpage, should not be here" << endl;
+        if (onfi_debug_file) onfi_debug_file << "Program Operation of third subpage, should not be here" << std::endl;
         else fprintf(stdout, "Program Operation of third subpage, should not be here\n");
 #else
 	if(verbose) fprintf(stdout,"Program Operation of third subpage, should not be here\n");
@@ -420,7 +419,7 @@ void onfi_interface::partial_program_page(unsigned int my_block_number, unsigned
         char my_temp[100];
         sprintf(my_temp, "Inside Program Fn: Address is: %02x,%02x,%02x,%02x,%02x.", page_address[0], page_address[1],
                 page_address[2], page_address[3], page_address[4]);
-        onfi_debug_file << my_temp << endl;
+        onfi_debug_file << my_temp << std::endl;
     } else
         fprintf(stdout, "Inside Program Fn: Address is: %02x,%02x,%02x,%02x,%02x.", page_address[0], page_address[1],
                 page_address[2], page_address[3], page_address[4]);
@@ -437,7 +436,7 @@ void onfi_interface::partial_program_page(unsigned int my_block_number, unsigned
 
 #if PROFILE_TIME
     time_info_file << "program page: ";
-    START_TIME;
+    uint64_t start_time = get_timestamp_ns();
 #endif
         send_command(0x10);
 
@@ -449,11 +448,11 @@ void onfi_interface::partial_program_page(unsigned int my_block_number, unsigned
         send_command(0xff);
 
 #if PROFILE_TIME
-    END_TIME;
-    PRINT_TIME;
+    uint64_t end_time = get_timestamp_ns();
+    time_info_file << "  took " << (end_time - start_time) / 1000 << " microseconds\n";
 #endif
     // check if it is out of Busy cycle
-    while (gpioRead(GPIO_RB) == 0);
+    while (gpio_read(GPIO_RB) == 0);
 
     uint8_t status;
     read_status(&status);
@@ -464,7 +463,7 @@ void onfi_interface::partial_program_page(unsigned int my_block_number, unsigned
             fprintf(stdout, "Failed Program Operation\n");
         } else {
 #if DEBUG_ONFI
-            if (onfi_debug_file) onfi_debug_file << "Program Operation Completed" << endl;
+            if (onfi_debug_file) onfi_debug_file << "Program Operation Completed" << std::endl;
             else fprintf(stdout, "Program Operation Completed\n");
 #else
 	if(verbose) fprintf(stdout,"Program Operation Completed\n");
@@ -472,7 +471,7 @@ void onfi_interface::partial_program_page(unsigned int my_block_number, unsigned
         }
     } else {
 #if DEBUG_ONFI
-        if (onfi_debug_file) onfi_debug_file << "Program Operation, should not be here" << endl;
+        if (onfi_debug_file) onfi_debug_file << "Program Operation, should not be here" << std::endl;
         else fprintf(stdout, "Program Operation, should not be here\n");
 #else
 	if(verbose) fprintf(stdout,"Program Operation, should not be here\n");
@@ -568,7 +567,7 @@ void onfi_interface::program_pages_in_a_block(unsigned int my_block_number, bool
         for (idx = 0; idx < num_pages; idx++)
             page_indices_sorted[idx] = page_indices[idx];
 
-        sort(page_indices_sorted, page_indices_sorted + num_pages);
+        std::sort(page_indices_sorted, page_indices_sorted + num_pages);
 
         for (idx = 0; idx < num_pages; idx++) {
             // let us grab the index from the array
@@ -607,7 +606,7 @@ void onfi_interface::partial_program_pages_in_a_block(unsigned int my_block_numb
         for (idx = 0; idx < num_pages; idx++)
             page_indices_sorted[idx] = page_indices[idx];
 
-        sort(page_indices_sorted, page_indices_sorted + num_pages);
+        std::sort(page_indices_sorted, page_indices_sorted + num_pages);
 
         for (idx = 0; idx < num_pages; idx++) {
             // let us grab the index from the array
@@ -649,7 +648,7 @@ bool onfi_interface::verify_program_pages_in_a_block(unsigned int my_block_numbe
     } else {
         uint16_t curr_page_index = 0;
         uint16_t idx = 0;
-        cout << "Verifying program operation on " << std::dec << num_pages << " pages" << endl;
+        std::cout << "Verifying program operation on " << std::dec << num_pages << " pages" << std::endl;
         for (idx = 0; idx < num_pages; idx++) {
             // let us grab the index from the array
             curr_page_index = page_indices[idx];

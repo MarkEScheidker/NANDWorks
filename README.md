@@ -4,14 +4,38 @@ This repository provides firmware and example code for interfacing ONFI-complian
 
 ## Building
 
+### Dependencies
+
+This project uses the `bcm2835` C library for GPIO access, which is included in the `lib/bcm2835_install` directory.
+
+### Compiling
+
 Use the provided `Makefile` in the repository root:
 
 ```bash
-make           # build into ./build and produce ./main
+make           # build into ./build and produce ./main, ./erase_chip, and ./benchmark
 make clean     # remove build artifacts
 ```
 
-The resulting `main` executable must be run with root privileges.
+The resulting executables must be run with root privileges (`sudo`).
+
+## Real-Time GPIO
+
+To achieve sub-microsecond timing precision, this project uses a number of techniques:
+
+*   **bcm2835 Library:** All GPIO pin control is handled by the `bcm2835` C library, which provides direct memory-mapped access to the GPIO registers. This avoids the overhead of the standard Linux GPIO driver.
+*   **Real-Time Scheduler:** The process's scheduler is elevated to a real-time policy (`SCHED_FIFO`) with a high priority. This ensures that the process is not preempted by the kernel, which is critical for maintaining tight timing loops.
+*   **High-Resolution Timing:** A busy-wait loop driven by `clock_gettime(CLOCK_MONOTONIC_RAW)` is used for all delays. This provides nanosecond-level precision.
+
+### Benchmark Utility
+
+A benchmark utility is included to measure the actual GPIO toggle frequency and demonstrate the impact of software delays. To run it:
+
+```bash
+sudo ./benchmark
+```
+
+The utility will iterate through a range of `HALF_PERIOD_CYCLES` values (representing the number of CPU cycles for a half-period delay) and print the measured actual frequency for each, allowing you to observe the relationship between the delay and the achievable toggle speed.
 
 ## Repository Layout
 
@@ -23,22 +47,6 @@ The resulting `main` executable must be run with root privileges.
 ## Basic Usage
 
 Running `./main` without arguments performs a small set of sanity tests. Pass `-v` for verbose output. Extensive usage examples can be found in `examples/`.
-
-## Hardware Setup
-
-GPIO assignments and timing parameters are defined in `include/hardware_locations.h`. The DE1‑SoC GPIO pins must be wired to the NAND device as specified there. Timing is implemented with simple software delays.
-
-| Signal | GPIO Bit |
-| ------ | -------- |
-| `DQ[7:0]` | `io0`-`io7` (21, 20, 16, 12, 25, 24, 23, 18) |
-| `WP#` | 26 |
-| `WE#` | 19 |
-| `ALE` | 13 |
-| `CLE` | 11 |
-| `CE#` | 22 |
-| `RE#` | 27 |
-| `R/B#` | 17 |
-
 
 ## Features
 

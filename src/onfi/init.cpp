@@ -1,13 +1,12 @@
 #include "onfi_interface.h"
+#include "gpio.h"
+#include "timing.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <cstring>
 #include <cstdint>
 #include <iomanip>
 #include <algorithm>
-#include <pigpio.h>
-
-using namespace std;
 
 void onfi_interface::get_started(param_type ONFI_OR_JEDEC) {
     bool bytewise = true;
@@ -67,7 +66,7 @@ void onfi_interface::open_time_profile_file() {
 // follow the following function call by get_data() function call
 // .. please change this if the device has multiple dies
 void onfi_interface::initialize_onfi(bool verbose) {
-    cout << "Entering initialize_onfi()" << endl;
+    std::cout << "Entering initialize_onfi()" << std::endl;
     open_interface_debug_file();
     //open the ONFI debug file
     open_onfi_debug_file();
@@ -78,11 +77,11 @@ void onfi_interface::initialize_onfi(bool verbose) {
 
 #if DEBUG_ONFI
     if (onfi_debug_file)
-        onfi_debug_file << "I: Successful initialization of pigpio and pin modes" << endl;
+        onfi_debug_file << "I: Successful initialization of gpio and pin modes" << std::endl;
     else
-        cout << "I: Successful initialization of pigpio and pin modes" << endl;
+        std::cout << "I: Successful initialization of gpio and pin modes" << std::endl;
 #else
-	if(verbose) cout<<"I: Successful initialization of pigpio and pin modes"<<endl;
+	if(verbose) std::cout<<"I: Successful initialization of gpio and pin modes"<<std::endl;
 #endif
 }
 
@@ -109,24 +108,24 @@ void onfi_interface::deinitialize_onfi(bool verbose) {
 void onfi_interface::test_onfi_leds(bool verbose) {
 #if DEBUG_ONFI
     if (onfi_debug_file)
-        onfi_debug_file << "I: Testing LEDs" << endl;
+        onfi_debug_file << "I: Testing LEDs" << std::endl;
     else
-        cout << "I: Testing LEDs" << endl;
+        std::cout << "I: Testing LEDs" << std::endl;
 #else
-	if(verbose) cout<<"I: Testing LEDs"<<endl;
+	if(verbose) std::cout<<"I: Testing LEDs"<<std::endl;
 #endif
     //just a simple delay for LEDs to stay ON
     turn_leds_on();
-    gpioDelay(20000); // 20ms delay
+    busy_wait_ns(20000000);
     turn_leds_off();
 
 #if DEBUG_ONFI
     if (onfi_debug_file)
-        onfi_debug_file << "I: Testing LEDs completed" << endl;
+        onfi_debug_file << "I: Testing LEDs completed" << std::endl;
     else
-        cout << "I: Testing LEDs completed" << endl;
+        std::cout << "I: Testing LEDs completed" << std::endl;
 #else
-	if(verbose) cout<<"I: Testing LEDs completed"<<endl;
+	if(verbose) std::cout<<"I: Testing LEDs completed"<<std::endl;
 #endif
 }
 
@@ -136,32 +135,32 @@ void onfi_interface::test_onfi_leds(bool verbose) {
 void onfi_interface::device_initialization(bool verbose) {
 #if DEBUG_ONFI
     if (onfi_debug_file)
-        onfi_debug_file << "I: Initializing device with a reset cycle" << endl;
+        onfi_debug_file << "I: Initializing device with a reset cycle" << std::endl;
     else
-        cout << "I: Initializing device with a reset cycle" << endl;
+        std::cout << "I: Initializing device with a reset cycle" << std::endl;
 #else
-	if(verbose) cout<<"I: Initializing device with a reset cycle"<<endl;
+	if(verbose) std::cout<<"I: Initializing device with a reset cycle"<<std::endl;
 #endif
-    cout << "Setting pin direction inactive" << endl;
+    std::cout << "Setting pin direction inactive" << std::endl;
     set_pin_direction_inactive();
-    cout << "Setting default pin values" << endl;
+    std::cout << "Setting default pin values" << std::endl;
     set_default_pin_values();
 
     // we need to set CE to low for RESET to work
-    cout << "Setting CE low" << endl;
+    std::cout << "Setting CE low" << std::endl;
     set_ce_low();
 
     //insert delay here
-    cout << "Delaying for 50us" << endl;
-    gpioDelay(50); // 50 us max
+    std::cout << "Delaying for 50us" << std::endl;
+    busy_wait_ns(50000000); // 50 ms
 
     // wait for R/B signal to go high
-    cout << "Waiting for R/B signal to go high" << endl;
+    std::cout << "Waiting for R/B signal to go high" << std::endl;
     int timeout = 0;
-    while (gpioRead(GPIO_RB) == 0) {
+    while (gpio_read(GPIO_RB) == 0) {
         timeout++;
         if (timeout > 1000000) {
-            cout << "Timed out waiting for R/B to go high" << endl;
+            std::cout << "Timed out waiting for R/B to go high" << std::endl;
             break;
         }
     }
@@ -169,20 +168,20 @@ void onfi_interface::device_initialization(bool verbose) {
     // now issue RESET command
 #if DEBUG_ONFI
     if (onfi_debug_file)
-        onfi_debug_file << "I: .. initiating a reset cycle" << endl;
+        onfi_debug_file << "I: .. initiating a reset cycle" << std::endl;
     else
-        cout << "I: .. initiating a reset cycle" << endl;
+        std::cout << "I: .. initiating a reset cycle" << std::endl;
 #else
-	if(verbose) cout<<"I: .. initiating a reset cycle"<<endl;
+	if(verbose) std::cout<<"I: .. initiating a reset cycle"<<std::endl;
 #endif
     reset_device();
 #if DEBUG_ONFI
     if (onfi_debug_file)
-        onfi_debug_file << "I: .. .. reset cycle done" << endl;
+        onfi_debug_file << "I: .. .. reset cycle done" << std::endl;
     else
-        cout << "I: .. .. reset cycle done" << endl;
+        std::cout << "I: .. .. reset cycle done" << std::endl;
 #else
-	if(verbose) cout<<"I: .. .. reset cycle done"<<endl;
+	if(verbose) std::cout<<"I: .. .. reset cycle done"<<std::endl;
 #endif
 }
 
@@ -202,13 +201,13 @@ void onfi_interface::reset_device() {
     // .. not needed because the next polling statement will take care
     // .. polling the Ready/BUSY signal
     // .. but we should wait for tWB = 200ns before the RB signal is valid
-    tWB; // tWB = 200ns
+    busy_wait_ns(1000000); // 1ms
 
     int timeout = 0;
-    while (gpioRead(GPIO_RB) == 0) {
+    while (gpio_read(GPIO_RB) == 0) {
         timeout++;
         if (timeout > 1000000) {
-            cout << "Timed out waiting for R/B to go high" << endl;
+            std::cout << "Timed out waiting for R/B to go high" << std::endl;
             break;
         }
     }

@@ -1,34 +1,32 @@
 #include "onfi_interface.h"
+#include "gpio.h"
+#include "timing.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <cstring>
 #include <cstdint>
 #include <iomanip>
 #include <algorithm>
-#include <pigpio.h>
-
-using namespace std;
 
 void onfi_interface::disable_erase() {
     // check to see if the device is busy
     // .. wait if busy
-    while (gpioRead(GPIO_RB) == 0x00);
+    while (gpio_read(GPIO_RB) == 0x00);
 
     // wp to low
-    gpioWrite(GPIO_WP, 0);
+    gpio_write(GPIO_WP, 0);
 
     //insert delay here
-    uint8_t i = 0;
-    for (i = 0; i < 4; i++);
+    busy_wait_ns(100);
 }
 
 void onfi_interface::enable_erase() {
     // check to see if the device is busy
     // .. wait if busy
-    while (gpioRead(GPIO_RB) == 0x00);
+    while (gpio_read(GPIO_RB) == 0x00);
 
     // wp to high
-    gpioWrite(GPIO_WP, 1);
+    gpio_write(GPIO_WP, 1);
 
     //insert delay here
     tWW;
@@ -44,16 +42,16 @@ void onfi_interface::erase_block(unsigned int my_block_number, bool verbose) {
     uint8_t *row_address = my_test_block_address + 2;
 
     enable_erase();
-    gpioSetMode(GPIO_RB, PI_INPUT);
+    gpio_set_direction(GPIO_RB, false);
 
     // check if it is out of Busy cycle
-    while (gpioRead(GPIO_RB) == 0);
+    while (gpio_read(GPIO_RB) == 0);
 
     send_command(0x60);
     send_addresses(row_address, 3);
 #if PROFILE_TIME
     time_info_file << "Erasing block: ";
-    START_TIME;
+    uint64_t start_time = get_timestamp_ns();
 #endif
         send_command(0xd0);
 
@@ -61,11 +59,11 @@ void onfi_interface::erase_block(unsigned int my_block_number, bool verbose) {
 
 
         // check if it is out of Busy cycle
-        while (gpioRead(GPIO_RB) == 0);
+        while (gpio_read(GPIO_RB) == 0);
 
 #if PROFILE_TIME
-    END_TIME;
-    PRINT_TIME;
+    uint64_t end_time = get_timestamp_ns();
+    time_info_file << "  took " << (end_time - start_time) / 1000 << " microseconds\n";
 #endif
 
 #if DEBUG_ONFI
@@ -73,7 +71,7 @@ void onfi_interface::erase_block(unsigned int my_block_number, bool verbose) {
         char my_temp[100];
         sprintf(my_temp, "Inside Erase Fn: Address is: %02x,%02x,%02x.", row_address[0], row_address[1],
                 row_address[2]);
-        onfi_debug_file << my_temp << endl;
+        onfi_debug_file << my_temp << std::endl;
     } else
         fprintf(stdout, "Inside Erase Fn: Address is: %02x,%02x,%02x.\n", row_address[0], row_address[1],
                 row_address[2]);
@@ -89,7 +87,7 @@ void onfi_interface::erase_block(unsigned int my_block_number, bool verbose) {
             fprintf(stdout, "Failed Erase Operation\n");
         } else {
 #if DEBUG_ONFI
-            if (onfi_debug_file) onfi_debug_file << "Erase Operation Completed" << endl;
+            if (onfi_debug_file) onfi_debug_file << "Erase Operation Completed" << std::endl;
             else fprintf(stdout, "Erase Operation Completed\n");
 #else
 	if(verbose) fprintf(stdout,"Erase Operation Completed\n");
@@ -97,7 +95,7 @@ void onfi_interface::erase_block(unsigned int my_block_number, bool verbose) {
         }
     } else {
 #if DEBUG_ONFI
-        if (onfi_debug_file) onfi_debug_file << "Erase Operation, should not be here" << endl;
+        if (onfi_debug_file) onfi_debug_file << "Erase Operation, should not be here" << std::endl;
         else fprintf(stdout, "Erase Operation, should not be here\n");
 #else
 	if(verbose) fprintf(stdout,"Erase Operation, should not be here\n");
@@ -119,16 +117,16 @@ void onfi_interface::partial_erase_block(unsigned int my_block_number, unsigned 
     uint8_t *row_address = my_test_block_address + 2;
 
     enable_erase();
-    gpioSetMode(GPIO_RB, PI_INPUT);
+    gpio_set_direction(GPIO_RB, false);
 
     // check if it is out of Busy cycle
-    while (gpioRead(GPIO_RB) == 0);
+    while (gpio_read(GPIO_RB) == 0);
 
     send_command(0x60);
     send_addresses(row_address, 3);
 #if PROFILE_TIME
     time_info_file << "Partial Erasing block: ";
-    START_TIME;
+    uint64_t start_time = get_timestamp_ns();
 #endif
         send_command(0xd0);
 
@@ -140,19 +138,19 @@ void onfi_interface::partial_erase_block(unsigned int my_block_number, unsigned 
         send_command(0xff);
 
 #if PROFILE_TIME
-    END_TIME;
-    PRINT_TIME;
+    uint64_t end_time = get_timestamp_ns();
+    time_info_file << "  took " << (end_time - start_time) / 1000 << " microseconds\n";
 #endif
 
     // check if it is out of Busy cycle
-    while (gpioRead(GPIO_RB) == 0);
+    while (gpio_read(GPIO_RB) == 0);
 
 #if DEBUG_ONFI
     if (onfi_debug_file) {
         char my_temp[100];
         sprintf(my_temp, "Inside Erase Fn: Address is: %02x,%02x,%02x.", row_address[0], row_address[1],
                 row_address[2]);
-        onfi_debug_file << my_temp << endl;
+        onfi_debug_file << my_temp << std::endl;
     } else
         fprintf(stdout, "Inside Erase Fn: Address is: %02x,%02x,%02x.\n", row_address[0], row_address[1],
                 row_address[2]);
@@ -168,7 +166,7 @@ void onfi_interface::partial_erase_block(unsigned int my_block_number, unsigned 
             fprintf(stdout, "Failed Erase Operation\n");
         } else {
 #if DEBUG_ONFI
-            if (onfi_debug_file) onfi_debug_file << "Erase Operation Completed" << endl;
+            if (onfi_debug_file) onfi_debug_file << "Erase Operation Completed" << std::endl;
             else fprintf(stdout, "Erase Operation Completed\n");
 #else
 	if(verbose) fprintf(stdout,"Erase Operation Completed\n");
@@ -176,7 +174,7 @@ void onfi_interface::partial_erase_block(unsigned int my_block_number, unsigned 
         }
     } else {
 #if DEBUG_ONFI
-        if (onfi_debug_file) onfi_debug_file << "Erase Operation, should not be here" << endl;
+        if (onfi_debug_file) onfi_debug_file << "Erase Operation, should not be here" << std::endl;
         else fprintf(stdout, "Erase Operation, should not be here\n");
 #else
 	if(verbose) fprintf(stdout,"Erase Operation, should not be here\n");
@@ -219,7 +217,7 @@ bool onfi_interface::verify_block_erase_sample(unsigned int my_block_number, boo
         char my_temp[200];
         sprintf(my_temp, "Verifying erase operation on page no: %d (%02x,%02x,%02x,%02x,%02x)", page_num_to_verify,
                 page_address[0], page_address[1], page_address[2], page_address[3], page_address[4]);
-        onfi_debug_file << my_temp << endl;
+        onfi_debug_file << my_temp << std::endl;
     } else fprintf(stdout, "Verifying erase operation on page no: %d (%02x,%02x,%02x,%02x,%02x)\n", page_num_to_verify,
                    page_address[0], page_address[1], page_address[2], page_address[3], page_address[4]);
 #else
@@ -248,7 +246,7 @@ bool onfi_interface::verify_block_erase_sample(unsigned int my_block_number, boo
 #if DEBUG_ONFI
                 if (onfi_debug_file) {
                     onfi_debug_file << "E:" << std::hex << byte_id << "," << std::hex << page_num_to_verify << "," <<
-                            std::hex << data_read_from_page[byte_id] << endl;
+                            std::hex << data_read_from_page[byte_id] << std::endl;
                 } else fprintf(stdout, "E:%x,%x,%x\n", byte_id, page_num_to_verify, data_read_from_page[byte_id]);
 #else
 					fprintf(stdout,"E:%x,%x,%x\n",byte_id,page_num_to_verify,data_read_from_page[byte_id]);
@@ -256,9 +254,9 @@ bool onfi_interface::verify_block_erase_sample(unsigned int my_block_number, boo
             }
         }
     }
-    if (fail_count) cout << "The number of bytes in page id " << page_num_to_verify <<
-                    " where erase operation failed is " << std::dec << fail_count << endl;
-    else cout << "Erase operation SUCCESS!!. Tested on page id " << page_num_to_verify << endl;
+    if (fail_count) std::cout << "The number of bytes in page id " << page_num_to_verify <<
+                    " where erase operation failed is " << std::dec << fail_count << std::endl;
+    else std::cout << "Erase operation SUCCESS!!. Tested on page id " << page_num_to_verify << std::endl;
 
     delete[] data_read_from_page;
     return return_value;
@@ -309,7 +307,7 @@ bool onfi_interface::verify_block_erase(unsigned int my_block_number, bool compl
 #if DEBUG_ONFI
                         if (onfi_debug_file) {
                             onfi_debug_file << "E:" << std::hex << byte_id << "," << std::hex << curr_page_index << ","
-                                    << std::hex << data_read_from_page[byte_id] << endl;
+                                    << std::hex << data_read_from_page[byte_id] << std::endl;
                         } else fprintf(stdout, "E:%x,%x,%x\n", byte_id, curr_page_index, data_read_from_page[byte_id]);
 #else
 							fprintf(stdout,"E:%x,%x,%x\n",byte_id,curr_page_index,data_read_from_page[byte_id]);
@@ -317,8 +315,8 @@ bool onfi_interface::verify_block_erase(unsigned int my_block_number, bool compl
                     }
                 }
             }
-            if (fail_count) cout << "The number of bytes in page id " << curr_page_index <<
-                            " where erase operation failed is " << std::dec << fail_count << endl;
+            if (fail_count) std::cout << "The number of bytes in page id " << curr_page_index <<
+                            " where erase operation failed is " << std::dec << fail_count << std::endl;
         }
     } else {
         // this means we are working on all the pages in the block
@@ -343,7 +341,7 @@ bool onfi_interface::verify_block_erase(unsigned int my_block_number, bool compl
 #if DEBUG_ONFI
                         if (onfi_debug_file) {
                             onfi_debug_file << "E:" << std::hex << byte_id << "," << std::hex << idx << "," << std::hex
-                                    << data_read_from_page[byte_id] << endl;
+                                    << data_read_from_page[byte_id] << std::endl;
                         } else fprintf(stdout, "E:%x,%x,%x\n", byte_id, idx, data_read_from_page[byte_id]);
 #else
 							fprintf(stdout,"E:%x,%x,%x\n",byte_id,idx,data_read_from_page[byte_id]);
@@ -351,8 +349,8 @@ bool onfi_interface::verify_block_erase(unsigned int my_block_number, bool compl
                     }
                 }
             }
-            if (fail_count) cout << "The number of bytes in page id " << idx << " where erase operation failed is " <<
-                            std::dec << fail_count << endl;
+            if (fail_count) std::cout << "The number of bytes in page id " << idx << " where erase operation failed is " <<
+                            std::dec << fail_count << std::endl;
         }
     }
     delete[] data_read_from_page;
@@ -415,7 +413,7 @@ void onfi_interface::convert_to_slc(unsigned int my_block_number, bool first_tim
     send_addresses(my_test_block_address + 2);
     send_command(0xd0);
     tWB;
-    while (gpioRead(GPIO_RB) == 0);
+    while (gpio_read(GPIO_RB) == 0);
 
     //perform erase operation to init
     if (first_time) erase_block(my_block_number);
@@ -432,5 +430,5 @@ void onfi_interface::revert_to_mlc(unsigned int my_block_number) {
     send_addresses(my_test_block_address + 2);
     send_command(0xd0);
     tWB;
-    while (gpioRead(GPIO_RB) == 0);
+    while (gpio_read(GPIO_RB) == 0);
 }
