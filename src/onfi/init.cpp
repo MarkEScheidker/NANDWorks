@@ -66,7 +66,7 @@ void onfi_interface::open_time_profile_file() {
 // follow the following function call by get_data() function call
 // .. please change this if the device has multiple dies
 void onfi_interface::initialize_onfi(bool verbose) {
-    std::cout << "Entering initialize_onfi()" << std::endl;
+    if(verbose) std::cout << "Entering initialize_onfi()" << std::endl;
     open_interface_debug_file();
     //open the ONFI debug file
     open_onfi_debug_file();
@@ -133,56 +133,35 @@ void onfi_interface::test_onfi_leds(bool verbose) {
 // .. data is output from the cache regsiter of selected die
 // .. it is supported following a read operation of NAND array
 void onfi_interface::device_initialization(bool verbose) {
-#if DEBUG_ONFI
-    if (onfi_debug_file)
-        onfi_debug_file << "I: Initializing device with a reset cycle" << std::endl;
-    else
-        std::cout << "I: Initializing device with a reset cycle" << std::endl;
-#else
-	if(verbose) std::cout<<"I: Initializing device with a reset cycle"<<std::endl;
-#endif
-    std::cout << "Setting pin direction inactive" << std::endl;
+    if(verbose) std::cout << "I: Initializing device with a reset cycle" << std::endl;
+    if(verbose) std::cout << "Setting pin direction inactive" << std::endl;
     set_pin_direction_inactive();
-    std::cout << "Setting default pin values" << std::endl;
+    if(verbose) std::cout << "Setting default pin values" << std::endl;
     set_default_pin_values();
 
     // we need to set CE to low for RESET to work
-    std::cout << "Setting CE low" << std::endl;
+    if(verbose) std::cout << "Setting CE low" << std::endl;
     set_ce_low();
 
     //insert delay here
-    std::cout << "Delaying for 50us" << std::endl;
+    if(verbose) std::cout << "Delaying for 50us" << std::endl;
     busy_wait_ns(50000000); // 50 ms
 
     // wait for R/B signal to go high
-    std::cout << "Waiting for R/B signal to go high" << std::endl;
+    if(verbose) std::cout << "Waiting for R/B signal to go high" << std::endl;
     int timeout = 0;
     while (gpio_read(GPIO_RB) == 0) {
         timeout++;
         if (timeout > 1000000) {
-            std::cout << "Timed out waiting for R/B to go high" << std::endl;
+            if(verbose) std::cout << "Timed out waiting for R/B to go high" << std::endl;
             break;
         }
     }
 
     // now issue RESET command
-#if DEBUG_ONFI
-    if (onfi_debug_file)
-        onfi_debug_file << "I: .. initiating a reset cycle" << std::endl;
-    else
-        std::cout << "I: .. initiating a reset cycle" << std::endl;
-#else
-	if(verbose) std::cout<<"I: .. initiating a reset cycle"<<std::endl;
-#endif
-    reset_device();
-#if DEBUG_ONFI
-    if (onfi_debug_file)
-        onfi_debug_file << "I: .. .. reset cycle done" << std::endl;
-    else
-        std::cout << "I: .. .. reset cycle done" << std::endl;
-#else
-	if(verbose) std::cout<<"I: .. .. reset cycle done"<<std::endl;
-#endif
+    if(verbose) std::cout << "I: .. initiating a reset cycle" << std::endl;
+    reset_device(verbose);
+    if(verbose) std::cout << "I: .. .. reset cycle done" << std::endl;
 }
 
 // function to reset the whole device
@@ -191,7 +170,7 @@ void onfi_interface::device_initialization(bool verbose) {
 // .. .. enable command cycle
 // .. .. command to be sent is 0xFF
 // .. .. check for R/B signal to be high after certain duration (should go low(busy) and go high (ready))
-void onfi_interface::reset_device() {
+void onfi_interface::reset_device(bool verbose) {
     // oxff is reset command
     send_command(0xff);
     // no address is expected for reset command
@@ -207,7 +186,7 @@ void onfi_interface::reset_device() {
     while (gpio_read(GPIO_RB) == 0) {
         timeout++;
         if (timeout > 1000000) {
-            std::cout << "Timed out waiting for R/B to go high" << std::endl;
+            if(verbose) std::cout << "Timed out waiting for R/B to go high" << std::endl;
             break;
         }
     }

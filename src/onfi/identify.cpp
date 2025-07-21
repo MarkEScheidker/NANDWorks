@@ -24,14 +24,14 @@ void onfi_interface::read_id() {
     tRR;
 
     get_data(my_unique_id, num_bytes);
-    printf("-------------------------------------------------\n");
-    printf("The Unique ID is: ");
+    if(DEBUG_ONFI) printf("-------------------------------------------------\n");
+    if(DEBUG_ONFI) printf("The Unique ID is: ");
     for (uint8_t idx = 0; idx < num_bytes; idx++) {
-        printf("0x%x ,", my_unique_id[idx]);
+        if(DEBUG_ONFI) printf("0x%x ,", my_unique_id[idx]);
     }
-    printf("\n");
+    if(DEBUG_ONFI) printf("\n");
     free(my_unique_id);
-    printf("-------------------------------------------------\n");
+    if(DEBUG_ONFI) printf("-------------------------------------------------\n");
 
     // let us read the ID at address 00
     num_bytes = 8;
@@ -41,17 +41,17 @@ void onfi_interface::read_id() {
     uint8_t *my_00_address = (uint8_t *) (malloc(num_bytes * sizeof(uint8_t)));
     tWHR;
     get_data(my_00_address, num_bytes);
-    printf("-------------------------------------------------\n");
-    printf("The ID at 0x00 is: ");
+    if(DEBUG_ONFI) printf("-------------------------------------------------\n");
+    if(DEBUG_ONFI) printf("The ID at 0x00 is: ");
     for (uint8_t idx = 0; idx < num_bytes; idx++) {
         if ((my_00_address[idx] >= 'a' && my_00_address[idx] <= 'z') || (
                 my_00_address[idx] >= 'A' && my_00_address[idx] <= 'Z'))
-            printf("%c ,", my_00_address[idx]);
+            if(DEBUG_ONFI) printf("%c ,", my_00_address[idx]);
         else
-            printf("0x%x ,", my_00_address[idx]);
+            if(DEBUG_ONFI) printf("0x%x ,", my_00_address[idx]);
     }
-    printf("\n");
-    printf("-------------------------------------------------\n");
+    if(DEBUG_ONFI) printf("\n");
+    if(DEBUG_ONFI) printf("-------------------------------------------------\n");
 
     // let us read the ID at address 20
     num_bytes = 4;
@@ -61,18 +61,18 @@ void onfi_interface::read_id() {
     uint8_t *my_20_address = (uint8_t *) (malloc(num_bytes * sizeof(uint8_t)));
     tWHR;
     get_data(my_20_address, num_bytes);
-    printf("-------------------------------------------------\n");
-    printf("The ID at 0x20 is: ");
+    if(DEBUG_ONFI) printf("-------------------------------------------------\n");
+    if(DEBUG_ONFI) printf("The ID at 0x20 is: ");
     for (uint8_t idx = 0; idx < num_bytes; idx++) {
         if ((my_20_address[idx] >= 'a' && my_20_address[idx] <= 'z') || (
                 my_20_address[idx] >= 'A' && my_20_address[idx] <= 'Z'))
-            printf("%c ,", my_20_address[idx]);
+            if(DEBUG_ONFI) printf("%c ,", my_20_address[idx]);
         else
-            printf("0x%x ,", my_20_address[idx]);
+            if(DEBUG_ONFI) printf("0x%x ,", my_20_address[idx]);
     }
-    printf("\n");
+    if(DEBUG_ONFI) printf("\n");
     free(my_20_address);
-    printf("-------------------------------------------------\n");
+    if(DEBUG_ONFI) printf("-------------------------------------------------\n");
 
     // let us read the ID at address 40
     num_bytes = 6;
@@ -82,54 +82,54 @@ void onfi_interface::read_id() {
     uint8_t *my_40_address = (uint8_t *) (malloc(num_bytes * sizeof(uint8_t)));
     tWHR;
     get_data(my_40_address, num_bytes);
-    printf("-------------------------------------------------\n");
-    printf("The ID at 0x40 is: ");
+    if(DEBUG_ONFI) printf("-------------------------------------------------\n");
+    if(DEBUG_ONFI) printf("The ID at 0x40 is: ");
     for (uint8_t idx = 0; idx < num_bytes; idx++) {
         if ((my_40_address[idx] >= 'a' && my_40_address[idx] <= 'z') || (
                 my_40_address[idx] >= 'A' && my_40_address[idx] <= 'Z'))
-            printf("%c ,", my_40_address[idx]);
+            if(DEBUG_ONFI) printf("%c ,", my_40_address[idx]);
         else
-            printf("0x%x ,", my_40_address[idx]);
+            if(DEBUG_ONFI) printf("0x%x ,", my_40_address[idx]);
     }
-    printf("\n");
+    if(DEBUG_ONFI) printf("\n");
     free(my_40_address);
-    printf("-------------------------------------------------\n");
+    if(DEBUG_ONFI) printf("-------------------------------------------------\n");
 
     //this is where we determine if the default interface is asynchronous or toggle
     // .. ths is for TOSHIBA toggle chips
     if (my_00_address[0] == 0x98) // this is for TOSHIBA chips
     {
-        printf("Detected TOSHIBA");
+        if(DEBUG_ONFI) printf("Detected TOSHIBA");
         if ((my_00_address[5] & 0x80)) // this is for TOGGLE
         {
-            printf(" TOGGLE");
+            if(DEBUG_ONFI) printf(" TOGGLE");
             interface_type = toggle; // this will affect DIN and DOUT cycles
             if (((my_00_address[2] >> 2) & 0x02) == 0x02) // this is for TLC
             {
-                printf(" TLC");
+                if(DEBUG_ONFI) printf(" TLC");
                 flash_chip = toshiba_tlc_toggle; // this will affect how we program pages
             }
         }
-        printf(" Chip\n.");
+        if(DEBUG_ONFI) printf(" Chip\n.");
     } else if (my_00_address[0] == 0x2c) // this is for Micron
     {
-        printf("Detected MICRON");
+        if(DEBUG_ONFI) printf("Detected MICRON");
         if (((my_00_address[2] >> 2) & 0x02) == 0x02) // this is for TLC
         {
-            printf(" TLC");
+            if(DEBUG_ONFI) printf(" TLC");
             flash_chip = micron_tlc; // this will affect how we program pages
         } else if (((my_00_address[2] >> 2) & 0x01) == 0x01) // this is for MLC
         {
-            printf(" MLC");
+            if(DEBUG_ONFI) printf(" MLC");
             flash_chip = micron_mlc; // this will affect how we program pages
         } else if (((my_00_address[2] >> 2) & 0x02) == 0x00) // this is for SLC
         {
             // flash chip will be default type
-            printf(" SLC");
+            if(DEBUG_ONFI) printf(" SLC");
         }
-        printf(" Chip \n");
+        if(DEBUG_ONFI) printf(" Chip \n");
     } else {
-        printf("Detected Asynchronous NAND Flash Chip.\n");
+        if(DEBUG_ONFI) printf("Detected Asynchronous NAND Flash Chip.\n");
     }
     free(my_00_address);
 }
@@ -202,7 +202,7 @@ void onfi_interface::read_parameters(param_type ONFI_OR_JEDEC, bool bytewise, bo
         get_data(ONFI_parameters, num_bytes_in_parameters);
 
     uint8_t col_address[2] = {0, 0};
-    printf("-------------------------------------------------\n");
+    if(DEBUG_ONFI) printf("-------------------------------------------------\n");
     for (uint16_t idx = 0; idx < num_bytes_in_parameters; idx++) {
         if (bytewise) {
             col_address[1] = idx / 256;
@@ -210,18 +210,18 @@ void onfi_interface::read_parameters(param_type ONFI_OR_JEDEC, bool bytewise, bo
             change_read_column(col_address);
             get_data(ONFI_parameters + idx, 1);
         }
-#if DEBUG_ONFI
-        if (idx % 20 == 0)
-            printf("\n");
-        if ((ONFI_parameters[idx] >= 'a' && ONFI_parameters[idx] <= 'z') || (
-                ONFI_parameters[idx] >= 'A' && ONFI_parameters[idx] <= 'Z'))
-            printf("%c ,", ONFI_parameters[idx]);
-        else
-            printf("0x%x ,", ONFI_parameters[idx]);
-#endif
+        if(DEBUG_ONFI) {
+            if (idx % 20 == 0)
+                printf("\n");
+            if ((ONFI_parameters[idx] >= 'a' && ONFI_parameters[idx] <= 'z') || (
+                    ONFI_parameters[idx] >= 'A' && ONFI_parameters[idx] <= 'Z'))
+                printf("%c ,", ONFI_parameters[idx]);
+            else
+                printf("0x%x ,", ONFI_parameters[idx]);
+        }
     }
-    printf("\n");
-    printf("-------------------------------------------------\n");
+    if(DEBUG_ONFI) printf("\n");
+    if(DEBUG_ONFI) printf("-------------------------------------------------\n");
 
 #if DEBUG_ONFI
     if (onfi_debug_file)
@@ -246,8 +246,7 @@ void onfi_interface::read_parameters(param_type ONFI_OR_JEDEC, bool bytewise, bo
     num_row_cycles = (ONFI_parameters[101] & 0x0f);
 
 
-    // now that we have read the paramters, we must decode the read values
-#if DEBUG_ONFI
+    #if DEBUG_ONFI
     if (onfi_debug_file) {
         char my_temp[400];
 
@@ -312,46 +311,29 @@ void onfi_interface::read_parameters(param_type ONFI_OR_JEDEC, bool bytewise, bo
         onfi_debug_file << "***********************************************";
         onfi_debug_file << std::endl;
     } else {
-        fprintf(stdout, "Printing information from the %s paramters\n", type_parameter.c_str());
-        fprintf(stdout, ".. The signature obtained from first 4-bytes are %c%c%c%c\n", ONFI_parameters[0],
-                ONFI_parameters[1], ONFI_parameters[2], ONFI_parameters[3]);
-        fprintf(stdout, ".. Bytes 4 and 5 indicate the %s version supported: The maximum supported version is %c.%c\n",
-                type_parameter.c_str(), ret_whole, ret_decimal);
+        if(verbose) {
+			fprintf(stdout,"Printing information from the %s paramters\n",type_parameter.c_str());
+			fprintf(stdout,".. The signature obtained from first 4-bytes are %c%c%c%c\n", ONFI_parameters[0], ONFI_parameters[1], ONFI_parameters[2], ONFI_parameters[3]);
+			fprintf(stdout,".. Bytes 4 and 5 indicate the %s version supported: The maximum supported version is %c.%c\n",type_parameter.c_str(),ret_whole,ret_decimal);
 
-        fprintf(stdout, ".. Bytes 32 to 43 gives the manufacturer information: \"%c%c%c%c%c%c%c%c%c%c%c%c\"\n",
-                ONFI_parameters[32], ONFI_parameters[33], ONFI_parameters[34], ONFI_parameters[35], ONFI_parameters[36],
-                ONFI_parameters[37], ONFI_parameters[38], ONFI_parameters[39], ONFI_parameters[40], ONFI_parameters[41],
-                ONFI_parameters[42], ONFI_parameters[43]);
-        fprintf(stdout, ".. Bytes 44 to 63 gives the device model: \"%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c\"\n",
-                ONFI_parameters[44], ONFI_parameters[45], ONFI_parameters[46], ONFI_parameters[47], ONFI_parameters[48],
-                ONFI_parameters[49], ONFI_parameters[50], ONFI_parameters[51], ONFI_parameters[52], ONFI_parameters[53],
-                ONFI_parameters[54], ONFI_parameters[55], ONFI_parameters[56], ONFI_parameters[57], ONFI_parameters[58],
-                ONFI_parameters[59], ONFI_parameters[60], ONFI_parameters[61], ONFI_parameters[62],
-                ONFI_parameters[63]);
+			fprintf(stdout,".. Bytes 32 to 43 gives the manufacturer information: \"%c%c%c%c%c%c%c%c%c%c%c%c\"\n",ONFI_parameters[32],ONFI_parameters[33],ONFI_parameters[34],ONFI_parameters[35],ONFI_parameters[36],ONFI_parameters[37],ONFI_parameters[38],ONFI_parameters[39],ONFI_parameters[40],ONFI_parameters[41],ONFI_parameters[42],ONFI_parameters[43]);
+			fprintf(stdout,".. Bytes 44 to 63 gives the device model: \"%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c\"\n",ONFI_parameters[44],ONFI_parameters[45],ONFI_parameters[46],ONFI_parameters[47],ONFI_parameters[48],ONFI_parameters[49],ONFI_parameters[50],ONFI_parameters[51],ONFI_parameters[52],ONFI_parameters[53],ONFI_parameters[54],ONFI_parameters[55],ONFI_parameters[56],ONFI_parameters[57],ONFI_parameters[58],ONFI_parameters[59],ONFI_parameters[60],ONFI_parameters[61],ONFI_parameters[62],ONFI_parameters[63]);
 
-        fprintf(stdout, ".. Bytes 80-83 gives the number of bytes per page: 0x%02x%02x%02x%02x (%d bytes per page)\n",
-                ONFI_parameters[83], ONFI_parameters[82], ONFI_parameters[81], ONFI_parameters[80], num_bytes_in_page);
+			fprintf(stdout,".. Bytes 80-83 gives the number of bytes per page: 0x%02x%02x%02x%02x (%d bytes per page)\n",ONFI_parameters[83],ONFI_parameters[82],ONFI_parameters[81],ONFI_parameters[80],num_bytes_in_page);
 
-        fprintf(
-            stdout, ".. Bytes 84-85 gives the number of spare bytes per page: 0x%02x%02x (%d spare bytes per page)\n",
-            ONFI_parameters[85], ONFI_parameters[85], num_spare_bytes_in_page);
+			fprintf(stdout,".. Bytes 84-85 gives the number of spare bytes per page: 0x%02x%02x (%d spare bytes per page)\n",ONFI_parameters[85],ONFI_parameters[85],num_spare_bytes_in_page);
 
-        fprintf(
-            stdout, ".. Bytes 92-95 gives the number of pages in a block: 0x%02x%02x%02x%02x (%d pages in a block)\n",
-            ONFI_parameters[95], ONFI_parameters[94], ONFI_parameters[93], ONFI_parameters[92], num_pages_in_block);
-        fprintf(stdout, ".. Bytes 96-99 gives the number of blocks in a LUN: 0x%02x%02x%02x%02x\n", ONFI_parameters[99],
-                ONFI_parameters[98], ONFI_parameters[97], ONFI_parameters[96]);
-        fprintf(stdout, ".. Byte 100 gives the number of LUNs per chip enable: %d\n", ONFI_parameters[100]);
-        fprintf(stdout, ".. Byte 180 gives read-retry levels supported: %d levels\n", ONFI_parameters[179] & 0x0f);
-        fprintf(stdout, ".. Byte 181-184 gives available levels: %02x,%02x,%02x and %02x levels\n",
-                ONFI_parameters[180], ONFI_parameters[181], ONFI_parameters[182], ONFI_parameters[183]);
+			fprintf(stdout,".. Bytes 92-95 gives the number of pages in a block: 0x%02x%02x%02x%02x (%d pages in a block)\n", ONFI_parameters[95], ONFI_parameters[94], ONFI_parameters[93], ONFI_parameters[92],num_pages_in_block);
+			fprintf(stdout,".. Bytes 96-99 gives the number of blocks in a LUN: 0x%02x%02x%02x%02x\n",ONFI_parameters[99],ONFI_parameters[98],ONFI_parameters[97],ONFI_parameters[96]);
+			fprintf(stdout,".. Byte 100 gives the number of LUNs per chip enable: %d\n", ONFI_parameters[100]);
+			fprintf(stdout,".. Byte 180 gives read-retry levels supported: %d levels\n", ONFI_parameters[179]&0x0f);
+			fprintf(stdout,".. Byte 181-184 gives available levels: %02x,%02x,%02x and %02x levels\n", ONFI_parameters[180],ONFI_parameters[181],ONFI_parameters[182],ONFI_parameters[183]);
 
-        fprintf(stdout, ".. Byte 102 gives information on how many bits are per cell: %d bits per cell\n",
-                ONFI_parameters[102]);
-        fprintf(stdout, ".. Byte 180 gives read-retry levels supported: %d levels\n", ONFI_parameters[180] & 0x0f);
-        fprintf(stdout, ".. Number of Colum Cycles is: %d and number of Row Cycles is %d\n", num_column_cycles,
-                num_row_cycles);
-        fprintf(stdout, "***********************************************\n");
+			fprintf(stdout,".. Byte 102 gives information on how many bits are per cell: %d bits per cell\n", ONFI_parameters[102]);
+			fprintf(stdout,".. Byte 180 gives read-retry levels supported: %d levels\n", ONFI_parameters[180]&0x0f);
+			fprintf(stdout,".. Number of Colum Cycles is: %d and number of Row Cycles is %d\n", num_column_cycles,num_row_cycles);
+			fprintf(stdout,"***********************************************\n");
+        }
     }
 #else
 if(verbose)
@@ -372,6 +354,7 @@ if(verbose)
 		fprintf(stdout,".. Byte 100 gives the number of LUNs per chip enable: %d\n", ONFI_parameters[100]);
 		fprintf(stdout,".. Byte 180 gives read-retry levels supported: %d levels\n", ONFI_parameters[179]&0x0f);
 		fprintf(stdout,".. Byte 181-184 gives available levels: %02x,%02x,%02x and %02x levels\n", ONFI_parameters[180],ONFI_parameters[181],ONFI_parameters[182],ONFI_parameters[183]);
+
 		fprintf(stdout,".. Byte 102 gives information on how many bits are per cell: %d bits per cell\n", ONFI_parameters[102]);
 		fprintf(stdout,".. Byte 180 gives read-retry levels supported: %d levels\n", ONFI_parameters[180]&0x0f);
 		fprintf(stdout,".. Number of Colum Cycles is: %d and number of Row Cycles is %d\n", num_column_cycles,num_row_cycles);

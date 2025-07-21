@@ -14,7 +14,7 @@ void onfi_interface::read_page(unsigned int my_block_number, unsigned int my_pag
         fprintf(stdout, "E: Address Length Mismatch.");
     }
     uint8_t address[address_length];
-    convert_pagenumber_to_columnrow_address(my_block_number, my_page_number, address);
+    convert_pagenumber_to_columnrow_address(my_block_number, my_page_number, address, verbose);
     // make sure none of the LUNs are busy
     while (gpio_read(GPIO_RB) == 0);
 

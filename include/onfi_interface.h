@@ -20,7 +20,7 @@ enum param_type
 };
 
 // print debug messages for ONFI things
-#define DEBUG_ONFI true
+#define DEBUG_ONFI false
 #define PROFILE_DELAY_TIME true
 
 extern uint16_t num_pages_selected;
@@ -136,7 +136,7 @@ public:
 	.. .. command to be sent is 0xFF
 	.. .. check for R/B signal to be high after certain duration (should go low(busy) and go high (ready))
 */
-	void reset_device();
+	void reset_device(bool verbose = false);
 
 	/**
 	following function reads the ONFI parameter page
@@ -410,7 +410,7 @@ public:
 	following function converts the my_page_number inside the my_block_number to {x,x,x,x,x} and saves to my_test_block_address
 	my_test_block_address is an array [c1,c2,r1,r2,r3]
 	*/
-	void convert_pagenumber_to_columnrow_address(unsigned int my_block_number, unsigned int my_page_number, uint8_t* my_test_block_address);
+	void convert_pagenumber_to_columnrow_address(unsigned int my_block_number, unsigned int my_page_number, uint8_t* my_test_block_address, bool verbose);
 };
 
 #endif

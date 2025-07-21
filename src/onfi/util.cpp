@@ -179,7 +179,7 @@ void onfi_interface::get_data(uint8_t *data_received, uint16_t num_data) {
 // .. issue 0xFF command after R/B goes high (Reset is the first command to be issued)
 // .. R/B should be monotired again after issuing 0XFF command
 void onfi_interface::convert_pagenumber_to_columnrow_address(unsigned int my_block_number, unsigned int my_page_number,
-                                                             uint8_t *my_test_block_address) {
+                                                             uint8_t *my_test_block_address, bool verbose) {
 #if DEBUG_ONFI
     if (onfi_debug_file)
         onfi_debug_file << "I: Converting block: " << my_block_number << " and page: " << my_page_number <<

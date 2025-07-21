@@ -79,7 +79,7 @@ void onfi_interface::program_page(unsigned int my_block_number, unsigned int my_
                                   bool including_spare, bool verbose) {
     uint8_t page_address[5] = {0, 0, 0, 0, 0};
     // following function converts the my_page_number inside the my_block_number to {x,x,x,x,x} and saves to my_test_block_address
-    convert_pagenumber_to_columnrow_address(my_block_number, my_page_number, page_address);
+    convert_pagenumber_to_columnrow_address(my_block_number, my_page_number, page_address, verbose);
 
     enable_erase();
 
@@ -158,7 +158,7 @@ void onfi_interface::program_page_tlc_toshiba_subpage(unsigned int my_block_numb
 
     uint8_t page_address[5] = {0, 0, 0, 0, 0};
     // following function converts the my_page_number inside the my_block_number to {x,x,x,x,x} and saves to my_test_block_address
-    convert_pagenumber_to_columnrow_address(my_block_number, my_page_number, page_address);
+    convert_pagenumber_to_columnrow_address(my_block_number, my_page_number, page_address, verbose);
 
     // write program routine here
     enable_erase();
@@ -243,7 +243,7 @@ void onfi_interface::program_page_tlc_toshiba(unsigned int my_block_number, unsi
 
     uint8_t page_address[5] = {0, 0, 0, 0, 0};
     // following function converts the my_page_number inside the my_block_number to {x,x,x,x,x} and saves to my_test_block_address
-    convert_pagenumber_to_columnrow_address(my_block_number, my_page_number, page_address);
+    convert_pagenumber_to_columnrow_address(my_block_number, my_page_number, page_address, verbose);
 
     // write program routine here
     enable_erase();
@@ -410,7 +410,7 @@ void onfi_interface::partial_program_page(unsigned int my_block_number, unsigned
                                           bool verbose) {
     uint8_t page_address[5] = {0, 0, 0, 0, 0};
     // following function converts the my_page_number inside the my_block_number to {x,x,x,x,x} and saves to my_test_block_address
-    convert_pagenumber_to_columnrow_address(my_block_number, my_page_number, page_address);
+    convert_pagenumber_to_columnrow_address(my_block_number, my_page_number, page_address, verbose);
 
     enable_erase();
 

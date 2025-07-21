@@ -38,7 +38,7 @@ void onfi_interface::enable_erase() {
 void onfi_interface::erase_block(unsigned int my_block_number, bool verbose) {
     uint8_t my_test_block_address[5] = {0, 0, 0, 0, 0};
     // following function converts the my_page_number inside the my_block_number to {x,x,x,x,x} and saves to my_test_block_address
-    convert_pagenumber_to_columnrow_address(my_block_number, 0, my_test_block_address);
+    convert_pagenumber_to_columnrow_address(my_block_number, 0, my_test_block_address, verbose);
     uint8_t *row_address = my_test_block_address + 2;
 
     enable_erase();
@@ -113,7 +113,7 @@ void onfi_interface::erase_block(unsigned int my_block_number, bool verbose) {
 void onfi_interface::partial_erase_block(unsigned int my_block_number, unsigned int my_page_number, uint32_t loop_count,
                                          bool verbose) {
     uint8_t my_test_block_address[5];
-    convert_pagenumber_to_columnrow_address(my_block_number, my_page_number, my_test_block_address);
+    convert_pagenumber_to_columnrow_address(my_block_number, my_page_number, my_test_block_address, verbose);
     uint8_t *row_address = my_test_block_address + 2;
 
     enable_erase();
@@ -204,7 +204,7 @@ bool onfi_interface::verify_block_erase_sample(unsigned int my_block_number, boo
 
     uint8_t my_test_block_address[5] = {0, 0, 0, 0, 0};
     // following function converts the my_page_number inside the my_block_number to {x,x,x,x,x} and saves to my_test_block_address
-    convert_pagenumber_to_columnrow_address(my_block_number, page_num_to_verify, my_test_block_address);
+    convert_pagenumber_to_columnrow_address(my_block_number, page_num_to_verify, my_test_block_address, verbose);
     uint8_t *page_address = my_test_block_address;
 
 
@@ -368,7 +368,7 @@ bool onfi_interface::verify_block_erase(unsigned int my_block_number, bool compl
 void onfi_interface::convert_to_slc_set_features(unsigned int my_block_number) {
     uint8_t my_test_block_address[5] = {0, 0, 0, 0, 0};
     // following function converts the my_page_number inside the my_block_number to {x,x,x,x,x} and saves to my_test_block_address
-    convert_pagenumber_to_columnrow_address(my_block_number, 0, my_test_block_address);
+    convert_pagenumber_to_columnrow_address(my_block_number, 0, my_test_block_address, false);
 
     // to convert to SLC using set features, we have to first make sure
     // .. at least half the pages are programmed
@@ -397,7 +397,7 @@ void onfi_interface::revert_to_mlc_set_features() {
 void onfi_interface::convert_to_slc(unsigned int my_block_number, bool first_time) {
     uint8_t my_test_block_address[5] = {0, 0, 0, 0, 0};
     // following function converts the my_page_number inside the my_block_number to {x,x,x,x,x} and saves to my_test_block_address
-    convert_pagenumber_to_columnrow_address(my_block_number, 0, my_test_block_address);
+    convert_pagenumber_to_columnrow_address(my_block_number, 0, my_test_block_address, false);
 
     // to convert to SLC, we have to first make sure
     // .. at least half the pages are programmed
@@ -422,7 +422,7 @@ void onfi_interface::convert_to_slc(unsigned int my_block_number, bool first_tim
 void onfi_interface::revert_to_mlc(unsigned int my_block_number) {
     uint8_t my_test_block_address[5] = {0, 0, 0, 0, 0};
     // following function converts the my_page_number inside the my_block_number to {x,x,x,x,x} and saves to my_test_block_address
-    convert_pagenumber_to_columnrow_address(my_block_number, 0, my_test_block_address);
+    convert_pagenumber_to_columnrow_address(my_block_number, 0, my_test_block_address, false);
 
     send_command(0xdf);
     tWB;
