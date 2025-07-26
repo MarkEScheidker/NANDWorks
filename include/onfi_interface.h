@@ -381,7 +381,7 @@ public:
 	.. accepted by the target only when all die (LUNs) on the target are idle.
 	.. the parameters P1-P4 are in data_to_send argument
 	*/
-	void set_features(uint8_t address, uint8_t* data_to_send,bool verbose = false, uint8_t command = 0xef);
+	void set_features(uint8_t address, uint8_t* data_to_send, uint8_t command = 0xef);
 
 	/**
 	The GET FEATURES (EEh) command reads the subfeature parameters (P1-P4) from the
@@ -389,7 +389,7 @@ public:
 	.. (LUNs) on the target are idle.
 	.. the parameters P1-P4 are in data_received argument
 	*/
-	void get_features(uint8_t address, uint8_t* data_received,bool verbose = false, uint8_t command = 0xee);
+	void get_features(uint8_t address, uint8_t* data_received, uint8_t command = 0xee);
 
 	/**
 	following function will convert a block from MLC mode to SLC mode

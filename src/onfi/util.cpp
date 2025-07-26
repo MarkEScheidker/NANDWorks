@@ -212,7 +212,7 @@ void onfi_interface::convert_pagenumber_to_columnrow_address(unsigned int my_blo
 // .. the data will be available for read with a command sequence of ECh followed by an address of 40h
 // .. this function will read a random page and tries to verify if it was completely erased
 // .. for elaborate verifiying, please use a different function
-void onfi_interface::set_features(uint8_t address, uint8_t *data_to_send, bool verbose, uint8_t command) {
+void onfi_interface::set_features(uint8_t address, uint8_t *data_to_send, uint8_t command) {
     // check if it is out of Busy cycle
     while (gpio_read(GPIO_RB) == 0);
 
@@ -237,7 +237,7 @@ void onfi_interface::set_features(uint8_t address, uint8_t *data_to_send, bool v
 // .. specified feature address. This command is accepted by the target only when all die
 // .. (LUNs) on the target are idle.
 // .. the parameters P1-P4 are in data_received argument
-void onfi_interface::get_features(uint8_t address, uint8_t *data_received, bool verbose, uint8_t command) {
+void onfi_interface::get_features(uint8_t address, uint8_t *data_received, uint8_t command) {
     // check if it is out of Busy cycle
     while (gpio_read(GPIO_RB) == 0);
 
