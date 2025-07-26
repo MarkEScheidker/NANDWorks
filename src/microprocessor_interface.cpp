@@ -8,14 +8,20 @@
 
 // Helper to set DQ pins
 void interface::set_dq_pins(uint8_t data) {
-    gpio_write(GPIO_DQ0, (data >> 0) & 0x01);
-    gpio_write(GPIO_DQ1, (data >> 1) & 0x01);
-    gpio_write(GPIO_DQ2, (data >> 2) & 0x01);
-    gpio_write(GPIO_DQ3, (data >> 3) & 0x01);
-    gpio_write(GPIO_DQ4, (data >> 4) & 0x01);
-    gpio_write(GPIO_DQ5, (data >> 5) & 0x01);
-    gpio_write(GPIO_DQ6, (data >> 6) & 0x01);
-    gpio_write(GPIO_DQ7, (data >> 7) & 0x01);
+    uint32_t set_mask = 0;
+    uint32_t clr_mask = 0;
+
+    if ((data >> 0) & 0x01) set_mask |= (1 << GPIO_DQ0); else clr_mask |= (1 << GPIO_DQ0);
+    if ((data >> 1) & 0x01) set_mask |= (1 << GPIO_DQ1); else clr_mask |= (1 << GPIO_DQ1);
+    if ((data >> 2) & 0x01) set_mask |= (1 << GPIO_DQ2); else clr_mask |= (1 << GPIO_DQ2);
+    if ((data >> 3) & 0x01) set_mask |= (1 << GPIO_DQ3); else clr_mask |= (1 << GPIO_DQ3);
+    if ((data >> 4) & 0x01) set_mask |= (1 << GPIO_DQ4); else clr_mask |= (1 << GPIO_DQ4);
+    if ((data >> 5) & 0x01) set_mask |= (1 << GPIO_DQ5); else clr_mask |= (1 << GPIO_DQ5);
+    if ((data >> 6) & 0x01) set_mask |= (1 << GPIO_DQ6); else clr_mask |= (1 << GPIO_DQ6);
+    if ((data >> 7) & 0x01) set_mask |= (1 << GPIO_DQ7); else clr_mask |= (1 << GPIO_DQ7);
+
+    gpio_clr_multi(clr_mask);
+    gpio_set_multi(set_mask);
 }
 
 // Helper to read DQ pins
@@ -30,7 +36,7 @@ uint8_t interface::read_dq_pins() {
     data |= (gpio_read(GPIO_DQ6) << 6);
     data |= (gpio_read(GPIO_DQ7) << 7);
     return data;
-}
+} 
 
 void interface::open_interface_debug_file() {
 #if DEBUG_INTERFACE

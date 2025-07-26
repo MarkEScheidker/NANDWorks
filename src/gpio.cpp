@@ -42,3 +42,11 @@ void gpio_set_high(uint8_t pin) {
 void gpio_set_low(uint8_t pin) {
     bcm2835_gpio_clr(pin);
 }
+
+void gpio_set_multi(uint32_t mask) {
+    bcm2835_gpio_set_multi(mask);
+}
+
+void gpio_clr_multi(uint32_t mask) {
+    bcm2835_gpio_clr_multi(mask);
+}
