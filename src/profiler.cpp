@@ -124,11 +124,14 @@ BenchmarkResult benchmark_onfi_identify(onfi_interface& onfi) {
 BenchmarkResult benchmark_onfi_read_page(onfi_interface& onfi, std::default_random_engine& generator, std::uniform_int_distribution<uint16_t>& block_distribution, std::uniform_int_distribution<uint16_t>& page_distribution) {
     std::cout << "Benchmarking onfi_read_page..." << std::endl;
     std::vector<uint64_t> timings;
+    // Create a buffer to store the read data
+    std::vector<uint8_t> read_data(onfi.num_bytes_in_page + onfi.num_spare_bytes_in_page);
     for (int i = 0; i < 100; ++i) {
         uint16_t random_block = block_distribution(generator);
         uint16_t random_page = page_distribution(generator);
         uint64_t start_time = get_timestamp_ns();
         onfi.read_page(random_block, random_page);
+        onfi.get_data(read_data.data(), read_data.size()); // Get data from cache to host
         uint64_t end_time = get_timestamp_ns();
         timings.push_back(end_time - start_time);
     }
@@ -165,11 +168,12 @@ BenchmarkResult benchmark_onfi_erase_block(onfi_interface& onfi, std::default_ra
 
 void print_summary(const std::vector<BenchmarkResult>& results) {
     std::cout << "--- Function Profiler Summary ---" << std::endl;
-    std::cout << std::left << std::setw(25) << "Function" << std::setw(15) << "Mean (ns)" << std::setw(15) << "Median (ns)" << std::setw(15) << "Stddev (ns)" << std::endl;
+    std::cout << std::left << std::setw(25) << "Function" << std::setw(15) << "Mean (us)" << std::setw(15) << "Median (us)" << std::setw(15) << "Stddev (us)" << std::endl;
     std::cout << std::string(70, '-') << std::endl;
 
+    std::cout << std::fixed << std::setprecision(3);
     for (const auto& result : results) {
-        std::cout << std::left << std::setw(25) << result.name << std::setw(15) << result.mean << std::setw(15) << result.median << std::setw(15) << result.stddev << std::endl;
+        std::cout << std::left << std::setw(25) << result.name << std::setw(15) << result.mean / 1000.0 << std::setw(15) << result.median / 1000.0 << std::setw(15) << result.stddev / 1000.0 << std::endl;
     }
 }
 
