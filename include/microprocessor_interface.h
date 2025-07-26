@@ -96,7 +96,7 @@ public:
     .. since ALE and CLE are active high, we will reset them to 0
     ..
     */
-    void set_ce_low();
+    void set_ce_low() const;
 
     /**
     this function sets the default values of pins.
@@ -104,21 +104,21 @@ public:
     .. since CE#, RE# and WE# are active low, we will set them to 1
     .. since ALE and CLE are active high, we will reset them to 0
     */
-    void set_default_pin_values();
+    void set_default_pin_values() const;
 
     /**
     function that sets the data lines as input
     .. to be used when data is to be received from NAND
     ... please do not forget to reset them to output once done
     */
-    void set_datalines_direction_input();
+    void set_datalines_direction_input() const;
 
     /**
     function that sets the data lines as output/default
     .. to be used when sending data or sending command
     ... this function must be called once the datalines are set as input
     */
-    void set_datalines_direction_default();
+    void set_datalines_direction_default() const;
 
     /**
     function to initialize the data and command lines all in inactive state
@@ -126,7 +126,7 @@ public:
     ... set data lines as input right before when needed
     R/B signal will be set as input
     */
-    void set_pin_direction_inactive();
+    void set_pin_direction_inactive() const;
 
     /**
     \function to send an arbitrary command signal to the NAND device
@@ -153,7 +153,7 @@ public:
     \disable CLE
     \make sure to call set_default_pin_values()
     */
-    void send_command(uint8_t command_to_send);
+    void send_command(uint8_t command_to_send) const;
 
     /**
     \make this function inline in definition
@@ -178,7 +178,7 @@ public:
     \insert delay here
     \make sure to call set_default_pin_values()
     */
-    void send_addresses(uint8_t *address_to_send, uint8_t num_address_bytes = 1, bool verbose = false);
+    void send_addresses(uint8_t *address_to_send, uint8_t num_address_bytes = 1, bool verbose = false) const;
 
     /**
     \send data to the flash memory
@@ -187,7 +187,7 @@ public:
     \.. CE should be low
     \.. make WE low and repeat the procedure again for number of bytes required (int num_data)
     \.. put data on DQ and latch WE high for certain duration
-    \.. .. the idea is clear the least 8-bits
+    \.. .. the idea is clear clear the least 8-bits
     \.. .. copy the values to be sent
     \.. a simple delay
     \*jumper_address |= WE_mask;
@@ -198,11 +198,11 @@ public:
     \.. this might be unnecesary
     \make sure to call set_default_pin_values()
     */
-    void send_data(uint8_t *data_to_send, uint16_t num_data);
+    void send_data(uint8_t *data_to_send, uint16_t num_data) const;
 
-    void set_dq_pins(uint8_t data);
+    void set_dq_pins(uint8_t data) const;
 
-    uint8_t read_dq_pins();
+    uint8_t read_dq_pins() const;
 };
 
 #endif

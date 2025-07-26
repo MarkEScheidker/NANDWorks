@@ -7,7 +7,7 @@
 #include <iostream>
 
 // Helper to set DQ pins
-void interface::set_dq_pins(uint8_t data) {
+void interface::set_dq_pins(uint8_t data) const {
     uint32_t set_mask = 0;
     uint32_t clr_mask = 0;
 
@@ -25,7 +25,7 @@ void interface::set_dq_pins(uint8_t data) {
 }
 
 // Helper to read DQ pins
-uint8_t interface::read_dq_pins() {
+uint8_t interface::read_dq_pins() const {
     uint8_t data = 0;
     data |= (gpio_read(GPIO_DQ0) << 0);
     data |= (gpio_read(GPIO_DQ1) << 1);
@@ -57,7 +57,7 @@ void interface::close_interface_debug_file(bool verbose) {
 #endif
 }
 
-__attribute__((always_inline)) void interface::set_pin_direction_inactive() {
+__attribute__((always_inline)) void interface::set_pin_direction_inactive() const {
     // Set all control pins to output and inactive state
     gpio_set_direction(GPIO_WP, true); gpio_write(GPIO_WP, 1);
     gpio_set_direction(GPIO_CLE, true); gpio_write(GPIO_CLE, 0);
@@ -78,11 +78,11 @@ __attribute__((always_inline)) void interface::set_pin_direction_inactive() {
     gpio_set_direction(GPIO_DQSC, true); gpio_write(GPIO_DQSC, 0);
 }
 
-__attribute__((always_inline)) void interface::set_ce_low() {
+__attribute__((always_inline)) void interface::set_ce_low() const {
     gpio_write(GPIO_CE, 0);
 }
 
-__attribute__((always_inline)) void interface::set_default_pin_values() {
+__attribute__((always_inline)) void interface::set_default_pin_values() const {
     gpio_write(GPIO_CE, 1);
     gpio_write(GPIO_RE, 1);
     gpio_write(GPIO_WE, 1);
@@ -97,7 +97,7 @@ __attribute__((always_inline)) void interface::set_default_pin_values() {
     gpio_set_direction(GPIO_DQSC, false);
 }
 
-__attribute__((always_inline)) void interface::set_datalines_direction_default() {
+__attribute__((always_inline)) void interface::set_datalines_direction_default() const {
     gpio_set_direction(GPIO_DQ0, true);
     gpio_set_direction(GPIO_DQ1, true);
     gpio_set_direction(GPIO_DQ2, true);
@@ -110,7 +110,7 @@ __attribute__((always_inline)) void interface::set_datalines_direction_default()
     set_dq_pins(0x00); // Reset DQ pins to low
 }
 
-__attribute__((always_inline)) void interface::set_datalines_direction_input() {
+__attribute__((always_inline)) void interface::set_datalines_direction_input() const {
     gpio_set_direction(GPIO_DQ0, false);
     gpio_set_direction(GPIO_DQ1, false);
     gpio_set_direction(GPIO_DQ2, false);
@@ -121,7 +121,7 @@ __attribute__((always_inline)) void interface::set_datalines_direction_input() {
     gpio_set_direction(GPIO_DQ7, false);
 }
 
-__attribute__((always_inline)) void interface::send_command(uint8_t command_to_send) {
+__attribute__((always_inline)) void interface::send_command(uint8_t command_to_send) const {
     gpio_write(GPIO_WE, 0);
     gpio_write(GPIO_CE, 0);
     gpio_write(GPIO_CLE, 1);
@@ -139,14 +139,14 @@ __attribute__((always_inline)) void interface::send_command(uint8_t command_to_s
 }
 
 __attribute__((always_inline)) void interface::send_addresses(uint8_t *address_to_send, uint8_t num_address_bytes,
-                                                              bool verbose) {
+                                                              bool verbose) const {
 #if DEBUG_INTERFACE
 	if(interface_debug_file)
 		interface_debug_file<<"I: Sending Addresses "<<num_address_bytes<<" bytes"<<std::endl;
 	else
 		std::cout<<"I: Sending Addresses "<<num_address_bytes<<" bytes"<<std::endl;
 #else
-    if (verbose) std::cout << "I: Sending Addresses " << (int)num_address_bytes << " bytes" << std::endl << "\t:";
+    if (verbose) std::cout << "I: Sending Addresses " << (int)num_address_bytes << " bytes" << std::endl << "	:";
 #endif
 
     gpio_write(GPIO_CE, 0);
@@ -182,7 +182,7 @@ __attribute__((always_inline)) void interface::send_addresses(uint8_t *address_t
 #endif
 }
 
-__attribute__((always_inline)) void interface::send_data(uint8_t *data_to_send, uint16_t num_data) {
+__attribute__((always_inline)) void interface::send_data(uint8_t *data_to_send, uint16_t num_data) const {
     if (interface_type == asynchronous) {
         gpio_write(GPIO_CE, 0);
         uint16_t i = 0;

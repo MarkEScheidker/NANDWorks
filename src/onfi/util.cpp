@@ -58,7 +58,7 @@ void onfi_interface::print_status_on_fail() {
 // .. this function gets the bridge based address
 // .. converts the peripheral addresses
 // .. tests the LEDs
-void onfi_interface::get_data(uint8_t *data_received, uint16_t num_data) {
+void onfi_interface::get_data(uint8_t *data_received, uint16_t num_data) const {
     if (interface_type == asynchronous) {
         set_default_pin_values();
         set_datalines_direction_input();
@@ -201,7 +201,7 @@ void onfi_interface::set_features(uint8_t address, uint8_t *data_to_send, uint8_
 // .. specified feature address. This command is accepted by the target only when all die
 // .. (LUNs) on the target are idle.
 // .. the parameters P1-P4 are in data_received argument
-void onfi_interface::get_features(uint8_t address, uint8_t *data_received, uint8_t command) {
+void onfi_interface::get_features(uint8_t address, uint8_t* data_received, uint8_t command) const {
     // check if it is out of Busy cycle
     while (gpio_read(GPIO_RB) == 0);
 

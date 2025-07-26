@@ -166,6 +166,8 @@ BenchmarkResult benchmark_onfi_erase_block(onfi_interface& onfi, std::default_ra
     return {"onfi_erase_block", calculate_mean(timings), calculate_median(timings), calculate_stddev(timings)};
 }
 
+
+
 void print_summary(const std::vector<BenchmarkResult>& results) {
     std::cout << "--- Function Profiler Summary ---" << std::endl;
     std::cout << std::left << std::setw(25) << "Function" << std::setw(15) << "Mean (us)" << std::setw(15) << "Median (us)" << std::setw(15) << "Stddev (us)" << std::endl;
@@ -195,6 +197,16 @@ void print_chip_info(const onfi_interface& onfi) {
         std::cout << std::hex << std::setw(2) << std::setfill('0') << (int)onfi.unique_id[i];
     }
     std::cout << std::dec << std::endl;
+
+    // Read and display feature data (e.g., Timing Mode at address 0x01)
+    uint8_t timing_mode_feature[4];
+    onfi.get_features(0x01, timing_mode_feature);
+    std::cout << std::left << std::setw(30) << "Timing Mode Feature (0x01):";
+    for (int i = 0; i < 4; ++i) {
+        std::cout << std::hex << std::setw(2) << std::setfill('0') << (int)timing_mode_feature[i] << " ";
+    }
+    std::cout << std::dec << std::endl;
+
     std::cout << std::string(50, '-') << std::endl;
 }
 
@@ -228,6 +240,7 @@ int main() {
     results.push_back(benchmark_onfi_read_page(onfi, generator, block_distribution, page_distribution));
     results.push_back(benchmark_onfi_write_page(onfi, generator, block_distribution, page_distribution));
     results.push_back(benchmark_onfi_erase_block(onfi, generator, block_distribution));
+    
 
     std::cout << std::endl;
     print_summary(results);

@@ -107,7 +107,7 @@ public:
 	.. data is output from the cache regsiter of selected die
 	.. it is supported following a read operation of NAND array
 */
-	void get_data(uint8_t* data_received,uint16_t num_data);
+	void get_data(uint8_t* data_received,uint16_t num_data) const;
 
 /**
 	Function to get the status code of the last operation 
@@ -383,7 +383,7 @@ public:
 	.. (LUNs) on the target are idle.
 	.. the parameters P1-P4 are in data_received argument
 	*/
-	void get_features(uint8_t address, uint8_t* data_received, uint8_t command = 0xee);
+	void get_features(uint8_t address, uint8_t* data_received, uint8_t command = 0xee) const;
 
 	/**
 	following function will convert a block from MLC mode to SLC mode
