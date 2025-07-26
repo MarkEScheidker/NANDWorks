@@ -8,18 +8,6 @@
 #include <iomanip>
 #include <algorithm>
 
-/**
- finds the number of 1s in the number input
-..  the algo iscalled Brain-Kernigham algo
-*/
-unsigned int find_num_1s(int input_number) {
-    unsigned int count = 0;
-    while (input_number) {
-        input_number &= (input_number - 1);
-        count++;
-    }
-    return count;
-}
 
 /**
 Following is the list of carefull chosen page indices in any block
@@ -79,48 +67,29 @@ void onfi_interface::get_data(uint8_t *data_received, uint16_t num_data) {
         // .. ensure RDY is high
         // .. .. just keep spinning here checking for ready signal
         while (gpio_read(GPIO_RB) == 0x00);
-
-        // .. data can be received following READ operation
-        // .. the procedure should be as follows
-        // .. .. CE should be low
+        
+        // set CE to low to enable the chip
         gpio_write(GPIO_CE, 0);
-        // .. make WE high
-        // .. .. WE should be high from before
-        // .. .. ALE and CLE should be low
-        // .. .. they should be low from before
-        uint16_t i = 0;
-        for (i = 0; i < num_data; i++) {
-            // #if PROFILE_TIME
 
-            // 	fprintf(stderr,"Obtaining data from cache Follows\n");
-            // 	START_TIME;
-            // #endif
+        //Loop through the number of data to be received
+        uint16_t i;
+        for (i = 0; i < num_data; i++) {
             // set the RE to low for next cycle
             gpio_write(GPIO_RE, 0);
-
-            // The time for the function calls themselves is sufficient delay
-            // for tREA on a non-realtime OS.
 
             // read the data
             data_received[i] = read_dq_pins();
 
-            // .. data is available at DQ pins on the rising edge of RE pin (RE is also input to NAND)
+            // data is available at DQ pins on the rising edge of RE pin (RE is also input to NAND)
             gpio_write(GPIO_RE, 1);
-
-            // #if PROFILE_TIME
-            // 	fprintf(stderr,".. time profile from get_data() one word: ");
-            // 	END_TIME;
-            // 	PRINT_TIME;
-            // #endif
-            // tREH is met by the loop overhead
-            // same same
         }
 
         // set the pins as output
         set_datalines_direction_default();
         //make sure to call set_default_pin_values()
         set_default_pin_values();
-    } else if (interface_type == toggle) {
+
+    }else if (interface_type == toggle) {
         if (num_data % 2) {
             printf("E: In TOGGLE mode, num_data for data out cycle must be even number (currently is %d).\n", num_data);
             // printf(".. E: Program will terminate.\n");

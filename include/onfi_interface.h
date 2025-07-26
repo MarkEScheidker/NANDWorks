@@ -27,12 +27,6 @@ extern uint16_t num_pages_selected;
 extern uint16_t page_indices_selected[];
 
 /**
-finds the number of 1s in the number input
-..  the algo iscalled Brain-Kernigham algo
-*/
-unsigned int find_num_1s(int input_number);
-
-/**
 let us define a class that includes all the lowest level functions that are needed for
 .. interfacing with NAND device.
 */
