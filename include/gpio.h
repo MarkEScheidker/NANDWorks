@@ -30,7 +30,4 @@ void gpio_set_multi(uint32_t mask);
 // Set multiple GPIO pins low using a mask
 void gpio_clr_multi(uint32_t mask);
 
-// Read the state of all GPIO pins (0-31) and return as a uint32_t
-uint32_t gpio_read_all_pins();
-
 #endif // GPIO_H

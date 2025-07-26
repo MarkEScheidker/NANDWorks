@@ -190,13 +190,8 @@ void onfi_interface::set_features(uint8_t address, uint8_t *data_to_send, uint8_
     //send the address
     send_addresses(&address);
 
-    //now we wait
-    busy_wait_ns(1000); //tWB
-
     // now send the parameters
     send_data(data_to_send, 4);
-
-    busy_wait_ns(1000); //tWB
 
     // check if it is out of Busy cycle
     while (gpio_read(GPIO_RB) == 0);
@@ -215,11 +210,8 @@ void onfi_interface::get_features(uint8_t address, uint8_t *data_received, uint8
     //send the address
     send_addresses(&address);
 
-    //now we wait
-    busy_wait_ns(1000); //tWB
     // check if it is out of Busy cycle
     while (gpio_read(GPIO_RB) == 0);
-    busy_wait_ns(1000);
 
     get_data(data_received, 4);
 }

@@ -38,8 +38,6 @@ void onfi_interface::read_page(unsigned int my_block_number, unsigned int my_pag
     if (verbose) fprintf(stdout, "Read page completed \n");
     time_info_file << "  took " << (end_time - start_time) / 1000 << " microseconds\n";
 #endif
-    // tRR = 40ns
-    tRR;
 }
 
 // this function opens a file named time_info_file.txt
@@ -72,7 +70,6 @@ void onfi_interface::read_and_spit_page(unsigned int my_block_number, unsigned i
             col_address[1] = b_idx / 256;
             col_address[0] = b_idx % 256;
             change_read_column(col_address);
-            busy_wait_ns(1000);
             get_data(data_read_from_page + b_idx, 1);
         }
     } else {

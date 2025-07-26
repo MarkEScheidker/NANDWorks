@@ -48,8 +48,6 @@ void onfi_interface::erase_block(unsigned int my_block_number, bool verbose) {
 #endif
         send_command(0xd0);
 
-        tWB;
-
         // check if it is out of Busy cycle
         while (gpio_read(GPIO_RB) == 0);
 
@@ -121,8 +119,6 @@ void onfi_interface::partial_erase_block(unsigned int my_block_number, unsigned 
     uint64_t start_time = get_timestamp_ns();
 #endif
         send_command(0xd0);
-
-        // tWB;
 
         delay_function(loop_count);
 
