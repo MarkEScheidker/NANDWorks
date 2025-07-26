@@ -1,6 +1,9 @@
 # Build artifacts
 build/
 main
+benchmark
+profiler
+erase_chip
 
 # Temporary files
 *.o

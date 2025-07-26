@@ -116,11 +116,14 @@ public:
 	void get_data(uint8_t* data_received,uint16_t num_data);
 
 /**
-	this function can be used to test the status of flash operation
+	Function to get the status code of the last operation 
 */
-	void check_status();
+	uint8_t get_status();
 
-	void wait_on_status();
+/**
+	Function to check and print if the last operation failed
+*/	
+	void print_status_on_fail();
 
 /**
 	function to initialize the NAND device
@@ -227,11 +230,6 @@ public:
 	.. loop_count is the partial erase times, a value of 10 will correspond to 1 ns delay
 	*/
 	void partial_erase_block(unsigned int my_block_number, unsigned int my_page_number, uint32_t loop_count = 30000,bool verbose = false);
-
-	/**
-	 following function can be used to read the status following any command
-	 */
-	void read_status(uint8_t* status_value);
 
 	/**
 	.. this function will read any random page and tries to verify if it was completely erased

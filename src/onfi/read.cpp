@@ -31,9 +31,6 @@ void onfi_interface::read_page(unsigned int my_block_number, unsigned int my_pag
 
         send_command(0x30);
 
-        // just a delay
-        tWB;
-
         // check for RDY signal
         while (gpio_read(GPIO_RB) == 0);
 #if PROFILE_TIME
@@ -75,7 +72,6 @@ void onfi_interface::read_and_spit_page(unsigned int my_block_number, unsigned i
             col_address[1] = b_idx / 256;
             col_address[0] = b_idx % 256;
             change_read_column(col_address);
-            busy_wait_ns(1000);
             busy_wait_ns(1000);
             get_data(data_read_from_page + b_idx, 1);
         }

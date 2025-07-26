@@ -10,7 +10,8 @@
 
 bool onfi_interface::verify_program_page(unsigned int my_block_number, unsigned int my_page_number,
                                          uint8_t *data_to_program, bool verbose, int max_allowed_errors) {
-    bool return_value = true;
+    
+    
     //uint16_t num_bytes_to_test = num_bytes_in_page+num_spare_bytes_in_page;
     uint16_t num_bytes_to_test = num_bytes_in_page;
 
@@ -30,7 +31,7 @@ bool onfi_interface::verify_program_page(unsigned int my_block_number, unsigned 
     for (byte_id = 0; byte_id < (num_bytes_to_test); byte_id++) {
         if (data_read_from_page[byte_id] != data_to_program[byte_id]) {
             byte_fail_count++;
-            return_value = false;
+
 
             // Calculate bit differences
             uint8_t diff = data_read_from_page[byte_id] ^ data_to_program[byte_id];
@@ -117,8 +118,8 @@ void onfi_interface::program_page(unsigned int my_block_number, unsigned int my_
     time_info_file << "  took " << (end_time - start_time) / 1000 << " microseconds\n";
 #endif
 
-    uint8_t status;
-    read_status(&status);
+    uint8_t status = 0;
+    status = get_status();
     // .. use  the commended code for multi-plane die
     // read_status_enhanced(&status_value,(address+2));
     if (status & 0x20) {
@@ -199,8 +200,8 @@ void onfi_interface::program_page_tlc_toshiba_subpage(unsigned int my_block_numb
     time_info_file << "  took " << (end_time - start_time) / 1000 << " microseconds\n";
 #endif
 
-    uint8_t status;
-    read_status(&status);
+    uint8_t status = 0;
+    status = get_status();
     // .. use  the commended code for multi-plane die
     // read_status_enhanced(&status_value,(address+2));
     if (status & 0x20) {
@@ -283,8 +284,8 @@ void onfi_interface::program_page_tlc_toshiba(unsigned int my_block_number, unsi
     time_info_file << "  took " << (end_time - start_time) / 1000 << " microseconds\n";
 #endif
 
-    uint8_t status;
-    read_status(&status);
+    uint8_t status = 0;
+    status = get_status();
     // .. use  the commended code for multi-plane die
     // read_status_enhanced(&status_value,(address+2));
     if (status & 0x20) {
@@ -331,7 +332,7 @@ void onfi_interface::program_page_tlc_toshiba(unsigned int my_block_number, unsi
     time_info_file << "  took " << (end_time2 - start_time2) / 1000 << " microseconds\n";
 #endif
 
-    read_status(&status);
+    status = get_status();
     // .. use  the commended code for multi-plane die
     // read_status_enhanced(&status_value,(address+2));
     if (status & 0x20) {
@@ -379,7 +380,7 @@ void onfi_interface::program_page_tlc_toshiba(unsigned int my_block_number, unsi
     time_info_file << "  took " << (end_time3 - start_time3) / 1000 << " microseconds\n";
 #endif
 
-    read_status(&status);
+    status = get_status();
     // .. use  the commended code for multi-plane die
     // read_status_enhanced(&status_value,(address+2));
     if (status & 0x20) {
@@ -454,8 +455,8 @@ void onfi_interface::partial_program_page(unsigned int my_block_number, unsigned
     // check if it is out of Busy cycle
     while (gpio_read(GPIO_RB) == 0);
 
-    uint8_t status;
-    read_status(&status);
+    uint8_t status = 0;
+    status = get_status();
     // .. use  the commended code for multi-plane die
     // read_status_enhanced(&status_value,(address+2));
     if (status & 0x20) {

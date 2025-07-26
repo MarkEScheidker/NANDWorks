@@ -15,9 +15,6 @@ void onfi_interface::disable_erase() {
 
     // wp to low
     gpio_write(GPIO_WP, 0);
-
-    //insert delay here
-    busy_wait_ns(100);
 }
 
 void onfi_interface::enable_erase() {
@@ -27,9 +24,6 @@ void onfi_interface::enable_erase() {
 
     // wp to high
     gpio_write(GPIO_WP, 1);
-
-    //insert delay here
-    tWW;
 }
 
 // following function erases the block address provided as the parameter to the function
@@ -50,13 +44,11 @@ void onfi_interface::erase_block(unsigned int my_block_number, bool verbose) {
     send_command(0x60);
     send_addresses(row_address, 3);
 #if PROFILE_TIME
-    time_info_file << "Erasing block: ";
     uint64_t start_time = get_timestamp_ns();
 #endif
         send_command(0xd0);
 
         tWB;
-
 
         // check if it is out of Busy cycle
         while (gpio_read(GPIO_RB) == 0);
@@ -80,11 +72,11 @@ void onfi_interface::erase_block(unsigned int my_block_number, bool verbose) {
 #endif
 
     // let us read the status register value
-    uint8_t status;
-    read_status(&status);
+    uint8_t status = 0;
+    status = get_status();
     if (status & 0x20) {
         if (status & 0x01) {
-            fprintf(stdout, "Failed Erase Operation\n");
+            if(verbose) fprintf(stdout, "Failed Erase Operation\n");
         } else {
 #if DEBUG_ONFI
             if (onfi_debug_file) onfi_debug_file << "Erase Operation Completed" << std::endl;
@@ -120,7 +112,7 @@ void onfi_interface::partial_erase_block(unsigned int my_block_number, unsigned 
     gpio_set_direction(GPIO_RB, false);
 
     // check if it is out of Busy cycle
-    while (gpio_read(GPIO_RB) == 0);
+    while (gpio_read(GPIO_RB) == 0);;
 
     send_command(0x60);
     send_addresses(row_address, 3);
@@ -143,7 +135,7 @@ void onfi_interface::partial_erase_block(unsigned int my_block_number, unsigned 
 #endif
 
     // check if it is out of Busy cycle
-    while (gpio_read(GPIO_RB) == 0);
+    while (gpio_read(GPIO_RB) == 0);;
 
 #if DEBUG_ONFI
     if (onfi_debug_file) {
@@ -159,8 +151,8 @@ void onfi_interface::partial_erase_block(unsigned int my_block_number, unsigned 
 #endif
 
     // let us read the status register value
-    uint8_t status;
-    read_status(&status);
+    uint8_t status = 0;
+    status = get_status();
     if (status & 0x20) {
         if (status & 0x01) {
             fprintf(stdout, "Failed Erase Operation\n");
@@ -185,14 +177,7 @@ void onfi_interface::partial_erase_block(unsigned int my_block_number, unsigned 
 }
 
 
-// following function can be used to read the status following any command
-void onfi_interface::read_status(uint8_t *status_value) {
-    send_command(0x70);
-    //insert delay here
-    // .. tWHR= 120ns
-    tWHR;
-    get_data(status_value, 1);
-}
+
 
 // .. this function will read a random page and tries to verify if it was completely erased
 // .. for elaborate verifiying, please use a different function
@@ -413,7 +398,7 @@ void onfi_interface::convert_to_slc(unsigned int my_block_number, bool first_tim
     send_addresses(my_test_block_address + 2);
     send_command(0xd0);
     tWB;
-    while (gpio_read(GPIO_RB) == 0);
+    while (gpio_read(GPIO_RB) == 0);;
 
     //perform erase operation to init
     if (first_time) erase_block(my_block_number);
@@ -430,5 +415,5 @@ void onfi_interface::revert_to_mlc(unsigned int my_block_number) {
     send_addresses(my_test_block_address + 2);
     send_command(0xd0);
     tWB;
-    while (gpio_read(GPIO_RB) == 0);
+    while (gpio_read(GPIO_RB) == 0);;
 }

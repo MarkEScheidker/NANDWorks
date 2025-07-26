@@ -45,32 +45,23 @@ uint16_t page_indices_selected[] = {
     1003, 1005, 1009, 1011, 1013, 1015, 1017, 1019, 1021, 1023
 }; // .. these are unshared pages at the tail of the block
 
-void onfi_interface::check_status() {
+
+
+uint8_t onfi_interface::get_status() {
     // 0x70 is the command for getting status register value
     send_command(0x70);
-    uint8_t status;
+    uint8_t status = 0;
     get_data(&status, 1);
+    return status;
+}
 
+void onfi_interface::print_status_on_fail() {
+    uint8_t status = get_status();
     if (status & 0x01) {
         if (onfi_debug_file)
             onfi_debug_file << "I: Last Operation failed" << std::endl;
         else
             std::cout << "I: Last Operation failed" << std::endl;
-    }
-}
-
-void onfi_interface::wait_on_status() {
-    // 0x70 is the command for getting status register value
-    send_command(0x70);
-    uint8_t status;
-    get_data(&status, 1);
-
-    // wait until the ARDY bit is 1
-    while ((status & 0x20) == 0x0) {
-    }
-    if (status & 0x01) {
-        if (onfi_debug_file) onfi_debug_file << "I: Last Operation failed" << std::endl;
-        else std::cout << "I: Last Operation failed" << std::endl;
     }
 }
 
