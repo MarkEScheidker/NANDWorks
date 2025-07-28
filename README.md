@@ -1,8 +1,8 @@
-# ONFI NAND Flash Interface for Altera DE1-SoC
+# ONFI NAND Flash Interface for Raspberry Pi
 
-This project provides a comprehensive C++ library and a suite of command-line tools for interfacing with ONFI-compliant NAND flash memory on an Altera DE1-SoC development board. The software is designed to run on the board's ARM processor under Linux, using memory-mapped I/O for high-performance, low-level control of the GPIO pins connected to the NAND flash.
+This project provides a comprehensive C++ library and a suite of command-line tools for interfacing with ONFI-compliant NAND flash memory on a Raspberry Pi. The software is designed to run on the board's ARM processor under Linux, using memory-mapped I/O for high-performance, low-level control of the GPIO pins connected to the NAND flash.
 
-This implementation has been validated with a Micron MT29F256G08CBCBB 3D NAND part (ONFI 4.0 compliant), but its modular design makes it adaptable for other similar NAND devices.
+This implementation has been validated with a Micron 3D NAND part (ONFI 4.0 compliant), but its modular design makes it adaptable for other similar NAND devices.
 
 ## Table of Contents
 
@@ -38,7 +38,7 @@ This implementation has been validated with a Micron MT29F256G08CBCBB 3D NAND pa
 
 ## Hardware Setup
 
-The code is specifically designed for the Altera DE1-SoC board. The following sections detail the required hardware connections.
+The code is specifically designed for the Raspberry Pi. The following sections detail the required hardware connections.
 
 ### Pin Connections
 
