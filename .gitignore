@@ -24,8 +24,4 @@ erase_chip
 *.PNG
 *.py
 *.m
-erase_chip
-profiler
-erase_chip
-erase_chip
-profiler
+

@@ -75,13 +75,13 @@ void onfi_interface::get_data(uint8_t *data_received, uint16_t num_data) const {
         uint16_t i;
         for (i = 0; i < num_data; i++) {
             // set the RE to low for next cycle
-            gpio_write(GPIO_RE, 0);
+            gpio_set_low(GPIO_RE);
 
             // read the data
             data_received[i] = read_dq_pins();
 
             // data is available at DQ pins on the rising edge of RE pin (RE is also input to NAND)
-            gpio_write(GPIO_RE, 1);
+            gpio_set_high(GPIO_RE);
         }
 
         // set the pins as output
@@ -110,7 +110,7 @@ void onfi_interface::get_data(uint8_t *data_received, uint16_t num_data) const {
         gpio_set_direction(GPIO_DQSC, true);
         gpio_write(GPIO_DQS, 0);
         busy_wait_ns(1000);
-        gpio_write(GPIO_RE, 1);
+        gpio_set_high(GPIO_RE);
         busy_wait_ns(1000);
         // now in a loop read the data
         uint16_t i = 0;

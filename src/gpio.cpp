@@ -50,3 +50,9 @@ void gpio_set_multi(uint32_t mask) {
 void gpio_clr_multi(uint32_t mask) {
     bcm2835_gpio_clr_multi(mask);
 }
+
+uint32_t gpio_read_levels0() {
+    // Read the level register for GPIO 0..31 in one shot.
+    // Use the mapped GPIO base plus the GPLEV0 offset (word offset).
+    return bcm2835_peri_read(bcm2835_gpio + (BCM2835_GPLEV0 / 4));
+}

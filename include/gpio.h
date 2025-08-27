@@ -30,4 +30,8 @@ void gpio_set_multi(uint32_t mask);
 // Set multiple GPIO pins low using a mask
 void gpio_clr_multi(uint32_t mask);
 
+// Read levels for GPIO 0..31 in a single register access (GPLEV0)
+// Useful for fast sampling of multiple input pins.
+uint32_t gpio_read_levels0();
+
 #endif // GPIO_H

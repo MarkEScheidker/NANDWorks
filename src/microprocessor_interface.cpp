@@ -24,19 +24,20 @@ void interface::set_dq_pins(uint8_t data) const {
     gpio_set_multi(set_mask);
 }
 
-// Helper to read DQ pins
+// Helper to read DQ pins (single GPLEV0 read for speed)
 uint8_t interface::read_dq_pins() const {
+    const uint32_t levels = gpio_read_levels0();
     uint8_t data = 0;
-    data |= (gpio_read(GPIO_DQ0) << 0);
-    data |= (gpio_read(GPIO_DQ1) << 1);
-    data |= (gpio_read(GPIO_DQ2) << 2);
-    data |= (gpio_read(GPIO_DQ3) << 3);
-    data |= (gpio_read(GPIO_DQ4) << 4);
-    data |= (gpio_read(GPIO_DQ5) << 5);
-    data |= (gpio_read(GPIO_DQ6) << 6);
-    data |= (gpio_read(GPIO_DQ7) << 7);
+    data |= ((levels >> GPIO_DQ0) & 0x1) << 0;
+    data |= ((levels >> GPIO_DQ1) & 0x1) << 1;
+    data |= ((levels >> GPIO_DQ2) & 0x1) << 2;
+    data |= ((levels >> GPIO_DQ3) & 0x1) << 3;
+    data |= ((levels >> GPIO_DQ4) & 0x1) << 4;
+    data |= ((levels >> GPIO_DQ5) & 0x1) << 5;
+    data |= ((levels >> GPIO_DQ6) & 0x1) << 6;
+    data |= ((levels >> GPIO_DQ7) & 0x1) << 7;
     return data;
-} 
+}
 
 void interface::open_interface_debug_file() {
 #if DEBUG_INTERFACE
@@ -122,7 +123,7 @@ __attribute__((always_inline)) void interface::set_datalines_direction_input() c
 }
 
 __attribute__((always_inline)) void interface::send_command(uint8_t command_to_send) const {
-    gpio_write(GPIO_WE, 0);
+    gpio_set_low(GPIO_WE);
     gpio_write(GPIO_CE, 0);
     gpio_write(GPIO_CLE, 1);
 
@@ -130,7 +131,7 @@ __attribute__((always_inline)) void interface::send_command(uint8_t command_to_s
 
     SAMPLE_TIME;
 
-    gpio_write(GPIO_WE, 1);
+    gpio_set_high(GPIO_WE);
 
     HOLD_TIME;
 
@@ -154,7 +155,7 @@ __attribute__((always_inline)) void interface::send_addresses(uint8_t *address_t
 
     uint8_t i = 0;
     for (i = 0; i < num_address_bytes; i++) {
-        gpio_write(GPIO_WE, 0);
+        gpio_set_low(GPIO_WE);
         set_dq_pins(address_to_send[i]);
 
 #if DEBUG_INTERFACE
@@ -167,7 +168,7 @@ __attribute__((always_inline)) void interface::send_addresses(uint8_t *address_t
 #endif
         SAMPLE_TIME;
 
-        gpio_write(GPIO_WE, 1);
+        gpio_set_high(GPIO_WE);
         HOLD_TIME;
     }
     set_default_pin_values();
@@ -187,9 +188,9 @@ __attribute__((always_inline)) void interface::send_data(uint8_t *data_to_send, 
         gpio_write(GPIO_CE, 0);
         uint16_t i = 0;
         for (i = 0; i < num_data; i++) {
-            gpio_write(GPIO_WE, 0);
+            gpio_set_low(GPIO_WE);
             set_dq_pins(data_to_send[i]);
-            gpio_write(GPIO_WE, 1);
+            gpio_set_high(GPIO_WE);
         }
         set_default_pin_values();
     } else {

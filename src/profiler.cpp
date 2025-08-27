@@ -177,6 +177,17 @@ void print_summary(const std::vector<BenchmarkResult>& results) {
     for (const auto& result : results) {
         std::cout << std::left << std::setw(25) << result.name << std::setw(15) << result.mean / 1000.0 << std::setw(15) << result.median / 1000.0 << std::setw(15) << result.stddev / 1000.0 << std::endl;
     }
+
+    // Derived throughput for common operations (assuming page-sized ops)
+    auto find = [&](const std::string& name) -> const BenchmarkResult* {
+        for (const auto& r : results) if (r.name == name) return &r; return nullptr;
+    };
+    const BenchmarkResult* rread = find("onfi_read_page");
+    const BenchmarkResult* rwrite = find("onfi_write_page");
+    if (rread || rwrite) {
+        std::cout << "\n--- Derived Throughput (MB/s, decimal MB) ---" << std::endl;
+    }
+    // Note: page size not known here; caller prints chip info separately. We approximate using latest onfi instance below in main.
 }
 
 void print_chip_info(const onfi_interface& onfi) {
@@ -244,6 +255,26 @@ int main() {
 
     std::cout << std::endl;
     print_summary(results);
+
+    // Derived throughput based on measured means
+    auto find = [&](const std::string& name) -> const BenchmarkResult* {
+        for (const auto& r : results) if (r.name == name) return &r; return nullptr;
+    };
+    const BenchmarkResult* rread = find("onfi_read_page");
+    const BenchmarkResult* rwrite = find("onfi_write_page");
+    const size_t page_bytes = static_cast<size_t>(onfi.num_bytes_in_page) + static_cast<size_t>(onfi.num_spare_bytes_in_page);
+    if ((rread || rwrite) && page_bytes > 0) {
+        std::cout << "\n--- Throughput ---" << std::endl;
+        std::cout << std::left << std::setw(20) << "Operation" << std::setw(15) << "MB/s" << std::endl;
+        std::cout << std::string(35, '-') << std::endl;
+        auto to_MBps = [&](double mean_ns) {
+            double mean_s = mean_ns / 1e9;
+            double MBps = (page_bytes / mean_s) / 1e6; // decimal MB
+            return MBps;
+        };
+        if (rread)  std::cout << std::left << std::setw(20) << "read_page"  << std::setw(15) << std::fixed << std::setprecision(3) << to_MBps(rread->mean)  << std::endl;
+        if (rwrite) std::cout << std::left << std::setw(20) << "write_page" << std::setw(15) << std::fixed << std::setprecision(3) << to_MBps(rwrite->mean) << std::endl;
+    }
     print_chip_info(onfi);
 
     return 0;
