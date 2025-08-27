@@ -189,11 +189,7 @@ __attribute__((always_inline)) void interface::send_data(uint8_t *data_to_send, 
         for (i = 0; i < num_data; i++) {
             gpio_write(GPIO_WE, 0);
             set_dq_pins(data_to_send[i]);
-            SAMPLE_TIME;
-
             gpio_write(GPIO_WE, 1);
-            HOLD_TIME;
-            set_dq_pins(0x00);
         }
         set_default_pin_values();
     } else {

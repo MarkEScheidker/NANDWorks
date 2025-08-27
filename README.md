@@ -48,16 +48,12 @@ The following table outlines the expected GPIO connections between the DE1-SoC a
 | :--- | :--- | :---------------------------------------- |
 | `DQ0-DQ7` | 21, 20, 16, 12, 25, 24, 23, 18 | 8-bit bidirectional data bus.             |
 | `WP#` | 26 | Write Protect (Active Low).               |
-| `CLE` | 11 | Command Latch Enable (Active High).       |
-| `ALE` | 13 | Address Latch Enable (Active High).       |
-| `RE#` | 27 | Read Enable (Active Low).                 |
 | `WE#` | 19 | Write Enable (Active Low).                |
+| `ALE` | 13 | Address Latch Enable (Active High).       |
+| `CLE` | 11 | Command Latch Enable (Active High).       |
 | `CE#` | 22 | Chip Enable (Active Low).                 |
+| `RE#` | 27 | Read Enable (Active Low).                 |
 | `R/B#` | 17 | Ready/Busy status (Output from NAND).     |
-
-### FPGA Bridge
-
-The lightweight HPS-to-FPGA bridge is expected to be available at the physical address `0xFF200000`. The software uses this bridge to access the GPIO controllers.
 
 ## Software Architecture
 
