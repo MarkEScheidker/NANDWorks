@@ -18,10 +18,10 @@ void onfi_interface::read_id() {
     send_command(0xED);
     send_addresses(&address_to_read);
     uint8_t *my_unique_id = (uint8_t *) (malloc(num_bytes * sizeof(uint8_t)));
-    tRR;
+    
     //wait for RB# signal to be high
     while (gpio_read(GPIO_RB) == 0);
-    tRR;
+    
 
     get_data(my_unique_id, num_bytes);
     memcpy(unique_id, my_unique_id, num_bytes);
@@ -34,7 +34,7 @@ void onfi_interface::read_id() {
     send_command(0x90);
     send_addresses(&address_to_read);
     uint8_t *my_00_address = (uint8_t *) (malloc(num_bytes * sizeof(uint8_t)));
-    tWHR;
+    
     get_data(my_00_address, num_bytes);
     if(DEBUG_ONFI) printf("-------------------------------------------------\n");
     if(DEBUG_ONFI) printf("The ID at 0x00 is: ");
@@ -54,7 +54,7 @@ void onfi_interface::read_id() {
     send_command(0x90);
     send_addresses(&address_to_read);
     uint8_t *my_20_address = (uint8_t *) (malloc(num_bytes * sizeof(uint8_t)));
-    tWHR;
+    
     get_data(my_20_address, num_bytes);
     if(DEBUG_ONFI) printf("-------------------------------------------------\n");
     if(DEBUG_ONFI) printf("The ID at 0x20 is: ");
@@ -75,7 +75,7 @@ void onfi_interface::read_id() {
     send_command(0x90);
     send_addresses(&address_to_read);
     uint8_t *my_40_address = (uint8_t *) (malloc(num_bytes * sizeof(uint8_t)));
-    tWHR;
+    
     get_data(my_40_address, num_bytes);
     if(DEBUG_ONFI) printf("-------------------------------------------------\n");
     if(DEBUG_ONFI) printf("The ID at 0x40 is: ");

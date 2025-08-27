@@ -203,6 +203,10 @@ public:
     void set_dq_pins(uint8_t data) const;
 
     uint8_t read_dq_pins() const;
+
+    // Wait for Ready/Busy (R/B#) to indicate ready (high). Returns true if
+    // ready before timeout, false on timeout. Uses CLOCK_MONOTONIC_RAW.
+    bool wait_ready(uint64_t timeout_ns) const;
 };
 
 #endif

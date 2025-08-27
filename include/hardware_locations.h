@@ -54,20 +54,5 @@
 #define GPIO_RLED2 7  // Red LED 2
 #define GPIO_RLED3 8  // Red LED 3
 
-// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// Timing Delays
-//
-// These macros define timing delays required for NAND flash operations, based on the device's
-// datasheet. The values are in nanoseconds.
-// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#define SAMPLE_TIME busy_wait_ns(10) // tDS (Data Setup Time)
-#define HOLD_TIME   busy_wait_ns(10) // tDH (Data Hold Time)
-#define tWW         busy_wait_ns(100) // 100ns (Write to Write delay)
-#define tWB         busy_wait_ns(200) // 200ns (Write Busy)
-#define tRR         busy_wait_ns(40)  // 40ns (Read to Read delay)
-#define tRHW        busy_wait_ns(200) // 200ns (Read High to Write)
-#define tCCS        busy_wait_ns(200) // 200ns (Chip Select Setup)
-#define tADL        busy_wait_ns(300) // 300ns (Address to Data Latch)
-#define tWHR        busy_wait_ns(120) // 120ns (Write High to Read)
 
 #endif // HARDWARE_LOCATIONS_H

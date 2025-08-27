@@ -143,19 +143,10 @@ void onfi_interface::device_initialization(bool verbose) {
     if(verbose) std::cout << "Setting CE low" << std::endl;
     set_ce_low();
 
-    //insert delay here
-    if(verbose) std::cout << "Delaying for 50us" << std::endl;
-    busy_wait_ns(50000000); // 50 ms
-
-    // wait for R/B signal to go high
+    // Wait for R/B signal to go high
     if(verbose) std::cout << "Waiting for R/B signal to go high" << std::endl;
-    int timeout = 0;
-    while (gpio_read(GPIO_RB) == 0) {
-        timeout++;
-        if (timeout > 1000000) {
-            if(verbose) std::cout << "Timed out waiting for R/B to go high" << std::endl;
-            break;
-        }
+    if (!wait_ready(200000000)) { // 200 ms timeout
+        if(verbose) std::cout << "Timed out waiting for R/B to go high" << std::endl;
     }
 
     // now issue RESET command
@@ -173,21 +164,8 @@ void onfi_interface::device_initialization(bool verbose) {
 void onfi_interface::reset_device(bool verbose) {
     // oxff is reset command
     send_command(0xff);
-    // no address is expected for reset command
-    // wait for busy signal again
-
-    //insert delay here
-    // .. not needed because the next polling statement will take care
-    // .. polling the Ready/BUSY signal
-    // .. but we should wait for tWB = 200ns before the RB signal is valid
-    busy_wait_ns(1000000); // 1ms
-
-    int timeout = 0;
-    while (gpio_read(GPIO_RB) == 0) {
-        timeout++;
-        if (timeout > 1000000) {
-            if(verbose) std::cout << "Timed out waiting for R/B to go high" << std::endl;
-            break;
-        }
+    // No fixed delay; just wait for ready with a timeout
+    if (!wait_ready(200000000)) { // 200 ms timeout
+        if(verbose) std::cout << "Timed out waiting for R/B to go high after reset" << std::endl;
     }
 }

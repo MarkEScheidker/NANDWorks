@@ -100,7 +100,7 @@ void onfi_interface::program_page(unsigned int my_block_number, unsigned int my_
     send_command(0x80);
     send_addresses(page_address, 5);
 
-    tADL;
+    
 
     send_data(data_to_program, including_spare ? (num_bytes_in_page + num_spare_bytes_in_page) : (num_bytes_in_page));
 
@@ -110,7 +110,7 @@ void onfi_interface::program_page(unsigned int my_block_number, unsigned int my_
 #endif
         send_command(0x10);
 
-        tWB;
+        
         // check if it is out of Busy cycle
         while (gpio_read(GPIO_RB) == 0);
 #if PROFILE_TIME
@@ -181,7 +181,7 @@ void onfi_interface::program_page_tlc_toshiba_subpage(unsigned int my_block_numb
     send_command(0x80);
     send_addresses(page_address, 5);
 
-    tADL;
+    
 
     send_data(data_to_program, including_spare ? (num_bytes_in_page + num_spare_bytes_in_page) : (num_bytes_in_page));
 
@@ -192,7 +192,7 @@ void onfi_interface::program_page_tlc_toshiba_subpage(unsigned int my_block_numb
         if (my_subpage_number < 3) send_command(0x1a);
         else send_command(0x10);
 
-        tWB;
+        
         // check if it is out of Busy cycle
         while (gpio_read(GPIO_RB) == 0);
 #if PROFILE_TIME
@@ -266,7 +266,7 @@ void onfi_interface::program_page_tlc_toshiba(unsigned int my_block_number, unsi
     send_command(0x80);
     send_addresses(page_address, 5);
 
-    tADL;
+    
 
     send_data(data_to_program, including_spare ? (num_bytes_in_page + num_spare_bytes_in_page) : (num_bytes_in_page));
 
@@ -276,7 +276,7 @@ void onfi_interface::program_page_tlc_toshiba(unsigned int my_block_number, unsi
 #endif
         send_command(0x1a);
 
-        tWB;
+        
         // check if it is out of Busy cycle
         while (gpio_read(GPIO_RB) == 0);
 #if PROFILE_TIME
@@ -314,7 +314,7 @@ void onfi_interface::program_page_tlc_toshiba(unsigned int my_block_number, unsi
     send_command(0x80);
     send_addresses(page_address, 5);
 
-    tADL;
+    
 
     send_data(data_to_program, including_spare ? (num_bytes_in_page + num_spare_bytes_in_page) : (num_bytes_in_page));
 
@@ -324,7 +324,7 @@ void onfi_interface::program_page_tlc_toshiba(unsigned int my_block_number, unsi
 #endif
         send_command(0x1a);
 
-        tWB;
+        
         // check if it is out of Busy cycle
         while (gpio_read(GPIO_RB) == 0);
 #if PROFILE_TIME
@@ -362,7 +362,7 @@ void onfi_interface::program_page_tlc_toshiba(unsigned int my_block_number, unsi
     send_command(0x80);
     send_addresses(page_address, 5);
 
-    tADL;
+    
 
     send_data(data_to_program, including_spare ? (num_bytes_in_page + num_spare_bytes_in_page) : (num_bytes_in_page));
 
@@ -372,7 +372,7 @@ void onfi_interface::program_page_tlc_toshiba(unsigned int my_block_number, unsi
 #endif
         send_command(0x10);
 
-        tWB;
+        
         // check if it is out of Busy cycle
         while (gpio_read(GPIO_RB) == 0);
 #if PROFILE_TIME
@@ -431,7 +431,7 @@ void onfi_interface::partial_program_page(unsigned int my_block_number, unsigned
     send_command(0x80);
     send_addresses(page_address, 5);
 
-    tADL;
+    
 
     send_data(data_to_program, including_spare ? (num_bytes_in_page + num_spare_bytes_in_page) : (num_bytes_in_page));
 

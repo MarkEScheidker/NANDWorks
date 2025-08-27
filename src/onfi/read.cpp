@@ -43,13 +43,13 @@ void onfi_interface::read_page(unsigned int my_block_number, unsigned int my_pag
 // this function opens a file named time_info_file.txt
 // .. this file will log all the duration from the timing operations as necessary
 void onfi_interface::change_read_column(uint8_t *col_address) {
-    tRHW;
+    
 
     send_command(0x05);
     send_addresses(col_address, 2);
     send_command(0xe0);
 
-    tCCS;
+    
 }
 
 // function to disable Program and Erase operation

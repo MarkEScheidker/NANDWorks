@@ -389,11 +389,11 @@ void onfi_interface::convert_to_slc(unsigned int my_block_number, bool first_tim
     }
 
     send_command(0xda);
-    tWB;
+        
     send_command(0x60);
     send_addresses(my_test_block_address + 2);
     send_command(0xd0);
-    tWB;
+        
     while (gpio_read(GPIO_RB) == 0);;
 
     //perform erase operation to init
@@ -406,10 +406,10 @@ void onfi_interface::revert_to_mlc(unsigned int my_block_number) {
     convert_pagenumber_to_columnrow_address(my_block_number, 0, my_test_block_address, false);
 
     send_command(0xdf);
-    tWB;
+        
     send_command(0x60);
     send_addresses(my_test_block_address + 2);
     send_command(0xd0);
-    tWB;
+        
     while (gpio_read(GPIO_RB) == 0);;
 }

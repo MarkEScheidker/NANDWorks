@@ -129,11 +129,7 @@ __attribute__((always_inline)) void interface::send_command(uint8_t command_to_s
 
     set_dq_pins(command_to_send);
 
-    SAMPLE_TIME;
-
     gpio_set_high(GPIO_WE);
-
-    HOLD_TIME;
 
     gpio_write(GPIO_CLE, 0);
     set_default_pin_values();
@@ -166,10 +162,7 @@ __attribute__((always_inline)) void interface::send_addresses(uint8_t *address_t
 #else
         if (verbose) fprintf(stdout, "0x%x,", address_to_send[i]);
 #endif
-        SAMPLE_TIME;
-
         gpio_set_high(GPIO_WE);
-        HOLD_TIME;
     }
     set_default_pin_values();
 
@@ -259,4 +252,12 @@ void interface::test_leds_increment(bool verbose) {
 #else
     if (verbose) std::cout << "I: .. testing LEDs completed" << std::endl;
 #endif
+}
+
+bool interface::wait_ready(uint64_t timeout_ns) const {
+    const uint64_t start = get_timestamp_ns();
+    while (gpio_read(GPIO_RB) == 0) {
+        if ((get_timestamp_ns() - start) > timeout_ns) return false;
+    }
+    return true;
 }
