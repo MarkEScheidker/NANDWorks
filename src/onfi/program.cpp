@@ -112,7 +112,7 @@ void onfi_interface::program_page(unsigned int my_block_number, unsigned int my_
 
         
         // check if it is out of Busy cycle
-        while (gpio_read(GPIO_RB) == 0);
+        wait_ready_blocking();
 #if PROFILE_TIME
     uint64_t end_time = get_timestamp_ns();
     time_info_file << "  took " << (end_time - start_time) / 1000 << " microseconds\n";
@@ -194,7 +194,7 @@ void onfi_interface::program_page_tlc_toshiba_subpage(unsigned int my_block_numb
 
         
         // check if it is out of Busy cycle
-        while (gpio_read(GPIO_RB) == 0);
+        wait_ready_blocking();
 #if PROFILE_TIME
     uint64_t end_time = get_timestamp_ns();
     time_info_file << "  took " << (end_time - start_time) / 1000 << " microseconds\n";
@@ -278,7 +278,7 @@ void onfi_interface::program_page_tlc_toshiba(unsigned int my_block_number, unsi
 
         
         // check if it is out of Busy cycle
-        while (gpio_read(GPIO_RB) == 0);
+        wait_ready_blocking();
 #if PROFILE_TIME
     uint64_t end_time = get_timestamp_ns();
     time_info_file << "  took " << (end_time - start_time) / 1000 << " microseconds\n";
@@ -453,7 +453,7 @@ void onfi_interface::partial_program_page(unsigned int my_block_number, unsigned
     time_info_file << "  took " << (end_time - start_time) / 1000 << " microseconds\n";
 #endif
     // check if it is out of Busy cycle
-    while (gpio_read(GPIO_RB) == 0);
+    wait_ready_blocking();
 
     uint8_t status = 0;
     status = get_status();

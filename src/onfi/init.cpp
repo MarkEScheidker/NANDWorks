@@ -145,9 +145,7 @@ void onfi_interface::device_initialization(bool verbose) {
 
     // Wait for R/B signal to go high
     if(verbose) std::cout << "Waiting for R/B signal to go high" << std::endl;
-    if (!wait_ready(200000000)) { // 200 ms timeout
-        if(verbose) std::cout << "Timed out waiting for R/B to go high" << std::endl;
-    }
+    wait_ready_blocking();
 
     // now issue RESET command
     if(verbose) std::cout << "I: .. initiating a reset cycle" << std::endl;
@@ -165,7 +163,5 @@ void onfi_interface::reset_device(bool verbose) {
     // oxff is reset command
     send_command(0xff);
     // No fixed delay; just wait for ready with a timeout
-    if (!wait_ready(200000000)) { // 200 ms timeout
-        if(verbose) std::cout << "Timed out waiting for R/B to go high after reset" << std::endl;
-    }
+    wait_ready_blocking();
 }

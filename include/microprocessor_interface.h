@@ -207,6 +207,9 @@ public:
     // Wait for Ready/Busy (R/B#) to indicate ready (high). Returns true if
     // ready before timeout, false on timeout. Uses CLOCK_MONOTONIC_RAW.
     bool wait_ready(uint64_t timeout_ns) const;
+
+    // Spin until R/B# is high (ready). No timeout, polls as fast as possible.
+    void wait_ready_blocking() const;
 };
 
 #endif

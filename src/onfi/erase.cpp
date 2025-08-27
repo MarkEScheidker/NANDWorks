@@ -11,7 +11,7 @@
 void onfi_interface::disable_erase() {
     // check to see if the device is busy
     // .. wait if busy
-    while (gpio_read(GPIO_RB) == 0x00);
+    wait_ready_blocking();
 
     // wp to low
     gpio_write(GPIO_WP, 0);
@@ -20,7 +20,7 @@ void onfi_interface::disable_erase() {
 void onfi_interface::enable_erase() {
     // check to see if the device is busy
     // .. wait if busy
-    while (gpio_read(GPIO_RB) == 0x00);
+    wait_ready_blocking();
 
     // wp to high
     gpio_write(GPIO_WP, 1);
@@ -39,7 +39,7 @@ void onfi_interface::erase_block(unsigned int my_block_number, bool verbose) {
     gpio_set_direction(GPIO_RB, false);
 
     // check if it is out of Busy cycle
-    while (gpio_read(GPIO_RB) == 0);
+    wait_ready_blocking();
 
     send_command(0x60);
     send_addresses(row_address, 3);
@@ -49,7 +49,7 @@ void onfi_interface::erase_block(unsigned int my_block_number, bool verbose) {
         send_command(0xd0);
 
         // check if it is out of Busy cycle
-        while (gpio_read(GPIO_RB) == 0);
+        wait_ready_blocking();
 
 #if PROFILE_TIME
     uint64_t end_time = get_timestamp_ns();
@@ -110,7 +110,7 @@ void onfi_interface::partial_erase_block(unsigned int my_block_number, unsigned 
     gpio_set_direction(GPIO_RB, false);
 
     // check if it is out of Busy cycle
-    while (gpio_read(GPIO_RB) == 0);;
+    wait_ready_blocking();
 
     send_command(0x60);
     send_addresses(row_address, 3);
@@ -131,7 +131,7 @@ void onfi_interface::partial_erase_block(unsigned int my_block_number, unsigned 
 #endif
 
     // check if it is out of Busy cycle
-    while (gpio_read(GPIO_RB) == 0);;
+    wait_ready_blocking();
 
 #if DEBUG_ONFI
     if (onfi_debug_file) {

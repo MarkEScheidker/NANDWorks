@@ -31,8 +31,8 @@ void onfi_interface::read_page(unsigned int my_block_number, unsigned int my_pag
 
         send_command(0x30);
 
-        // check for RDY signal
-        while (gpio_read(GPIO_RB) == 0);
+        // check for RDY signal (blockingly, as fast as possible)
+        wait_ready_blocking();
 #if PROFILE_TIME
     uint64_t end_time = get_timestamp_ns();
     if (verbose) fprintf(stdout, "Read page completed \n");

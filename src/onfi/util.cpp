@@ -65,8 +65,7 @@ void onfi_interface::get_data(uint8_t *data_received, uint16_t num_data) const {
 
         // .. data can be received when on ready state (RDY signal)
         // .. ensure RDY is high
-        // .. .. just keep spinning here checking for ready signal
-        while (gpio_read(GPIO_RB) == 0x00);
+        wait_ready_blocking();
         
         // set CE to low to enable the chip
         gpio_write(GPIO_CE, 0);

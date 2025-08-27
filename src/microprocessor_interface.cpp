@@ -6,22 +6,38 @@
 #include <cstdint>
 #include <iostream>
 
-// Helper to set DQ pins
+namespace {
+    static uint32_t dq_all_mask = 0;
+    static uint32_t dq_set_mask[256];
+    static bool dq_lut_inited = false;
+
+    inline uint32_t bit(uint8_t pin) { return (uint32_t)1u << pin; }
+
+    void init_dq_lut() {
+        if (dq_lut_inited) return;
+        dq_all_mask = bit(GPIO_DQ0) | bit(GPIO_DQ1) | bit(GPIO_DQ2) | bit(GPIO_DQ3) |
+                      bit(GPIO_DQ4) | bit(GPIO_DQ5) | bit(GPIO_DQ6) | bit(GPIO_DQ7);
+        for (int v = 0; v < 256; ++v) {
+            uint32_t m = 0;
+            if (v & 0x01) m |= bit(GPIO_DQ0);
+            if (v & 0x02) m |= bit(GPIO_DQ1);
+            if (v & 0x04) m |= bit(GPIO_DQ2);
+            if (v & 0x08) m |= bit(GPIO_DQ3);
+            if (v & 0x10) m |= bit(GPIO_DQ4);
+            if (v & 0x20) m |= bit(GPIO_DQ5);
+            if (v & 0x40) m |= bit(GPIO_DQ6);
+            if (v & 0x80) m |= bit(GPIO_DQ7);
+            dq_set_mask[v] = m;
+        }
+        dq_lut_inited = true;
+    }
+}
+
+// Helper to set DQ pins using LUT for speed
 void interface::set_dq_pins(uint8_t data) const {
-    uint32_t set_mask = 0;
-    uint32_t clr_mask = 0;
-
-    if ((data >> 0) & 0x01) set_mask |= (1 << GPIO_DQ0); else clr_mask |= (1 << GPIO_DQ0);
-    if ((data >> 1) & 0x01) set_mask |= (1 << GPIO_DQ1); else clr_mask |= (1 << GPIO_DQ1);
-    if ((data >> 2) & 0x01) set_mask |= (1 << GPIO_DQ2); else clr_mask |= (1 << GPIO_DQ2);
-    if ((data >> 3) & 0x01) set_mask |= (1 << GPIO_DQ3); else clr_mask |= (1 << GPIO_DQ3);
-    if ((data >> 4) & 0x01) set_mask |= (1 << GPIO_DQ4); else clr_mask |= (1 << GPIO_DQ4);
-    if ((data >> 5) & 0x01) set_mask |= (1 << GPIO_DQ5); else clr_mask |= (1 << GPIO_DQ5);
-    if ((data >> 6) & 0x01) set_mask |= (1 << GPIO_DQ6); else clr_mask |= (1 << GPIO_DQ6);
-    if ((data >> 7) & 0x01) set_mask |= (1 << GPIO_DQ7); else clr_mask |= (1 << GPIO_DQ7);
-
-    gpio_clr_multi(clr_mask);
-    gpio_set_multi(set_mask);
+    if (!dq_lut_inited) init_dq_lut();
+    gpio_clr_multi(dq_all_mask);
+    gpio_set_multi(dq_set_mask[data]);
 }
 
 // Helper to read DQ pins (single GPLEV0 read for speed)
@@ -260,4 +276,10 @@ bool interface::wait_ready(uint64_t timeout_ns) const {
         if ((get_timestamp_ns() - start) > timeout_ns) return false;
     }
     return true;
+}
+
+void interface::wait_ready_blocking() const {
+    while (gpio_read(GPIO_RB) == 0) {
+        // tight spin, minimal overhead
+    }
 }
