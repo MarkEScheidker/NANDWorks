@@ -13,24 +13,18 @@ Date: 			18 July 2020
 // include our next header
 #include "microprocessor_interface.h"
 
-enum param_type 
+enum param_type
 {
 	JEDEC = 0,
 	ONFI = 1
 };
 
 // print debug messages for ONFI things
-#define DEBUG_ONFI true
+#define DEBUG_ONFI false
 #define PROFILE_DELAY_TIME true
 
 extern uint16_t num_pages_selected;
 extern uint16_t page_indices_selected[];
-
-/**
-finds the number of 1s in the number input
-..  the algo iscalled Brain-Kernigham algo
-*/
-unsigned int find_num_1s(int input_number);
 
 /**
 let us define a class that includes all the lowest level functions that are needed for
@@ -42,6 +36,7 @@ private:
 	// private items go here
 	std::fstream onfi_debug_file;
 	std::fstream onfi_data_file;
+	std::fstream time_info_file;
 
 public:
 	// public items go here: this should be almost all the required functions
@@ -66,6 +61,11 @@ public:
 	uint8_t num_column_cycles;
 	uint8_t num_row_cycles;
 
+	char manufacturer_id[13];
+	char device_model[21];
+	char onfi_version[5];
+	char unique_id[33]; // 32 bytes for unique ID + null terminator
+
 
 	/**
 	This function initializes everything and gets thing started.
@@ -88,9 +88,9 @@ public:
 	.. the interface is set up properly
 */
 	void test_onfi_leds(bool verbose = false);
-	
+
 /**
-	this function opens the debug file 
+	this function opens the debug file
 	.. debug file is used to log the debug messages
 	.. the file is only opened when DEBUG_ONFI is true
 	.. unless otherwise, it is suggested to set DEBUG_ONFI to false
@@ -101,20 +101,23 @@ public:
 	open the data file
 */
 	void open_onfi_data_file();
-	
+
 /**
 	function to receive data from the NAND device
 	.. data is output from the cache regsiter of selected die
 	.. it is supported following a read operation of NAND array
 */
-	void get_data(uint8_t* data_received,uint16_t num_data);
+	void get_data(uint8_t* data_received,uint16_t num_data) const;
 
 /**
-	this function can be used to test the status of flash operation
+	Function to get the status code of the last operation 
 */
-	void check_status();
+	uint8_t get_status();
 
-	void wait_on_status();
+/**
+	Function to check and print if the last operation failed
+*/	
+	void print_status_on_fail();
 
 /**
 	function to initialize the NAND device
@@ -135,7 +138,7 @@ public:
 	.. .. command to be sent is 0xFF
 	.. .. check for R/B signal to be high after certain duration (should go low(busy) and go high (ready))
 */
-	void reset_device();
+	void reset_device(bool verbose = false);
 
 	/**
 	following function reads the ONFI parameter page
@@ -157,12 +160,12 @@ public:
 	void decode_ONFI_version(uint8_t byte_4,uint8_t byte_5,uint8_t* ret_whole,uint8_t* ret_decimal);
 
 	/**
-	 following function will set the size of page based on value read 
+	 following function will set the size of page based on value read
 	*/
 	void set_page_size(uint8_t byte_83,uint8_t byte_82,uint8_t byte_81,uint8_t byte_80);
 
 	/**
-	following function will set the size of spare bytes in a page based on value read 
+	following function will set the size of spare bytes in a page based on value read
 	*/
 	void set_page_size_spare(uint8_t byte_85,uint8_t byte_84);
 
@@ -206,7 +209,7 @@ public:
 
 	/**
 	following function erases the block address provided as the parameter to the function
-	.. the address provided should be three 8-bit number array that corresponds to 
+	.. the address provided should be three 8-bit number array that corresponds to
 	.. .. R1,R2 and R3 for the block to be erased
 	*/
 	void erase_block(unsigned int my_block_number, bool verbose = false);
@@ -216,16 +219,11 @@ public:
 
 	/**
 	following function erases the block address provided as the parameter to the function
-	.. the address provided should be three 8-bit number array that corresponds to 
+	.. the address provided should be three 8-bit number array that corresponds to
 	.. .. R1,R2 and R3 for the block to be erased
 	.. loop_count is the partial erase times, a value of 10 will correspond to 1 ns delay
 	*/
 	void partial_erase_block(unsigned int my_block_number, unsigned int my_page_number, uint32_t loop_count = 30000,bool verbose = false);
-
-	/**
-	 following function can be used to read the status following any command
-	 */
-	void read_status(uint8_t* status_value);
 
 	/**
 	.. this function will read any random page and tries to verify if it was completely erased
@@ -277,7 +275,7 @@ public:
 	.. .. if including spare  = 1, then length of data_to_program should be (num of bytes in pages + num of spare bytes)
 	.. verbose is for priting messages
 	*/
-	bool verify_program_page(unsigned int my_block_number, unsigned int my_page_number,uint8_t* data_to_program,bool verbose = false);
+	    bool verify_program_page(unsigned int my_block_number, unsigned int my_page_number,uint8_t* data_to_program,bool verbose = false, int max_allowed_errors = 0);
 
 	/**
 	let us program pages in the block with all 0s
@@ -288,7 +286,7 @@ public:
 	.. num_pages is the number of pages in the page_indices array
 	.. verbose is for printing
 	*/
-	void program_pages_in_a_block(unsigned int my_block_number,bool complete_block = false, bool data_random = false, uint16_t* page_indices = page_indices_selected,uint16_t num_pages = num_pages_selected, bool verbose = false);
+	void program_pages_in_a_block(unsigned int my_block_number,bool complete_block, bool data_random, uint16_t* page_indices,uint16_t num_pages, bool verbose);
 
 
 /**
@@ -318,11 +316,11 @@ public:
 	.. verbose is for printing
 	*/
 	void program_pages_in_a_block_slc(unsigned int my_block_number,uint16_t num_pages = 256,bool verbose=false);
-	
-	void partial_program_pages_in_a_block(unsigned int my_block_number,uint32_t loop_count,bool complete_block = false,uint16_t* page_indices = page_indices_selected,uint16_t num_pages = num_pages_selected,bool verbose = false);
+
+	void partial_program_pages_in_a_block(unsigned int my_block_number,uint32_t loop_count,bool complete_block,uint16_t* page_indices,uint16_t num_pages,bool verbose);
 
 /**
-	let us verify program pages in the block 
+	let us verify program pages in the block
 	the paramters are:
 	.. my_test_block_address is the address of the block (starting address)
 	.. complete_block if this is true all the pages in the block will be verified
@@ -330,8 +328,8 @@ public:
 	.. num_pages is the number of pages in the page_indices array
 	.. verbose is for printing
 	*/
-	bool verify_program_pages_in_a_block(unsigned int my_block_number,bool complete_block = false,uint16_t* page_indices = page_indices_selected,uint16_t num_pages = num_pages_selected,bool verbose = false);
-	bool verify_program_pages_in_a_block_slc(unsigned int my_block_number,bool verbose = false);
+	    bool verify_program_pages_in_a_block(unsigned int my_block_number,bool complete_block,uint16_t* page_indices,uint16_t num_pages,bool verbose, int max_allowed_errors = 0);
+	    bool verify_program_pages_in_a_block_slc(unsigned int my_block_number,bool verbose = false, int max_allowed_errors = 0);
 
 	/**
 	this function reads the single page address provided
@@ -355,10 +353,10 @@ public:
 	.. verbose indicates the debug messages to be printed
 	*/
 	void read_block_data(unsigned int my_block_number, unsigned int my_page_number,bool complete_block = false,uint16_t* page_indices = page_indices_selected,uint16_t num_pages = num_pages_selected,bool verbose = false);
-	
-	
+
+
 	 /**
-	 This function read the page specified by the index value in the 
+	 This function read the page specified by the index value in the
 	.. block and puts the read value into the array passed " return_value" as argument
 	*/
 	void read_page_and_return_value(unsigned int my_block_number, unsigned int my_page_number,uint16_t index,uint8_t* return_value,bool including_spare = true);
@@ -377,7 +375,7 @@ public:
 	.. accepted by the target only when all die (LUNs) on the target are idle.
 	.. the parameters P1-P4 are in data_to_send argument
 	*/
-	void set_features(uint8_t address, uint8_t* data_to_send,bool verbose = false, uint8_t command = 0xef);
+	void set_features(uint8_t address, uint8_t* data_to_send, uint8_t command = 0xef);
 
 	/**
 	The GET FEATURES (EEh) command reads the subfeature parameters (P1-P4) from the
@@ -385,7 +383,7 @@ public:
 	.. (LUNs) on the target are idle.
 	.. the parameters P1-P4 are in data_received argument
 	*/
-	void get_features(uint8_t address, uint8_t* data_received,bool verbose = false, uint8_t command = 0xee);
+	void get_features(uint8_t address, uint8_t* data_received, uint8_t command = 0xee) const;
 
 	/**
 	following function will convert a block from MLC mode to SLC mode
@@ -409,7 +407,7 @@ public:
 	following function converts the my_page_number inside the my_block_number to {x,x,x,x,x} and saves to my_test_block_address
 	my_test_block_address is an array [c1,c2,r1,r2,r3]
 	*/
-	void convert_pagenumber_to_columnrow_address(unsigned int my_block_number, unsigned int my_page_number, uint8_t* my_test_block_address);
+	void convert_pagenumber_to_columnrow_address(unsigned int my_block_number, unsigned int my_page_number, uint8_t* my_test_block_address, bool verbose);
 };
 
 #endif
