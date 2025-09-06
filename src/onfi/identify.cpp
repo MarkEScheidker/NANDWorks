@@ -7,6 +7,7 @@
 #include <cstdint>
 #include <iomanip>
 #include <algorithm>
+#include "logging.h"
 
 void onfi_interface::read_id() {
     uint8_t num_bytes;
@@ -36,17 +37,17 @@ void onfi_interface::read_id() {
     uint8_t *my_00_address = (uint8_t *) (malloc(num_bytes * sizeof(uint8_t)));
     
     get_data(my_00_address, num_bytes);
-    if(DEBUG_ONFI) printf("-------------------------------------------------\n");
-    if(DEBUG_ONFI) printf("The ID at 0x00 is: ");
+    LOG_ONFI_DEBUG("-------------------------------------------------");
+    LOG_ONFI_DEBUG("The ID at 0x00 is: ");
     for (uint8_t idx = 0; idx < num_bytes; idx++) {
         if ((my_00_address[idx] >= 'a' && my_00_address[idx] <= 'z') || (
                 my_00_address[idx] >= 'A' && my_00_address[idx] <= 'Z'))
-            if(DEBUG_ONFI) printf("%c ,", my_00_address[idx]);
+            LOG_ONFI_DEBUG("%c ,", my_00_address[idx]);
         else
-            if(DEBUG_ONFI) printf("0x%x ,", my_00_address[idx]);
+            LOG_ONFI_DEBUG("0x%x ,", my_00_address[idx]);
     }
-    if(DEBUG_ONFI) printf("\n");
-    if(DEBUG_ONFI) printf("-------------------------------------------------\n");
+    LOG_ONFI_DEBUG("");
+    LOG_ONFI_DEBUG("-------------------------------------------------");
 
     // let us read the ID at address 20
     num_bytes = 4;
@@ -57,17 +58,17 @@ void onfi_interface::read_id() {
     
     get_data(my_20_address, num_bytes);
     if(DEBUG_ONFI) printf("-------------------------------------------------\n");
-    if(DEBUG_ONFI) printf("The ID at 0x20 is: ");
+    LOG_ONFI_DEBUG("The ID at 0x20 is: ");
     for (uint8_t idx = 0; idx < num_bytes; idx++) {
         if ((my_20_address[idx] >= 'a' && my_20_address[idx] <= 'z') || (
                 my_20_address[idx] >= 'A' && my_20_address[idx] <= 'Z'))
-            if(DEBUG_ONFI) printf("%c ,", my_20_address[idx]);
+            LOG_ONFI_DEBUG("%c ,", my_20_address[idx]);
         else
-            if(DEBUG_ONFI) printf("0x%x ,", my_20_address[idx]);
+            LOG_ONFI_DEBUG("0x%x ,", my_20_address[idx]);
     }
-    if(DEBUG_ONFI) printf("\n");
+    LOG_ONFI_DEBUG("");
     free(my_20_address);
-    if(DEBUG_ONFI) printf("-------------------------------------------------\n");
+    LOG_ONFI_DEBUG("-------------------------------------------------");
 
     // let us read the ID at address 40
     num_bytes = 6;
@@ -78,53 +79,53 @@ void onfi_interface::read_id() {
     
     get_data(my_40_address, num_bytes);
     if(DEBUG_ONFI) printf("-------------------------------------------------\n");
-    if(DEBUG_ONFI) printf("The ID at 0x40 is: ");
+    LOG_ONFI_DEBUG("The ID at 0x40 is: ");
     for (uint8_t idx = 0; idx < num_bytes; idx++) {
         if ((my_40_address[idx] >= 'a' && my_40_address[idx] <= 'z') || (
                 my_40_address[idx] >= 'A' && my_40_address[idx] <= 'Z'))
-            if(DEBUG_ONFI) printf("%c ,", my_40_address[idx]);
+            LOG_ONFI_DEBUG("%c ,", my_40_address[idx]);
         else
-            if(DEBUG_ONFI) printf("0x%x ,", my_40_address[idx]);
+            LOG_ONFI_DEBUG("0x%x ,", my_40_address[idx]);
     }
-    if(DEBUG_ONFI) printf("\n");
+    LOG_ONFI_DEBUG("");
     free(my_40_address);
-    if(DEBUG_ONFI) printf("-------------------------------------------------\n");
+    LOG_ONFI_DEBUG("-------------------------------------------------");
 
     //this is where we determine if the default interface is asynchronous or toggle
     // .. ths is for TOSHIBA toggle chips
     if (my_00_address[0] == 0x98) // this is for TOSHIBA chips
     {
-        if(DEBUG_ONFI) printf("Detected TOSHIBA");
+        LOG_ONFI_DEBUG("Detected TOSHIBA");
         if ((my_00_address[5] & 0x80)) // this is for TOGGLE
         {
-            if(DEBUG_ONFI) printf(" TOGGLE");
+            LOG_ONFI_DEBUG(" TOGGLE");
             interface_type = toggle; // this will affect DIN and DOUT cycles
             if (((my_00_address[2] >> 2) & 0x02) == 0x02) // this is for TLC
             {
-                if(DEBUG_ONFI) printf(" TLC");
+                LOG_ONFI_DEBUG(" TLC");
                 flash_chip = toshiba_tlc_toggle; // this will affect how we program pages
             }
         }
-        if(DEBUG_ONFI) printf(" Chip\n.");
+        LOG_ONFI_DEBUG(" Chip.");
     } else if (my_00_address[0] == 0x2c) // this is for Micron
     {
-        if(DEBUG_ONFI) printf("Detected MICRON");
+        LOG_ONFI_DEBUG("Detected MICRON");
         if (((my_00_address[2] >> 2) & 0x02) == 0x02) // this is for TLC
         {
-            if(DEBUG_ONFI) printf(" TLC");
+            LOG_ONFI_DEBUG(" TLC");
             flash_chip = micron_tlc; // this will affect how we program pages
         } else if (((my_00_address[2] >> 2) & 0x01) == 0x01) // this is for MLC
         {
-            if(DEBUG_ONFI) printf(" MLC");
+            LOG_ONFI_DEBUG(" MLC");
             flash_chip = micron_mlc; // this will affect how we program pages
         } else if (((my_00_address[2] >> 2) & 0x02) == 0x00) // this is for SLC
         {
             // flash chip will be default type
-            if(DEBUG_ONFI) printf(" SLC");
+            LOG_ONFI_DEBUG(" SLC");
         }
-        if(DEBUG_ONFI) printf(" Chip \n");
+        LOG_ONFI_DEBUG(" Chip ");
     } else {
-        if(DEBUG_ONFI) printf("Detected Asynchronous NAND Flash Chip.\n");
+        LOG_ONFI_DEBUG("Detected Asynchronous NAND Flash Chip.");
     }
     free(my_00_address);
 }
@@ -142,38 +143,17 @@ void onfi_interface::read_parameters(param_type ONFI_OR_JEDEC, bool bytewise, bo
         type_parameter = "JEDEC";
     }
 
-#if DEBUG_ONFI
-    if (onfi_debug_file)
-        onfi_debug_file << "I: Reading " << type_parameter << " parameters" << std::endl;
-    else
-        std::cout << "I: Reading " << type_parameter << " parameters" << std::endl;
-#else
-	if(verbose) std::cout<<"I: Reading "<<type_parameter<<" parameters"<<std::endl;
-#endif
+    LOG_ONFI_INFO_IF(verbose, "Reading %s parameters", type_parameter.c_str());
 
     // make sure none of the LUNs are busy
     while (gpio_read(GPIO_RB) == 0);
 
-#if DEBUG_ONFI
-    if (onfi_debug_file)
-        onfi_debug_file << "I: .. sending command" << std::endl;
-    else
-        std::cout << "I: .. sending command" << std::endl;
-#else
-	if(verbose) std::cout<<"I: .. sending command"<<std::endl;
-#endif
+    LOG_ONFI_DEBUG_IF(verbose, ".. sending command");
     // read ID command
     send_command(0xEC);
     // send address 00
 
-#if DEBUG_ONFI
-    if (onfi_debug_file)
-        onfi_debug_file << "I: .. sending address" << std::endl;
-    else
-        std::cout << "I: .. sending address" << std::endl;
-#else
-	if(verbose) std::cout<<"I: .. sending address"<<std::endl;
-#endif
+    LOG_ONFI_DEBUG_IF(verbose, ".. sending address");
     send_addresses(&address_to_send);
 
     //have some delay here and wait for busy signal again before reading the paramters
@@ -181,14 +161,7 @@ void onfi_interface::read_parameters(param_type ONFI_OR_JEDEC, bool bytewise, bo
     // make sure none of the LUNs are busy
     while (gpio_read(GPIO_RB) == 0);
 
-#if DEBUG_ONFI
-    if (onfi_debug_file)
-        onfi_debug_file << "I: .. acquiring " << type_parameter << " parameters" << std::endl;
-    else
-        std::cout << "I: .. acquiring " << type_parameter << " parameters" << std::endl;
-#else
-	if(verbose) std::cout<<"I: .. acquiring "<<type_parameter<<" parameters"<<std::endl;
-#endif
+    LOG_ONFI_DEBUG_IF(verbose, ".. acquiring %s parameters", type_parameter.c_str());
     // now read the 256-bytes of data
     uint16_t num_bytes_in_parameters = 256;
     uint8_t ONFI_parameters[num_bytes_in_parameters];
@@ -218,14 +191,7 @@ void onfi_interface::read_parameters(param_type ONFI_OR_JEDEC, bool bytewise, bo
     if(DEBUG_ONFI) printf("\n");
     if(DEBUG_ONFI) printf("-------------------------------------------------\n");
 
-#if DEBUG_ONFI
-    if (onfi_debug_file)
-        onfi_debug_file << "I: .. acquired " << type_parameter << " parameters" << std::endl;
-    else
-        std::cout << "I: .. acquired " << type_parameter << " parameters" << std::endl;
-#else
-	if(verbose) std::cout<<"I: .. acquired "<<type_parameter<<" parameters"<<std::endl;
-#endif
+    LOG_ONFI_DEBUG_IF(verbose, ".. acquired %s parameters", type_parameter.c_str());
 
     uint8_t ret_whole, ret_decimal;
 

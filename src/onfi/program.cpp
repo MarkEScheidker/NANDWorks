@@ -7,6 +7,7 @@
 #include <cstdint>
 #include <iomanip>
 #include <algorithm>
+#include "logging.h"
 
 bool onfi_interface::verify_program_page(unsigned int my_block_number, unsigned int my_page_number,
                                          uint8_t *data_to_program, bool verbose, int max_allowed_errors) {
@@ -293,12 +294,7 @@ void onfi_interface::program_page_tlc_toshiba(unsigned int my_block_number, unsi
             fprintf(stdout, "Failed Program Operation of first subpage: %d,%d,%d\n", page_address[2], page_address[3],
                     page_address[4]);
         } else {
-#if DEBUG_ONFI
-            if (onfi_debug_file) onfi_debug_file << "Program Operation Completed of first subpage" << std::endl;
-            else fprintf(stdout, "Program Operation Completed of first subpage\n");
-#else
-	if(verbose) fprintf(stdout,"Program Operation Completed of first subpage\n");
-#endif
+            LOG_ONFI_INFO_IF(verbose, "Program Operation Completed of first subpage");
         }
     } else {
 #if DEBUG_ONFI
@@ -341,12 +337,7 @@ void onfi_interface::program_page_tlc_toshiba(unsigned int my_block_number, unsi
                     page_address[4]);
         }
         else {
-#if DEBUG_ONFI
-            if (onfi_debug_file) onfi_debug_file << "Program Operation Completed of second subpage" << std::endl;
-            else fprintf(stdout, "Program Operation Completed of second subpage\n");
-#else
-	if(verbose) fprintf(stdout,"Program Operation Completed of second subpage\n");
-#endif
+            LOG_ONFI_INFO_IF(verbose, "Program Operation Completed of second subpage");
         }
     } else {
 #if DEBUG_ONFI
@@ -388,12 +379,7 @@ void onfi_interface::program_page_tlc_toshiba(unsigned int my_block_number, unsi
             fprintf(stdout, "Failed Program Operation of third subpage: %d,%d,%d\n", page_address[2], page_address[3],
                     page_address[4]);
         } else {
-#if DEBUG_ONFI
-            if (onfi_debug_file) onfi_debug_file << "Program Operation Completed of third subpage" << std::endl;
-            else fprintf(stdout, "Program Operation Completed of third subpage\n");
-#else
-	if(verbose) fprintf(stdout,"Program Operation Completed of third subpage\n");
-#endif
+            LOG_ONFI_INFO_IF(verbose, "Program Operation Completed of third subpage");
         }
     } else {
 #if DEBUG_ONFI

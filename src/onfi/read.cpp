@@ -7,6 +7,7 @@
 #include <cstdint>
 #include <iomanip>
 #include <algorithm>
+#include "logging.h"
 
 void onfi_interface::read_page(unsigned int my_block_number, unsigned int my_page_number, uint8_t address_length,
                                bool verbose) {
@@ -76,15 +77,7 @@ void onfi_interface::read_and_spit_page(unsigned int my_block_number, unsigned i
         get_data(data_read_from_page, num_bytes_in_page + num_spare_bytes_in_page);
     }
 
-    if (verbose) {
-#if DEBUG_ONFI
-        if (onfi_debug_file) {
-            onfi_debug_file << "Reading page (" << my_page_number << " of block " << my_block_number << " ):" << std::endl;
-        } else fprintf(stdout, "Reading page (%d of block %d):\n", my_page_number, my_block_number);
-#else
-			fprintf(stdout,"Reading page (%d of block %d):\n",my_page_number, my_block_number);
-#endif
-    }
+    LOG_ONFI_INFO_IF(verbose, "Reading page (%u of block %u)", my_page_number, my_block_number);
 
     //now iterate through each of them to see if they are correct
     uint16_t byte_id = 0;
@@ -104,15 +97,7 @@ void onfi_interface::read_and_spit_page(unsigned int my_block_number, unsigned i
         std::cout << std::endl;
     }
 
-    if (verbose) {
-#if DEBUG_ONFI
-        if (onfi_debug_file) {
-            onfi_debug_file << ".. Reading page completed" << std::endl;
-        } else fprintf(stdout, ".. Reading page completed\n");
-#else
-			fprintf(stdout,".. Reading page completed\n");
-#endif
-    }
+    LOG_ONFI_INFO_IF(verbose, ".. Reading page completed");
     fflush(stdout);
     free(data_read_from_page);
 }
@@ -136,16 +121,7 @@ void onfi_interface::read_and_spit_page_tlc_toshiba(unsigned int my_block_number
     // now let us get the values from the cache memory to our local variable
     get_data(data_read_from_page, num_bytes_in_page + num_spare_bytes_in_page);
 
-    if (verbose) {
-#if DEBUG_ONFI
-        if (onfi_debug_file) {
-            onfi_debug_file << "Reading LSB subpage of page (" << my_page_number << " of block " << my_block_number <<
-                    " ):" << std::endl;
-        } else fprintf(stdout, "Reading LSB subpage of page (%d of block %d):\n", my_page_number, my_block_number);
-#else
-			fprintf(stdout,"Reading LSB subpage of page (%d of block %d):\n",my_page_number, my_block_number);
-#endif
-    }
+    LOG_ONFI_INFO_IF(verbose, "Reading LSB subpage of page (%u of block %u)", my_page_number, my_block_number);
 
     //now iterate through each of them to see if they are correct
     uint16_t byte_id = 0;
@@ -166,15 +142,7 @@ void onfi_interface::read_and_spit_page_tlc_toshiba(unsigned int my_block_number
         std::cout << std::endl;
     }
 
-    if (verbose) {
-#if DEBUG_ONFI
-        if (onfi_debug_file) {
-            onfi_debug_file << ".. Reading  LSB subpage of page completed" << std::endl;
-        } else fprintf(stdout, ".. Reading  LSB subpage of page completed\n");
-#else
-			fprintf(stdout,".. Reading  LSB subpage of page completed\n");
-#endif
-    }
+    LOG_ONFI_INFO_IF(verbose, ".. Reading  LSB subpage of page completed");
     fflush(stdout);
 
     //////////////////////
@@ -187,16 +155,7 @@ void onfi_interface::read_and_spit_page_tlc_toshiba(unsigned int my_block_number
     // now let us get the values from the cache memory to our local variable
     get_data(data_read_from_page, num_bytes_in_page + num_spare_bytes_in_page);
 
-    if (verbose) {
-#if DEBUG_ONFI
-        if (onfi_debug_file) {
-            onfi_debug_file << "Reading CSB subpage of page (" << my_page_number << " of block " << my_block_number <<
-                    " ):" << std::endl;
-        } else fprintf(stdout, "Reading CSB subpage of page (%d of block %d):\n", my_page_number, my_block_number);
-#else
-			fprintf(stdout,"Reading CSB subpage of page (%d of block %d):\n",my_page_number, my_block_number);
-#endif
-    }
+    LOG_ONFI_INFO_IF(verbose, "Reading CSB subpage of page (%u of block %u)", my_page_number, my_block_number);
 
     //now iterate through each of them to see if they are correct
     for (byte_id = 0; byte_id < (num_bytes_in_page + num_spare_bytes_in_page); byte_id++) {
@@ -216,15 +175,7 @@ void onfi_interface::read_and_spit_page_tlc_toshiba(unsigned int my_block_number
         std::cout << std::endl;
     }
 
-    if (verbose) {
-#if DEBUG_ONFI
-        if (onfi_debug_file) {
-            onfi_debug_file << ".. Reading  CSB subpage of page completed" << std::endl;
-        } else fprintf(stdout, ".. Reading CSB subpage of page completed\n");
-#else
-			fprintf(stdout,".. Reading CSB subpage of page completed\n");
-#endif
-    }
+    LOG_ONFI_INFO_IF(verbose, ".. Reading CSB subpage of page completed");
     fflush(stdout);
     /////////////////////////////////
     // let us first reset all the values in the local variables to 0xff
@@ -236,16 +187,7 @@ void onfi_interface::read_and_spit_page_tlc_toshiba(unsigned int my_block_number
     // now let us get the values from the cache memory to our local variable
     get_data(data_read_from_page, num_bytes_in_page + num_spare_bytes_in_page);
 
-    if (verbose) {
-#if DEBUG_ONFI
-        if (onfi_debug_file) {
-            onfi_debug_file << "Reading MSB subpage of page (" << my_page_number << " of block " << my_block_number <<
-                    " ):" << std::endl;
-        } else fprintf(stdout, "Reading MSB subpage of page (%d of block %d):\n", my_page_number, my_block_number);
-#else
-			fprintf(stdout,"Reading MSB subpage of page (%d of block %d):\n",my_page_number, my_block_number);
-#endif
-    }
+    LOG_ONFI_INFO_IF(verbose, "Reading MSB subpage of page (%u of block %u)", my_page_number, my_block_number);
 
     //now iterate through each of them to see if they are correct
     for (byte_id = 0; byte_id < (num_bytes_in_page + num_spare_bytes_in_page); byte_id++) {
@@ -265,15 +207,7 @@ void onfi_interface::read_and_spit_page_tlc_toshiba(unsigned int my_block_number
         std::cout << std::endl;
     }
 
-    if (verbose) {
-#if DEBUG_ONFI
-        if (onfi_debug_file) {
-            onfi_debug_file << ".. Reading  MSB subpage of page completed" << std::endl;
-        } else fprintf(stdout, ".. Reading  MSB subpage of page completed\n");
-#else
-			fprintf(stdout,".. Reading  MSB subpage of page completed\n");
-#endif
-    }
+    LOG_ONFI_INFO_IF(verbose, ".. Reading  MSB subpage of page completed");
     fflush(stdout);
 
     free(data_read_from_page);

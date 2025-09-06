@@ -6,7 +6,7 @@
 #include "gpio.h"
 
 // Enables/disables detailed timing profiles for operations.
-#define PROFILE_TIME true
+#define PROFILE_TIME false
 
 // Forces a function to be inlined.
 #define FORCE_INLINE __attribute__((always_inline))

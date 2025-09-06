@@ -7,6 +7,7 @@
 #include <cstdint>
 #include <iomanip>
 #include <algorithm>
+#include "logging.h"
 
 void onfi_interface::disable_erase() {
     // check to see if the device is busy
@@ -56,18 +57,7 @@ void onfi_interface::erase_block(unsigned int my_block_number, bool verbose) {
     time_info_file << "  took " << (end_time - start_time) / 1000 << " microseconds\n";
 #endif
 
-#if DEBUG_ONFI
-    if (onfi_debug_file) {
-        char my_temp[100];
-        sprintf(my_temp, "Inside Erase Fn: Address is: %02x,%02x,%02x.", row_address[0], row_address[1],
-                row_address[2]);
-        onfi_debug_file << my_temp << std::endl;
-    } else
-        fprintf(stdout, "Inside Erase Fn: Address is: %02x,%02x,%02x.\n", row_address[0], row_address[1],
-                row_address[2]);
-#else
-	if(verbose) fprintf(stdout,"Inside Erase Fn: Address is: %02x,%02x,%02x.\n",row_address[0],row_address[1],row_address[2]);
-#endif
+    LOG_ONFI_INFO_IF(verbose, "Inside Erase Fn: Address is: %02x,%02x,%02x.", row_address[0], row_address[1], row_address[2]);
 
     // let us read the status register value
     uint8_t status = 0;
@@ -76,20 +66,10 @@ void onfi_interface::erase_block(unsigned int my_block_number, bool verbose) {
         if (status & 0x01) {
             if(verbose) fprintf(stdout, "Failed Erase Operation\n");
         } else {
-#if DEBUG_ONFI
-            if (onfi_debug_file) onfi_debug_file << "Erase Operation Completed" << std::endl;
-            else fprintf(stdout, "Erase Operation Completed\n");
-#else
-	if(verbose) fprintf(stdout,"Erase Operation Completed\n");
-#endif
+            LOG_ONFI_INFO_IF(verbose, "Erase Operation Completed");
         }
     } else {
-#if DEBUG_ONFI
-        if (onfi_debug_file) onfi_debug_file << "Erase Operation, should not be here" << std::endl;
-        else fprintf(stdout, "Erase Operation, should not be here\n");
-#else
-	if(verbose) fprintf(stdout,"Erase Operation, should not be here\n");
-#endif
+        LOG_ONFI_WARN_IF(verbose, "Erase Operation, should not be here");
     }
 
     disable_erase();
@@ -133,18 +113,7 @@ void onfi_interface::partial_erase_block(unsigned int my_block_number, unsigned 
     // check if it is out of Busy cycle
     wait_ready_blocking();
 
-#if DEBUG_ONFI
-    if (onfi_debug_file) {
-        char my_temp[100];
-        sprintf(my_temp, "Inside Erase Fn: Address is: %02x,%02x,%02x.", row_address[0], row_address[1],
-                row_address[2]);
-        onfi_debug_file << my_temp << std::endl;
-    } else
-        fprintf(stdout, "Inside Erase Fn: Address is: %02x,%02x,%02x.\n", row_address[0], row_address[1],
-                row_address[2]);
-#else
-	if(verbose) fprintf(stdout,"Inside Erase Fn: Address is: %02x,%02x,%02x.\n",row_address[0],row_address[1],row_address[2]);
-#endif
+    LOG_ONFI_INFO_IF(verbose, "Inside Erase Fn: Address is: %02x,%02x,%02x.", row_address[0], row_address[1], row_address[2]);
 
     // let us read the status register value
     uint8_t status = 0;
@@ -153,20 +122,10 @@ void onfi_interface::partial_erase_block(unsigned int my_block_number, unsigned 
         if (status & 0x01) {
             fprintf(stdout, "Failed Erase Operation\n");
         } else {
-#if DEBUG_ONFI
-            if (onfi_debug_file) onfi_debug_file << "Erase Operation Completed" << std::endl;
-            else fprintf(stdout, "Erase Operation Completed\n");
-#else
-	if(verbose) fprintf(stdout,"Erase Operation Completed\n");
-#endif
+            LOG_ONFI_INFO_IF(verbose, "Erase Operation Completed");
         }
     } else {
-#if DEBUG_ONFI
-        if (onfi_debug_file) onfi_debug_file << "Erase Operation, should not be here" << std::endl;
-        else fprintf(stdout, "Erase Operation, should not be here\n");
-#else
-	if(verbose) fprintf(stdout,"Erase Operation, should not be here\n");
-#endif
+        LOG_ONFI_WARN_IF(verbose, "Erase Operation, should not be here");
     }
 
     disable_erase();

@@ -7,6 +7,7 @@
 #include <cstdint>
 #include <iomanip>
 #include <algorithm>
+#include "logging.h"
 
 void onfi_interface::get_started(param_type ONFI_OR_JEDEC) {
     bool bytewise = true;
@@ -47,11 +48,7 @@ void onfi_interface::get_started(param_type ONFI_OR_JEDEC) {
     set_features(0x01, timing_mode_data, true);
 }
 
-void onfi_interface::open_onfi_debug_file() {
-#if DEBUG_ONFI
-    onfi_debug_file.open("onfi_debug_log.txt", std::fstream::out);
-#endif
-}
+// open_onfi_debug_file removed (legacy)
 
 void onfi_interface::open_onfi_data_file() {
     onfi_data_file.open("data_file.txt", std::fstream::out);
@@ -66,23 +63,14 @@ void onfi_interface::open_time_profile_file() {
 // follow the following function call by get_data() function call
 // .. please change this if the device has multiple dies
 void onfi_interface::initialize_onfi(bool verbose) {
-    if(verbose) std::cout << "Entering initialize_onfi()" << std::endl;
-    open_interface_debug_file();
-    //open the ONFI debug file
-    open_onfi_debug_file();
+    if (verbose) LOG_ONFI_INFO("initialize_onfi() start");
+    open_interface_debug_file(); // no-op (legacy)
     // open the data file
     open_onfi_data_file();
 
     // No need for bridge_base_virtual or fd with pigpio
 
-#if DEBUG_ONFI
-    if (onfi_debug_file)
-        onfi_debug_file << "I: Successful initialization of gpio and pin modes" << std::endl;
-    else
-        std::cout << "I: Successful initialization of gpio and pin modes" << std::endl;
-#else
-	if(verbose) std::cout<<"I: Successful initialization of gpio and pin modes"<<std::endl;
-#endif
+    if (verbose) LOG_ONFI_INFO("GPIO and pin modes initialized");
 }
 
 void onfi_interface::deinitialize_onfi(bool verbose) {
@@ -106,51 +94,37 @@ void onfi_interface::deinitialize_onfi(bool verbose) {
 //  since it is called as a part of onfi_interface, if this works
 // .. the interface is set up properly
 void onfi_interface::test_onfi_leds(bool verbose) {
-#if DEBUG_ONFI
-    if (onfi_debug_file)
-        onfi_debug_file << "I: Testing LEDs" << std::endl;
-    else
-        std::cout << "I: Testing LEDs" << std::endl;
-#else
-	if(verbose) std::cout<<"I: Testing LEDs"<<std::endl;
-#endif
+    if (verbose) LOG_ONFI_INFO("Testing LEDs");
     //just a simple delay for LEDs to stay ON
     turn_leds_on();
     busy_wait_ns(20000000);
     turn_leds_off();
 
-#if DEBUG_ONFI
-    if (onfi_debug_file)
-        onfi_debug_file << "I: Testing LEDs completed" << std::endl;
-    else
-        std::cout << "I: Testing LEDs completed" << std::endl;
-#else
-	if(verbose) std::cout<<"I: Testing LEDs completed"<<std::endl;
-#endif
+    if (verbose) LOG_ONFI_INFO("Testing LEDs completed");
 }
 
 // function to receive data from the NAND device
 // .. data is output from the cache regsiter of selected die
 // .. it is supported following a read operation of NAND array
 void onfi_interface::device_initialization(bool verbose) {
-    if(verbose) std::cout << "I: Initializing device with a reset cycle" << std::endl;
-    if(verbose) std::cout << "Setting pin direction inactive" << std::endl;
+    if (verbose) LOG_ONFI_INFO("Initializing device with a reset cycle");
+    if (verbose) LOG_ONFI_DEBUG("Setting pin direction inactive");
     set_pin_direction_inactive();
-    if(verbose) std::cout << "Setting default pin values" << std::endl;
+    if (verbose) LOG_ONFI_DEBUG("Setting default pin values");
     set_default_pin_values();
 
     // we need to set CE to low for RESET to work
-    if(verbose) std::cout << "Setting CE low" << std::endl;
+    if (verbose) LOG_ONFI_DEBUG("Setting CE low");
     set_ce_low();
 
     // Wait for R/B signal to go high
-    if(verbose) std::cout << "Waiting for R/B signal to go high" << std::endl;
+    if (verbose) LOG_ONFI_DEBUG("Waiting for R/B signal to go high");
     wait_ready_blocking();
 
     // now issue RESET command
-    if(verbose) std::cout << "I: .. initiating a reset cycle" << std::endl;
+    if (verbose) LOG_ONFI_INFO("Issuing reset");
     reset_device(verbose);
-    if(verbose) std::cout << "I: .. .. reset cycle done" << std::endl;
+    if (verbose) LOG_ONFI_INFO("Reset complete");
 }
 
 // function to reset the whole device

@@ -26,6 +26,8 @@ This implementation has been validated with a Micron 3D NAND part (ONFI 4.0 comp
   - [Verification](#verification)
   - [Utilities](#utilities)
 - [Repository Structure](#repository-structure)
+ - [Debugging & Logging](#debugging--logging)
+ - [Build Options](#build-options)
 
 ## Features
 
@@ -186,3 +188,78 @@ The primary entry point for using this library is the `onfi_interface` class. Th
         ├── read.cpp
         └── util.cpp
 ```
+
+## Debugging & Logging
+
+A lightweight, header‑only logging system provides structured logs with zero overhead when disabled. Logs include timestamps, levels, and a component tag (ONFI/HAL).
+
+- Components: `onfi` (protocol API), `hal` (low‑level GPIO operations).
+- Levels: `0=NONE`, `1=ERROR`, `2=WARN`, `3=INFO`, `4=DEBUG`, `5=TRACE`.
+- Example macros:
+  - `LOG_ONFI_INFO("Erased block %u", block)`
+  - `LOG_ONFI_INFO_IF(verbose, "Erased block %u", block)`
+  - `LOG_HAL_DEBUG("Sending %u address bytes", n)`
+
+Enable logs at compile time by defining per‑component levels:
+
+```bash
+# ONFI at INFO, HAL at DEBUG
+make CXXFLAGS+=" -DLOG_ONFI_LEVEL=3 -DLOG_HAL_LEVEL=4 "
+
+# Very verbose
+make CXXFLAGS+=" -DLOG_ONFI_LEVEL=5 -DLOG_HAL_LEVEL=5 "
+```
+
+Most tools also accept `-v` to show user‑oriented messages. Internally, log calls use `*_IF(verbose, ...)` forms so the runtime condition is inside the macro and compiles away entirely when logging is disabled.
+
+Timing/profiling I/O is disabled by default to keep hot paths clean. To record per‑operation timings to `time_info_file.txt`:
+
+```bash
+make CXXFLAGS+=" -DPROFILE_TIME=1 "
+```
+
+## Build Options
+
+Suggested configurations:
+
+- Development diagnostics:
+  - `make CXXFLAGS+=" -g -O2 -DLOG_ONFI_LEVEL=4 -DLOG_HAL_LEVEL=4 -DPROFILE_TIME=1 "`
+
+- Maximum performance (no logs, no profiling):
+  - `make CXXFLAGS+=" -O3 "`
+
+- High‑level ONFI logs only:
+  - `make CXXFLAGS+=" -O3 -DLOG_ONFI_LEVEL=3 "`
+
+Run tools with `-v` to enable verbose output where supported:
+
+```bash
+sudo ./main -v
+sudo ./erase_chip -v
+```
+Convenience Makefile targets (shortcuts):
+
+- `make debug`: Enables ONFI=INFO and HAL=DEBUG logs, turns on profiling I/O, and adds `-g -O2` for easier debugging.
+- `make trace`: Enables ONFI/HAL at TRACE level (very verbose), turns on profiling I/O, and adds `-g -O2`.
+- `make profile`: Turns on profiling I/O only; logs remain at defaults.
+- `make help`: Prints a brief summary of available variables and targets.
+
+Make‑time variables (can be overridden on the command line):
+
+- `LOG_ONFI_LEVEL`: 0..5 (default 0)
+- `LOG_HAL_LEVEL`: 0..5 (default 0)
+- `PROFILE_TIME`: 0 or 1 (default 0)
+
+Examples:
+
+```bash
+# ONFI at INFO, HAL at DEBUG
+make LOG_ONFI_LEVEL=3 LOG_HAL_LEVEL=4
+
+# Enable profiling I/O only
+make PROFILE_TIME=1
+
+# Trace everything (be verbose!)
+make LOG_ONFI_LEVEL=5 LOG_HAL_LEVEL=5 PROFILE_TIME=1
+```
+

@@ -5,6 +5,7 @@
 #include <bcm2835.h>
 #include <cstdint>
 #include <iostream>
+#include "logging.h"
 
 namespace {
     static uint32_t dq_all_mask = 0;
@@ -56,22 +57,11 @@ uint8_t interface::read_dq_pins() const {
 }
 
 void interface::open_interface_debug_file() {
-#if DEBUG_INTERFACE
-	interface_debug_file.open("interface_debug_log.txt",std::fstream::out);
-#endif
+    // No-op: legacy interface debug removed; use structured logging instead
 }
 
 void interface::close_interface_debug_file(bool verbose) {
-#if DEBUG_INTERFACE
-	if(interface_debug_file)
-	{
-		interface_debug_file<<"I: Closing the debug file"<<std::endl;
-		interface_debug_file.close();
-	}else
-		std::cout<<"I: Closing the debug file"<<std::endl;
-#else
-    if (verbose) std::cout << "I: Closing the debug file" << std::endl;
-#endif
+    if (verbose) LOG_HAL_INFO("Closing interface debug (noop)");
 }
 
 __attribute__((always_inline)) void interface::set_pin_direction_inactive() const {
@@ -153,14 +143,7 @@ __attribute__((always_inline)) void interface::send_command(uint8_t command_to_s
 
 __attribute__((always_inline)) void interface::send_addresses(uint8_t *address_to_send, uint8_t num_address_bytes,
                                                               bool verbose) const {
-#if DEBUG_INTERFACE
-	if(interface_debug_file)
-		interface_debug_file<<"I: Sending Addresses "<<num_address_bytes<<" bytes"<<std::endl;
-	else
-		std::cout<<"I: Sending Addresses "<<num_address_bytes<<" bytes"<<std::endl;
-#else
-    if (verbose) std::cout << "I: Sending Addresses " << (int)num_address_bytes << " bytes" << std::endl << "	:";
-#endif
+    LOG_HAL_DEBUG_IF(verbose, "Sending %u address bytes", (unsigned)num_address_bytes);
 
     gpio_write(GPIO_CE, 0);
     gpio_write(GPIO_ALE, 1);
@@ -170,26 +153,11 @@ __attribute__((always_inline)) void interface::send_addresses(uint8_t *address_t
         gpio_set_low(GPIO_WE);
         set_dq_pins(address_to_send[i]);
 
-#if DEBUG_INTERFACE
-	if(interface_debug_file)
-		fprintf(interface_debug_file,"0x%x,", address_to_send[i]);
-	else
-		fprintf(stdout,"0x%x,", address_to_send[i]);
-#else
-        if (verbose) fprintf(stdout, "0x%x,", address_to_send[i]);
-#endif
         gpio_set_high(GPIO_WE);
     }
     set_default_pin_values();
 
-#if DEBUG_INTERFACE
-	if(interface_debug_file)
-		interface_debug_file<<std::endl;
-	else
-		std::cout<<std::endl;
-#else
-    if (verbose) std::cout << std::endl;
-#endif
+    (void)verbose;
 }
 
 __attribute__((always_inline)) void interface::send_data(uint8_t *data_to_send, uint16_t num_data) const {
@@ -242,13 +210,7 @@ void interface::turn_leds_off() {
 }
 
 void interface::test_leds_increment(bool verbose) {
-#if DEBUG_INTERFACE
-	if(interface_debug_file)	interface_debug_file<<"I: testing LEDs with a shifting lighting pattern"<<std::endl;
-	else
-		std::cout<<"I: testing LEDs with a shifting lighting pattern"<<std::endl;
-#else
-    if (verbose) std::cout << "I: testing LEDs with a shifting lighting pattern" << std::endl;
-#endif
+    LOG_HAL_INFO_IF(verbose, "Testing LEDs with a shifting lighting pattern");
 
     // Assuming RLED0_PIN to RLED3_PIN are consecutive for simplicity, or iterate through an array
     int leds[] = {GPIO_RLED0, GPIO_RLED1, GPIO_RLED2, GPIO_RLED3};
@@ -262,12 +224,7 @@ void interface::test_leds_increment(bool verbose) {
         }
     }
 
-#if DEBUG_INTERFACE
-	if(interface_debug_file)	interface_debug_file<<"I: .. testing LEDs completed"<<std::endl;
-	else 	std::cout<<"I: .. testing LEDs completed"<<std::endl;
-#else
-    if (verbose) std::cout << "I: .. testing LEDs completed" << std::endl;
-#endif
+    LOG_HAL_INFO_IF(verbose, ".. Testing LEDs completed");
 }
 
 bool interface::wait_ready(uint64_t timeout_ns) const {

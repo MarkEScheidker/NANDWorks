@@ -33,10 +33,9 @@ let us define a class that includes all the lowest level functions that are need
 class onfi_interface: public interface
 {
 private:
-	// private items go here
-	std::fstream onfi_debug_file;
-	std::fstream onfi_data_file;
-	std::fstream time_info_file;
+    // private items go here
+    std::fstream onfi_data_file;
+    std::fstream time_info_file;
 
 public:
 	// public items go here: this should be almost all the required functions
@@ -88,14 +87,6 @@ public:
 	.. the interface is set up properly
 */
 	void test_onfi_leds(bool verbose = false);
-
-/**
-	this function opens the debug file
-	.. debug file is used to log the debug messages
-	.. the file is only opened when DEBUG_ONFI is true
-	.. unless otherwise, it is suggested to set DEBUG_ONFI to false
-*/
-	void open_onfi_debug_file();
 
 /**
 	open the data file
