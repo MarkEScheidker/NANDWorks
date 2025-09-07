@@ -1,25 +1,6 @@
 var searchData=
 [
-  ['log_5fhal_5fdebug_0',['LOG_HAL_DEBUG',['../logging_8h.html#a8c81bc36898ca58e54906a8fb59476a1',1,'logging.h']]],
-  ['log_5fhal_5fdebug_5fif_1',['LOG_HAL_DEBUG_IF',['../logging_8h.html#a40ebd618503ed924060539a6588b7653',1,'logging.h']]],
-  ['log_5fhal_5ferror_2',['LOG_HAL_ERROR',['../logging_8h.html#a7169a493516c6d5455c1b94b9f3ce488',1,'logging.h']]],
-  ['log_5fhal_5ferror_5fif_3',['LOG_HAL_ERROR_IF',['../logging_8h.html#ae97de3578b7be0dec6c8c47f5af43145',1,'logging.h']]],
-  ['log_5fhal_5finfo_4',['LOG_HAL_INFO',['../logging_8h.html#a02d17d2035d0b419ef613ad0f25aa7d7',1,'logging.h']]],
-  ['log_5fhal_5finfo_5fif_5',['LOG_HAL_INFO_IF',['../logging_8h.html#a00e6e2c371363dc547a262a42dfc9b07',1,'logging.h']]],
-  ['log_5fhal_5flevel_6',['LOG_HAL_LEVEL',['../logging_8h.html#aad12ddb26f2eb69da7ba757453c73c48',1,'logging.h']]],
-  ['log_5fhal_5ftrace_7',['LOG_HAL_TRACE',['../logging_8h.html#a3f7a16a495392c86299307f2af71b9f4',1,'logging.h']]],
-  ['log_5fhal_5ftrace_5fif_8',['LOG_HAL_TRACE_IF',['../logging_8h.html#a9d34622119311dffb6f54d52099f58e2',1,'logging.h']]],
-  ['log_5fhal_5fwarn_9',['LOG_HAL_WARN',['../logging_8h.html#ad9ee538743b8c6c57e8ede29c34395ee',1,'logging.h']]],
-  ['log_5fhal_5fwarn_5fif_10',['LOG_HAL_WARN_IF',['../logging_8h.html#afbfdbe0017b750e873603f0f06b67a95',1,'logging.h']]],
-  ['log_5fonfi_5fdebug_11',['LOG_ONFI_DEBUG',['../logging_8h.html#ab981ca7ee867955f2b93f78eeebf5fc1',1,'logging.h']]],
-  ['log_5fonfi_5fdebug_5fif_12',['LOG_ONFI_DEBUG_IF',['../logging_8h.html#a390d9b350016f29147a13a745386fd30',1,'logging.h']]],
-  ['log_5fonfi_5ferror_13',['LOG_ONFI_ERROR',['../logging_8h.html#a870b9059e147a99961da42952d689edc',1,'logging.h']]],
-  ['log_5fonfi_5ferror_5fif_14',['LOG_ONFI_ERROR_IF',['../logging_8h.html#a8cb1e9211fb2ec6142863143c3db8681',1,'logging.h']]],
-  ['log_5fonfi_5finfo_15',['LOG_ONFI_INFO',['../logging_8h.html#ae4e61ec22d35e3d6b9521b5ad2295bf8',1,'logging.h']]],
-  ['log_5fonfi_5finfo_5fif_16',['LOG_ONFI_INFO_IF',['../logging_8h.html#a8ca53c8b45f391dc5eb449e0c34b91dd',1,'logging.h']]],
-  ['log_5fonfi_5flevel_17',['LOG_ONFI_LEVEL',['../logging_8h.html#a152764fffecb77cac1d1c13d56cba9cc',1,'logging.h']]],
-  ['log_5fonfi_5ftrace_18',['LOG_ONFI_TRACE',['../logging_8h.html#af98fabcbf69aaa015a99f6b4ddc792df',1,'logging.h']]],
-  ['log_5fonfi_5ftrace_5fif_19',['LOG_ONFI_TRACE_IF',['../logging_8h.html#afa792ab43c3840e1edd1b2a8ec846ce3',1,'logging.h']]],
-  ['log_5fonfi_5fwarn_20',['LOG_ONFI_WARN',['../logging_8h.html#a250f930032466a2b808a9e2149864e3e',1,'logging.h']]],
-  ['log_5fonfi_5fwarn_5fif_21',['LOG_ONFI_WARN_IF',['../logging_8h.html#a5944830dc6f63bca4666762a6da1e7e0',1,'logging.h']]]
+  ['print_5ftime_0',['PRINT_TIME',['../hardware__locations_8h.html#ac3f5ae786ea023082d01a5d0d9503908',1,'hardware_locations.h']]],
+  ['profile_5fdelay_5ftime_1',['PROFILE_DELAY_TIME',['../onfi__interface_8h.html#aaef8bc4dc671082854c788f06b1c379c',1,'onfi_interface.h']]],
+  ['profile_5ftime_2',['PROFILE_TIME',['../hardware__locations_8h.html#a05e7d91b1d063c166b488ae744207bfa',1,'hardware_locations.h']]]
 ];

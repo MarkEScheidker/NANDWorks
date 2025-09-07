@@ -1,6 +1,5 @@
 var hierarchy =
 [
-    [ "BenchmarkResult", "structBenchmarkResult.html", null ],
     [ "onfi::DataSink", "classonfi_1_1DataSink.html", [
       [ "onfi::FileDataSink", "classonfi_1_1FileDataSink.html", null ],
       [ "onfi::HexOstreamDataSink", "classonfi_1_1HexOstreamDataSink.html", null ],

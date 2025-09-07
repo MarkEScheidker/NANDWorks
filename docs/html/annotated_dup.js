@@ -10,7 +10,6 @@ var annotated_dup =
       [ "OstreamDataSink", "classonfi_1_1OstreamDataSink.html", "classonfi_1_1OstreamDataSink" ],
       [ "Version", "structonfi_1_1Version.html", "structonfi_1_1Version" ]
     ] ],
-    [ "BenchmarkResult", "structBenchmarkResult.html", "structBenchmarkResult" ],
     [ "interface", "classinterface.html", "classinterface" ],
     [ "onfi_interface", "classonfi__interface.html", "classonfi__interface" ]
 ];

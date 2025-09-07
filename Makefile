@@ -2,90 +2,95 @@ CXX = g++
 
 # -------------------------
 # Logging / profiling flags
-# Configure at make-time, e.g.:
-#   make LOG_ONFI_LEVEL=3 LOG_HAL_LEVEL=4 PROFILE_TIME=1
-# or use convenience targets: `make debug`, `make trace`, `make profile`
-# Defaults are zero-overhead (no logging, no profiling)
 LOG_ONFI_LEVEL ?= 0
 LOG_HAL_LEVEL  ?= 0
 PROFILE_TIME   ?= 0
 
-# Base compile flags (keep existing layout)
-CXXFLAGS = -Wall -O3 -s -lrt -std=c++0x -Iinclude -I$(OBJ_DIR)/../lib/bcm2835_install/include -L$(OBJ_DIR)/../lib/bcm2835_install/lib -lbcm2835 \
-           -DLOG_ONFI_LEVEL=$(LOG_ONFI_LEVEL) -DLOG_HAL_LEVEL=$(LOG_HAL_LEVEL) -DPROFILE_TIME=$(PROFILE_TIME)
+# Layout
 OBJ_DIR = build
-TARGETS = main erase_chip benchmark profiler
+LIB_DIR = $(OBJ_DIR)/lib
+BIN_DIR = bin
 
-SOURCES = main microprocessor_interface timing gpio \
-         onfi/init onfi/identify onfi/read onfi/program onfi/erase onfi/util \
-         onfi/address onfi/param_page onfi/controller onfi/device onfi/data_sink
+# Base compile flags
+CXXFLAGS = -Wall -O3 -s -lrt -std=c++0x -Iinclude -I$(OBJ_DIR)/../lib/bcm2835_install/include -L$(OBJ_DIR)/../lib/bcm2835_install/lib \
+           -DLOG_ONFI_LEVEL=$(LOG_ONFI_LEVEL) -DLOG_HAL_LEVEL=$(LOG_HAL_LEVEL) -DPROFILE_TIME=$(PROFILE_TIME)
+LIBS = -lbcm2835
 
-ERASE_CHIP_SOURCES = erase_chip microprocessor_interface timing gpio \
-         onfi/init onfi/identify onfi/read onfi/program onfi/erase onfi/util \
-         onfi/address onfi/param_page onfi/controller onfi/device onfi/data_sink
+# Core/library sources (no app/test code)
+CORE_SOURCES = microprocessor_interface timing gpio \
+               onfi/init onfi/identify onfi/read onfi/program onfi/erase onfi/util \
+               onfi/address onfi/param_page onfi/controller onfi/device onfi/data_sink
 
-BENCHMARK_SOURCES = benchmark timing gpio
+# App sources (live in apps/)
+APP_SOURCES = test_runner erase_chip benchmark profiler
 
-PROFILER_SOURCES = profiler microprocessor_interface timing gpio \
-         onfi/init onfi/identify onfi/read onfi/program onfi/erase onfi/util \
-         onfi/address onfi/param_page onfi/controller onfi/device onfi/data_sink
+# Objects
+CORE_OBJS = $(addprefix $(OBJ_DIR)/src/,$(addsuffix .o,$(CORE_SOURCES)))
+APP_OBJS  = $(addprefix $(OBJ_DIR)/apps/,$(addsuffix .o,$(APP_SOURCES)))
 
-OBJS = $(addprefix $(OBJ_DIR)/,$(addsuffix .o,$(SOURCES)))
-ERASE_CHIP_OBJS = $(addprefix $(OBJ_DIR)/,$(addsuffix .o,$(ERASE_CHIP_SOURCES)))
-BENCHMARK_OBJS = $(addprefix $(OBJ_DIR)/,$(addsuffix .o,$(BENCHMARK_SOURCES)))
-PROFILER_OBJS = $(addprefix $(OBJ_DIR)/,$(addsuffix .o,$(PROFILER_SOURCES)))
+# Binaries
+TARGETS = $(BIN_DIR)/tester $(BIN_DIR)/erase_chip $(BIN_DIR)/benchmark $(BIN_DIR)/profiler
 
 all: $(TARGETS) docs
 
-.PHONY: debug trace profile help
+.PHONY: debug trace profile help docs clean
 
-# Enable INFO/DEBUG logs and profiling; use -g and -O2 for easier debugging
 debug:
 	$(MAKE) all LOG_ONFI_LEVEL=4 LOG_HAL_LEVEL=4 PROFILE_TIME=1 CXXFLAGS="$(CXXFLAGS) -g -O2"
 
-# Enable TRACE (very verbose) logs and profiling
 trace:
 	$(MAKE) all LOG_ONFI_LEVEL=5 LOG_HAL_LEVEL=5 PROFILE_TIME=1 CXXFLAGS="$(CXXFLAGS) -g -O2"
 
-# Enable only profiling I/O while keeping logs at defaults
 profile:
 	$(MAKE) all PROFILE_TIME=1
 
 help:
 	@echo "Build targets:"
-	@echo "  make               Build all targets (logs off, profiling off by default)"
-	@echo "  make debug         Enable ONFI=INFO, HAL=DEBUG logs and profiling (-g -O2)"
-	@echo "  make trace         Enable ONFI/HAL TRACE logs and profiling (-g -O2)"
-	@echo "  make profile       Enable profiling I/O only"
+	@echo "  make               Build library and apps"
+	@echo "  make tester        Build the test runner"
+	@echo "  make erase_chip    Build the erase utility"
+	@echo "  make benchmark     Build the benchmark app"
+	@echo "  make profiler      Build the profiler app"
 	@echo
-	@echo "Variables:"
-	@echo "  LOG_ONFI_LEVEL     0..5 (default 0)"
-	@echo "  LOG_HAL_LEVEL      0..5 (default 0)"
-	@echo "  PROFILE_TIME       0 or 1 (default 0)"
+	@echo "Variables: LOG_ONFI_LEVEL, LOG_HAL_LEVEL, PROFILE_TIME"
 
-.PHONY: docs
 docs:
 	@command -v doxygen >/dev/null 2>&1 && doxygen docs/Doxyfile || echo "Doxygen not found; skipping docs"
 
-main: $(OBJS)
-	$(CXX) $(OBJS) $(CXXFLAGS) -o $@
+# Static library with core only
+$(LIB_DIR)/libonfi.a: $(CORE_OBJS) | $(LIB_DIR)
+	ar rcs $@ $(CORE_OBJS)
 
-erase_chip: $(ERASE_CHIP_OBJS)
-	$(CXX) $(ERASE_CHIP_OBJS) $(CXXFLAGS) -o $@
+$(BIN_DIR)/tester: $(LIB_DIR)/libonfi.a $(OBJ_DIR)/apps/test_runner.o | $(BIN_DIR)
+	$(CXX) $(OBJ_DIR)/apps/test_runner.o $(CXXFLAGS) $(LIB_DIR)/libonfi.a $(LIBS) -o $@
 
-benchmark: $(BENCHMARK_OBJS)
-	$(CXX) $(BENCHMARK_OBJS) $(CXXFLAGS) -o $@
+$(BIN_DIR)/erase_chip: $(LIB_DIR)/libonfi.a $(OBJ_DIR)/apps/erase_chip.o | $(BIN_DIR)
+	$(CXX) $(OBJ_DIR)/apps/erase_chip.o $(CXXFLAGS) $(LIB_DIR)/libonfi.a $(LIBS) -o $@
 
-profiler: $(PROFILER_OBJS)
-	$(CXX) $(PROFILER_OBJS) $(CXXFLAGS) -o $@
+$(BIN_DIR)/benchmark: $(LIB_DIR)/libonfi.a $(OBJ_DIR)/apps/benchmark.o | $(BIN_DIR)
+	$(CXX) $(OBJ_DIR)/apps/benchmark.o $(CXXFLAGS) $(LIB_DIR)/libonfi.a $(LIBS) -o $@
 
+$(BIN_DIR)/profiler: $(LIB_DIR)/libonfi.a $(OBJ_DIR)/apps/profiler.o | $(BIN_DIR)
+	$(CXX) $(OBJ_DIR)/apps/profiler.o $(CXXFLAGS) $(LIB_DIR)/libonfi.a $(LIBS) -o $@
 
 $(OBJ_DIR):
 	mkdir -p $(OBJ_DIR)
 
-$(OBJ_DIR)/%.o: src/%.cpp | $(OBJ_DIR)
+$(LIB_DIR): | $(OBJ_DIR)
+	mkdir -p $(LIB_DIR)
+
+$(BIN_DIR):
+	mkdir -p $(BIN_DIR)
+
+# Core object rule
+$(OBJ_DIR)/src/%.o: src/%.cpp | $(OBJ_DIR)
+	mkdir -p $(dir $@)
+	$(CXX) -c $< $(CXXFLAGS) -o $@
+
+# App object rule
+$(OBJ_DIR)/apps/%.o: apps/%.cpp | $(OBJ_DIR)
 	mkdir -p $(dir $@)
 	$(CXX) -c $< $(CXXFLAGS) -o $@
 
 clean:
-	rm -rf $(OBJ_DIR) $(TARGETS)
+	rm -rf $(OBJ_DIR) $(BIN_DIR) main benchmark profiler erase_chip tester

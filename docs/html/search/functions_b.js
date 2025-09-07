@@ -1,9 +1,21 @@
 var searchData=
 [
-  ['onfi_5finterface_0',['onfi_interface',['../classonfi__interface.html#af2951c5c746ad9422f4c94c7ae0d82a1',1,'onfi_interface']]],
-  ['onficontroller_1',['OnfiController',['../classonfi_1_1OnfiController.html#ab8f650ca5c6cfefb33290bb9d6573ba9',1,'onfi::OnfiController']]],
-  ['open_5finterface_5fdebug_5ffile_2',['open_interface_debug_file',['../classinterface.html#accd342b3758f8d740c3fb329a54a74b5',1,'interface']]],
-  ['open_5fonfi_5fdata_5ffile_3',['open_onfi_data_file',['../classonfi__interface.html#aaf50581b58fd3600a2f4d125c1c15810',1,'onfi_interface']]],
-  ['open_5ftime_5fprofile_5ffile_4',['open_time_profile_file',['../classonfi__interface.html#ac8b5721d89de1873340f7ec1f0ef43ac',1,'onfi_interface']]],
-  ['ostreamdatasink_5',['OstreamDataSink',['../classonfi_1_1OstreamDataSink.html#a4c3340e8430cff44a3d14981bc0d5e6b',1,'onfi::OstreamDataSink']]]
+  ['page_5fread_0',['page_read',['../classonfi_1_1OnfiController.html#a23f979f0b4798c1bcea964cf187e23b1',1,'onfi::OnfiController']]],
+  ['parse_5fblocks_5fper_5flun_1',['parse_blocks_per_lun',['../namespaceonfi.html#a4d5966e02a8958f59f7d5798cddba7cc',1,'onfi']]],
+  ['parse_5fgeometry_5ffrom_5fparameters_2',['parse_geometry_from_parameters',['../namespaceonfi.html#a979096ef8ba292b7a2716f0701916eff',1,'onfi']]],
+  ['parse_5fpage_5fsize_3',['parse_page_size',['../namespaceonfi.html#a7b813defa6c43438bcc7db79a9cdc28b',1,'onfi']]],
+  ['parse_5fpages_5fper_5fblock_4',['parse_pages_per_block',['../namespaceonfi.html#a46e064f1b5baedcb82f835d0c01230dd',1,'onfi']]],
+  ['parse_5fspare_5fsize_5',['parse_spare_size',['../namespaceonfi.html#a35f1cebcdce32ef767a39d0e5c3e6624',1,'onfi']]],
+  ['partial_5ferase_5fblock_6',['partial_erase_block',['../classonfi_1_1OnfiController.html#a781ed7a86a1579ef197bab98edf9750d',1,'onfi::OnfiController::partial_erase_block()'],['../classonfi__interface.html#afbc78d1e5ce04498bc57036522c981ed',1,'onfi_interface::partial_erase_block()'],['../classonfi_1_1NandDevice.html#a8df2b9108e49dc341b70bf9ba5bf6fc7',1,'onfi::NandDevice::partial_erase_block()']]],
+  ['partial_5fprogram_5fpage_7',['partial_program_page',['../classonfi__interface.html#a66f822cbed352c3066622aca4510cb92',1,'onfi_interface']]],
+  ['prefix_5fcommand_8',['prefix_command',['../classonfi_1_1OnfiController.html#ae155e0fb9f8aca80fdcb349e17068b69',1,'onfi::OnfiController']]],
+  ['print_5fstatus_5fon_5ffail_9',['print_status_on_fail',['../classonfi__interface.html#aeee5ee7daa7345dcee577b30c70be4fd',1,'onfi_interface']]],
+  ['profile_5ftime_10',['profile_time',['../classonfi__interface.html#a452d9fdaf02578b6a94e521866f741ec',1,'onfi_interface']]],
+  ['program_5fblock_11',['program_block',['../classonfi_1_1NandDevice.html#a4d6e520363b2eff5967f41c144381fe5',1,'onfi::NandDevice']]],
+  ['program_5fpage_12',['program_page',['../classonfi_1_1OnfiController.html#aa80ec48894cd7875e157fc3961e7ba60',1,'onfi::OnfiController::program_page()'],['../classonfi_1_1NandDevice.html#a09a7231a0c425959bec7466b4855beb8',1,'onfi::NandDevice::program_page()'],['../classonfi__interface.html#a280b86c77a5737672dea9001c80e8d17',1,'onfi_interface::program_page()']]],
+  ['program_5fpage_5fconfirm_13',['program_page_confirm',['../classonfi_1_1OnfiController.html#a067a83e77b73c62325d6ee58dcf0a246',1,'onfi::OnfiController']]],
+  ['program_5fpage_5ftlc_5ftoshiba_14',['program_page_tlc_toshiba',['../classonfi__interface.html#abe6ba91ab13d3961b6a32f648aa1a210',1,'onfi_interface']]],
+  ['program_5fpage_5ftlc_5ftoshiba_5fsubpage_15',['program_page_tlc_toshiba_subpage',['../classonfi__interface.html#a0bdf7a37eebc81a753f8199247cff52a',1,'onfi_interface']]],
+  ['program_5ftlc_5fpage_16',['program_tlc_page',['../classonfi_1_1NandDevice.html#a2be747610802fd694e1c0fa5fdef2eff',1,'onfi::NandDevice']]],
+  ['program_5ftlc_5fsubpage_17',['program_tlc_subpage',['../classonfi_1_1NandDevice.html#afac396559066529174080a3ebb9f5357',1,'onfi::NandDevice']]]
 ];

@@ -1,9 +1,11 @@
 # Build artifacts
 build/
+bin/
 main
 benchmark
 profiler
 erase_chip
+tester
 
 # Temporary files
 *.o
@@ -24,4 +26,3 @@ erase_chip
 *.PNG
 *.py
 *.m
-

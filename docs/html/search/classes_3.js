@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['geometry_0',['Geometry',['../structonfi_1_1Geometry.html',1,'onfi']]]
+  ['hexostreamdatasink_0',['HexOstreamDataSink',['../classonfi_1_1HexOstreamDataSink.html',1,'onfi']]]
 ];

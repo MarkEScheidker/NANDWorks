@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['benchmarkresult_0',['BenchmarkResult',['../structBenchmarkResult.html',1,'']]]
+  ['datasink_0',['DataSink',['../classonfi_1_1DataSink.html',1,'onfi']]]
 ];

@@ -14,8 +14,6 @@ var searchData=
   ['set_5fpage_5fsize_11',['set_page_size',['../classonfi__interface.html#aa2694e3fd0ebfb2d7ca5bac4876e7332',1,'onfi_interface']]],
   ['set_5fpage_5fsize_5fspare_12',['set_page_size_spare',['../classonfi__interface.html#a8e053f8a634b97f09b922d534c35bda2',1,'onfi_interface']]],
   ['set_5fpin_5fdirection_5finactive_13',['set_pin_direction_inactive',['../classinterface.html#a2402c55084a964bc45c7d822c41f4bba',1,'interface']]],
-  ['slc_5fpage_5findices_14',['slc_page_indices',['../main_8cpp.html#a01c2623d049b201baee621fe6b0c1291',1,'main.cpp']]],
-  ['spare_5fsize_5fbytes_15',['spare_size_bytes',['../structonfi_1_1Geometry.html#abe10e966e675725afe323f8a4b7b12dd',1,'onfi::Geometry']]],
-  ['start_5ftime_16',['START_TIME',['../hardware__locations_8h.html#a8cfe47a626c35a858e809a41829a2cd4',1,'hardware_locations.h']]],
-  ['stddev_17',['stddev',['../structBenchmarkResult.html#abe7f531a953173d9a74c9a184768bd13',1,'BenchmarkResult']]]
+  ['spare_5fsize_5fbytes_14',['spare_size_bytes',['../structonfi_1_1Geometry.html#abe10e966e675725afe323f8a4b7b12dd',1,'onfi::Geometry']]],
+  ['start_5ftime_15',['START_TIME',['../hardware__locations_8h.html#a8cfe47a626c35a858e809a41829a2cd4',1,'hardware_locations.h']]]
 ];

@@ -1,9 +1,6 @@
 <map id="data_sink.h" name="data_sink.h">
-<area shape="rect" id="node1" title=" " alt="" coords="263,5,360,32"/>
-<area shape="rect" id="node2" href="$data__sink_8cpp.html" title=" " alt="" coords="137,80,249,107"/>
-<area shape="rect" id="node3" href="$device_8h.html" title=" " alt="" coords="273,80,350,107"/>
-<area shape="rect" id="node6" href="$main_8cpp.html" title=" " alt="" coords="383,155,466,181"/>
-<area shape="rect" id="node4" href="$device_8cpp.html" title=" " alt="" coords="5,155,97,181"/>
-<area shape="rect" id="node5" href="$erase__chip_8cpp.html" title=" " alt="" coords="121,155,240,181"/>
-<area shape="rect" id="node7" href="$profiler_8cpp.html" title=" " alt="" coords="264,155,359,181"/>
+<area shape="rect" id="node1" title=" " alt="" coords="71,5,169,32"/>
+<area shape="rect" id="node2" href="$data__sink_8cpp.html" title=" " alt="" coords="5,80,117,107"/>
+<area shape="rect" id="node3" href="$device_8h.html" title=" " alt="" coords="141,80,219,107"/>
+<area shape="rect" id="node4" href="$device_8cpp.html" title=" " alt="" coords="134,155,226,181"/>
 </map>
