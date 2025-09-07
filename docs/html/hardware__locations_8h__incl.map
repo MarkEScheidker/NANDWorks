@@ -1,0 +1,7 @@
+<map id="hardware_locations.h" name="hardware_locations.h">
+<area shape="rect" id="node1" title=" " alt="" coords="60,5,221,32"/>
+<area shape="rect" id="node2" title=" " alt="" coords="5,80,79,107"/>
+<area shape="rect" id="node3" href="$timing_8h.html" title=" " alt="" coords="103,80,179,107"/>
+<area shape="rect" id="node5" href="$gpio_8h.html" title=" " alt="" coords="203,80,265,107"/>
+<area shape="rect" id="node4" title=" " alt="" coords="152,155,223,181"/>
+</map>

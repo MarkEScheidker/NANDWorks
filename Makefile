@@ -17,22 +17,25 @@ OBJ_DIR = build
 TARGETS = main erase_chip benchmark profiler
 
 SOURCES = main microprocessor_interface timing gpio \
-         onfi/init onfi/identify onfi/read onfi/program onfi/erase onfi/util
+         onfi/init onfi/identify onfi/read onfi/program onfi/erase onfi/util \
+         onfi/address onfi/param_page onfi/controller onfi/device onfi/data_sink
 
 ERASE_CHIP_SOURCES = erase_chip microprocessor_interface timing gpio \
-         onfi/init onfi/identify onfi/read onfi/program onfi/erase onfi/util
+         onfi/init onfi/identify onfi/read onfi/program onfi/erase onfi/util \
+         onfi/address onfi/param_page onfi/controller onfi/device onfi/data_sink
 
 BENCHMARK_SOURCES = benchmark timing gpio
 
 PROFILER_SOURCES = profiler microprocessor_interface timing gpio \
-         onfi/init onfi/identify onfi/read onfi/program onfi/erase onfi/util
+         onfi/init onfi/identify onfi/read onfi/program onfi/erase onfi/util \
+         onfi/address onfi/param_page onfi/controller onfi/device onfi/data_sink
 
 OBJS = $(addprefix $(OBJ_DIR)/,$(addsuffix .o,$(SOURCES)))
 ERASE_CHIP_OBJS = $(addprefix $(OBJ_DIR)/,$(addsuffix .o,$(ERASE_CHIP_SOURCES)))
 BENCHMARK_OBJS = $(addprefix $(OBJ_DIR)/,$(addsuffix .o,$(BENCHMARK_SOURCES)))
 PROFILER_OBJS = $(addprefix $(OBJ_DIR)/,$(addsuffix .o,$(PROFILER_SOURCES)))
 
-all: $(TARGETS)
+all: $(TARGETS) docs
 
 .PHONY: debug trace profile help
 
@@ -59,6 +62,10 @@ help:
 	@echo "  LOG_ONFI_LEVEL     0..5 (default 0)"
 	@echo "  LOG_HAL_LEVEL      0..5 (default 0)"
 	@echo "  PROFILE_TIME       0 or 1 (default 0)"
+
+.PHONY: docs
+docs:
+	@command -v doxygen >/dev/null 2>&1 && doxygen docs/Doxyfile || echo "Doxygen not found; skipping docs"
 
 main: $(OBJS)
 	$(CXX) $(OBJS) $(CXXFLAGS) -o $@

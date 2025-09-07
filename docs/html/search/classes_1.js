@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['onfi_5finterface_68',['onfi_interface',['../classonfi__interface.html',1,'']]]
+  ['datasink_0',['DataSink',['../classonfi_1_1DataSink.html',1,'onfi']]]
 ];

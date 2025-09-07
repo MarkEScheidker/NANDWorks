@@ -56,12 +56,10 @@ uint8_t interface::read_dq_pins() const {
     return data;
 }
 
-void interface::open_interface_debug_file() {
-    // No-op: legacy interface debug removed; use structured logging instead
-}
+void interface::open_interface_debug_file() {}
 
 void interface::close_interface_debug_file(bool verbose) {
-    if (verbose) LOG_HAL_INFO("Closing interface debug (noop)");
+    if (verbose) LOG_HAL_INFO("Closing interface debug");
 }
 
 __attribute__((always_inline)) void interface::set_pin_direction_inactive() const {

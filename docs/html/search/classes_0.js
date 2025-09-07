@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['interface_67',['interface',['../classinterface.html',1,'']]]
+  ['benchmarkresult_0',['BenchmarkResult',['../structBenchmarkResult.html',1,'']]]
 ];

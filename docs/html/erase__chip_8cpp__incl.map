@@ -1,0 +1,23 @@
+<map id="erase_chip.cpp" name="erase_chip.cpp">
+<area shape="rect" id="node1" title=" " alt="" coords="333,5,451,32"/>
+<area shape="rect" id="node2" href="$onfi__interface_8h.html" title=" " alt="" coords="220,229,343,256"/>
+<area shape="rect" id="node6" title=" " alt="" coords="43,379,123,405"/>
+<area shape="rect" id="node10" href="$controller_8h.html" title=" " alt="" coords="187,155,309,181"/>
+<area shape="rect" id="node11" href="$device_8h.html" title=" " alt="" coords="415,80,521,107"/>
+<area shape="rect" id="node20" title=" " alt="" coords="544,80,603,107"/>
+<area shape="rect" id="node21" title=" " alt="" coords="627,80,693,107"/>
+<area shape="rect" id="node3" href="$microprocessor__interface_8h.html" title=" " alt="" coords="182,304,381,331"/>
+<area shape="rect" id="node4" title=" " alt="" coords="414,528,485,555"/>
+<area shape="rect" id="node5" title=" " alt="" coords="338,453,411,480"/>
+<area shape="rect" id="node7" href="$gpio_8h.html" title=" " alt="" coords="151,453,214,480"/>
+<area shape="rect" id="node8" href="$hardware__locations_8h.html" title=" " alt="" coords="198,379,359,405"/>
+<area shape="rect" id="node9" href="$timing_8h.html" title=" " alt="" coords="238,453,314,480"/>
+<area shape="rect" id="node12" title=" " alt="" coords="1025,155,1087,181"/>
+<area shape="rect" id="node13" href="$types_8h.html" title=" " alt="" coords="492,304,591,331"/>
+<area shape="rect" id="node14" href="$data__sink_8h.html" title=" " alt="" coords="569,155,695,181"/>
+<area shape="rect" id="node19" href="$address_8h.html" title=" " alt="" coords="727,304,841,331"/>
+<area shape="rect" id="node15" title=" " alt="" coords="537,229,607,256"/>
+<area shape="rect" id="node16" title=" " alt="" coords="632,229,699,256"/>
+<area shape="rect" id="node17" title=" " alt="" coords="723,229,799,256"/>
+<area shape="rect" id="node18" title=" " alt="" coords="824,229,899,256"/>
+</map>

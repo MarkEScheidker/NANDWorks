@@ -8,6 +8,7 @@
 #include <iomanip>
 #include <algorithm>
 #include "logging.h"
+#include "onfi/param_page.h"
 
 void onfi_interface::read_id() {
     uint8_t num_bytes;
@@ -199,13 +200,15 @@ void onfi_interface::read_parameters(param_type ONFI_OR_JEDEC, bool bytewise, bo
     decode_ONFI_version(ONFI_parameters[4], ONFI_parameters[5], &ret_whole, &ret_decimal);
     snprintf(onfi_version, sizeof(onfi_version), "%c.%c", ret_whole, ret_decimal);
 
-    set_page_size(ONFI_parameters[83], ONFI_parameters[82], ONFI_parameters[81], ONFI_parameters[80]);
-    set_page_size_spare(ONFI_parameters[85], ONFI_parameters[84]);
-    set_block_size(ONFI_parameters[95], ONFI_parameters[94], ONFI_parameters[93], ONFI_parameters[92]);
-    set_lun_size(ONFI_parameters[99], ONFI_parameters[98], ONFI_parameters[97], ONFI_parameters[96]);
-
-    num_column_cycles = (ONFI_parameters[101] & 0xf0) >> 4;
-    num_row_cycles = (ONFI_parameters[101] & 0x0f);
+    // Use parser helpers to fill geometry fields
+    onfi::Geometry g{};
+    onfi::parse_geometry_from_parameters(ONFI_parameters, g);
+    num_bytes_in_page = static_cast<uint16_t>(g.page_size_bytes);
+    num_spare_bytes_in_page = static_cast<uint16_t>(g.spare_size_bytes);
+    num_pages_in_block = static_cast<uint16_t>(g.pages_per_block);
+    num_blocks = static_cast<uint16_t>(g.blocks_per_lun);
+    num_column_cycles = g.column_cycles;
+    num_row_cycles = g.row_cycles;
 
     // Extract manufacturer information (Bytes 32-43)
     memcpy(manufacturer_id, &ONFI_parameters[32], 12);
@@ -390,33 +393,21 @@ void onfi_interface::decode_ONFI_version(uint8_t byte_4, uint8_t byte_5, uint8_t
 
 // following function will set the size of page based on value read
 void onfi_interface::set_page_size(uint8_t byte_83, uint8_t byte_82, uint8_t byte_81, uint8_t byte_80) {
-    num_bytes_in_page = (((byte_83 * 256 + byte_82) * 256 + byte_81) * 256 + byte_80);
-    // for error condition
-    if ((byte_83 == 0xff && byte_82 == 0xff && byte_81 == 0xff && byte_80 == 0xff) || (
-            byte_83 == 0x0 && byte_82 == 0x0 && byte_81 == 0x0 && byte_80 == 0x0))
-        num_bytes_in_page = 2048;
+    num_bytes_in_page = static_cast<uint16_t>(onfi::parse_page_size(byte_83, byte_82, byte_81, byte_80));
 }
 
 // following function will set the size of spare bytes in a page based on value read
 void onfi_interface::set_page_size_spare(uint8_t byte_85, uint8_t byte_84) {
-    num_spare_bytes_in_page = (byte_85 * 256 + byte_84);
-    if ((byte_85 == 0xff && byte_84 == 0xff) || (byte_84 == 0x0 && byte_85 == 0x0))
-        num_spare_bytes_in_page = 128;
+    num_spare_bytes_in_page = static_cast<uint16_t>(onfi::parse_spare_size(byte_85, byte_84));
 }
 
 // following function will set the number of pages in a block
 void onfi_interface::set_block_size(uint8_t byte_95, uint8_t byte_94, uint8_t byte_93, uint8_t byte_92) {
-    num_pages_in_block = ((byte_95 * 256 + byte_94) * 256 + byte_93) * 256 + byte_92;
-    if ((byte_95 == 0xff && byte_94 == 0xff && byte_93 == 0xff && byte_92 == 0xff) || (
-            byte_95 == 0x0 && byte_94 == 0x0 && byte_93 == 0x0 && byte_92 == 0x0))
-        num_pages_in_block = 64;
+    num_pages_in_block = static_cast<uint16_t>(onfi::parse_pages_per_block(byte_95, byte_94, byte_93, byte_92));
 }
 
 void onfi_interface::set_lun_size(uint8_t byte_99, uint8_t byte_98, uint8_t byte_97, uint8_t byte_96) {
-    num_blocks = ((byte_99 * 256 + byte_98) * 256 + byte_97) * 256 + byte_96;
-    if ((byte_96 == 0xff && byte_97 == 0xff && byte_98 == 0xff && byte_99 == 0xff) || (
-            byte_96 == 0x0 && byte_97 == 0x0 && byte_98 == 0x0 && byte_99 == 0x0))
-        num_blocks = 64;
+    num_blocks = static_cast<uint16_t>(onfi::parse_blocks_per_lun(byte_99, byte_98, byte_97, byte_96));
 }
 
 // following function tests if the block address sent was a bad block or not

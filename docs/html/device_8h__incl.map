@@ -1,0 +1,20 @@
+<map id="device.h" name="device.h">
+<area shape="rect" id="node1" title=" " alt="" coords="477,5,555,32"/>
+<area shape="rect" id="node2" title=" " alt="" coords="383,453,454,480"/>
+<area shape="rect" id="node3" title=" " alt="" coords="153,80,215,107"/>
+<area shape="rect" id="node4" href="$types_8h.html" title=" " alt="" coords="851,229,949,256"/>
+<area shape="rect" id="node5" href="$controller_8h.html" title=" " alt="" coords="5,80,128,107"/>
+<area shape="rect" id="node7" href="$microprocessor__interface_8h.html" title=" " alt="" coords="201,229,399,256"/>
+<area shape="rect" id="node13" href="$data__sink_8h.html" title=" " alt="" coords="453,80,579,107"/>
+<area shape="rect" id="node18" href="$address_8h.html" title=" " alt="" coords="662,229,775,256"/>
+<area shape="rect" id="node6" href="$onfi__interface_8h.html" title=" " alt="" coords="93,155,216,181"/>
+<area shape="rect" id="node8" title=" " alt="" coords="537,379,610,405"/>
+<area shape="rect" id="node9" title=" " alt="" coords="456,304,536,331"/>
+<area shape="rect" id="node10" href="$gpio_8h.html" title=" " alt="" coords="218,379,281,405"/>
+<area shape="rect" id="node11" href="$hardware__locations_8h.html" title=" " alt="" coords="219,304,381,331"/>
+<area shape="rect" id="node12" href="$timing_8h.html" title=" " alt="" coords="305,379,381,405"/>
+<area shape="rect" id="node14" title=" " alt="" coords="291,155,362,181"/>
+<area shape="rect" id="node15" title=" " alt="" coords="387,155,453,181"/>
+<area shape="rect" id="node16" title=" " alt="" coords="478,155,554,181"/>
+<area shape="rect" id="node17" title=" " alt="" coords="579,155,653,181"/>
+</map>

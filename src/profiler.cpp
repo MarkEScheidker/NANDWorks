@@ -1,6 +1,8 @@
 #include "gpio.h"
 #include "timing.h"
 #include "onfi_interface.h"
+#include "onfi/controller.h"
+#include "onfi/device.h"
 #include "hardware_locations.h"
 #include <iostream>
 #include <vector>
@@ -124,14 +126,22 @@ BenchmarkResult benchmark_onfi_identify(onfi_interface& onfi) {
 BenchmarkResult benchmark_onfi_read_page(onfi_interface& onfi, std::default_random_engine& generator, std::uniform_int_distribution<uint16_t>& block_distribution, std::uniform_int_distribution<uint16_t>& page_distribution) {
     std::cout << "Benchmarking onfi_read_page..." << std::endl;
     std::vector<uint64_t> timings;
-    // Create a buffer to store the read data
-    std::vector<uint8_t> read_data(onfi.num_bytes_in_page + onfi.num_spare_bytes_in_page);
+    onfi::OnfiController ctrl(onfi);
+    onfi::NandDevice dev(ctrl);
+    dev.geometry.page_size_bytes = onfi.num_bytes_in_page;
+    dev.geometry.spare_size_bytes = onfi.num_spare_bytes_in_page;
+    dev.geometry.pages_per_block = onfi.num_pages_in_block;
+    dev.geometry.blocks_per_lun = onfi.num_blocks;
+    dev.geometry.column_cycles = onfi.num_column_cycles;
+    dev.geometry.row_cycles = onfi.num_row_cycles;
+    dev.interface_type = onfi.interface_type;
+    dev.chip = onfi.flash_chip;
     for (int i = 0; i < 100; ++i) {
         uint16_t random_block = block_distribution(generator);
         uint16_t random_page = page_distribution(generator);
         uint64_t start_time = get_timestamp_ns();
-        onfi.read_page(random_block, random_page);
-        onfi.get_data(read_data.data(), read_data.size()); // Get data from cache to host
+        std::vector<uint8_t> out;
+        dev.read_page(random_block, random_page, /*including_spare*/true, /*bytewise*/false, out);
         uint64_t end_time = get_timestamp_ns();
         timings.push_back(end_time - start_time);
     }
@@ -141,12 +151,23 @@ BenchmarkResult benchmark_onfi_read_page(onfi_interface& onfi, std::default_rand
 BenchmarkResult benchmark_onfi_write_page(onfi_interface& onfi, std::default_random_engine& generator, std::uniform_int_distribution<uint16_t>& block_distribution, std::uniform_int_distribution<uint16_t>& page_distribution) {
     std::cout << "Benchmarking onfi_write_page..." << std::endl;
     std::vector<uint64_t> timings;
-    uint8_t data[onfi.num_bytes_in_page];
+    onfi::OnfiController ctrl(onfi);
+    onfi::NandDevice dev(ctrl);
+    dev.geometry.page_size_bytes = onfi.num_bytes_in_page;
+    dev.geometry.spare_size_bytes = onfi.num_spare_bytes_in_page;
+    dev.geometry.pages_per_block = onfi.num_pages_in_block;
+    dev.geometry.blocks_per_lun = onfi.num_blocks;
+    dev.geometry.column_cycles = onfi.num_column_cycles;
+    dev.geometry.row_cycles = onfi.num_row_cycles;
+    dev.interface_type = onfi.interface_type;
+    dev.chip = onfi.flash_chip;
     for (int i = 0; i < 100; ++i) {
         uint16_t random_block = block_distribution(generator);
         uint16_t random_page = page_distribution(generator);
+        std::vector<uint8_t> write_data(onfi.num_bytes_in_page + onfi.num_spare_bytes_in_page, 0xAA);
+        write_data[onfi.num_bytes_in_page] = 0xFF; // avoid bad-block mark
         uint64_t start_time = get_timestamp_ns();
-        onfi.program_page(random_block, random_page, data);
+        dev.program_page(random_block, random_page, write_data.data(), /*including_spare*/true);
         uint64_t end_time = get_timestamp_ns();
         timings.push_back(end_time - start_time);
     }
@@ -156,10 +177,20 @@ BenchmarkResult benchmark_onfi_write_page(onfi_interface& onfi, std::default_ran
 BenchmarkResult benchmark_onfi_erase_block(onfi_interface& onfi, std::default_random_engine& generator, std::uniform_int_distribution<uint16_t>& block_distribution) {
     std::cout << "Benchmarking onfi_erase_block..." << std::endl;
     std::vector<uint64_t> timings;
+    onfi::OnfiController ctrl(onfi);
+    onfi::NandDevice dev(ctrl);
+    dev.geometry.page_size_bytes = onfi.num_bytes_in_page;
+    dev.geometry.spare_size_bytes = onfi.num_spare_bytes_in_page;
+    dev.geometry.pages_per_block = onfi.num_pages_in_block;
+    dev.geometry.blocks_per_lun = onfi.num_blocks;
+    dev.geometry.column_cycles = onfi.num_column_cycles;
+    dev.geometry.row_cycles = onfi.num_row_cycles;
+    dev.interface_type = onfi.interface_type;
+    dev.chip = onfi.flash_chip;
     for (int i = 0; i < 100; ++i) {
         uint16_t random_block = block_distribution(generator);
         uint64_t start_time = get_timestamp_ns();
-        onfi.erase_block(random_block);
+        dev.erase_block(random_block);
         uint64_t end_time = get_timestamp_ns();
         timings.push_back(end_time - start_time);
     }
@@ -180,7 +211,10 @@ void print_summary(const std::vector<BenchmarkResult>& results) {
 
     // Derived throughput for common operations (assuming page-sized ops)
     auto find = [&](const std::string& name) -> const BenchmarkResult* {
-        for (const auto& r : results) if (r.name == name) return &r; return nullptr;
+        for (const auto& r : results) {
+            if (r.name == name) return &r;
+        }
+        return nullptr;
     };
     const BenchmarkResult* rread = find("onfi_read_page");
     const BenchmarkResult* rwrite = find("onfi_write_page");
@@ -258,7 +292,10 @@ int main() {
 
     // Derived throughput based on measured means
     auto find = [&](const std::string& name) -> const BenchmarkResult* {
-        for (const auto& r : results) if (r.name == name) return &r; return nullptr;
+        for (const auto& r : results) {
+            if (r.name == name) return &r;
+        }
+        return nullptr;
     };
     const BenchmarkResult* rread = find("onfi_read_page");
     const BenchmarkResult* rwrite = find("onfi_write_page");

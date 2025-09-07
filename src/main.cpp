@@ -8,6 +8,9 @@ Description: This source file is to test the basic functionality of the interfac
 
 // onfi_interface.h has the necessary functionalities defined
 #include "onfi_interface.h"
+#include "onfi/device.h"
+#include "onfi/controller.h"
+#include "onfi/data_sink.h"
 
 #include <vector>
 #include <cstdlib>
@@ -47,11 +50,20 @@ static bool test_leds(onfi_interface &onfi_instance, bool verbose) {
 
 static bool test_block_erase(onfi_interface &onfi_instance, bool verbose) {
     unsigned int block = rand() % onfi_instance.num_blocks;
+    if (verbose) cout << "Erasing block " << block << endl;
+    onfi::OnfiController ctrl(onfi_instance);
+    onfi::NandDevice dev(ctrl);
+    dev.geometry.page_size_bytes = onfi_instance.num_bytes_in_page;
+    dev.geometry.spare_size_bytes = onfi_instance.num_spare_bytes_in_page;
+    dev.geometry.pages_per_block = onfi_instance.num_pages_in_block;
+    dev.geometry.blocks_per_lun = onfi_instance.num_blocks;
+    dev.geometry.column_cycles = onfi_instance.num_column_cycles;
+    dev.geometry.row_cycles = onfi_instance.num_row_cycles;
+    dev.interface_type = onfi_instance.interface_type;
+    dev.chip = onfi_instance.flash_chip;
 
-    if (verbose)
-        cout << "Erasing block " << block << endl;
-    onfi_instance.erase_block(block, verbose);
-    return onfi_instance.verify_block_erase(block, true, nullptr, 0, verbose);
+    dev.erase_block(block);
+    return dev.verify_erase_block(block, true, nullptr, 0, /*including_spare*/false, verbose);
 }
 
 static bool test_single_page_program(onfi_interface &onfi_instance, bool verbose) {
@@ -66,27 +78,75 @@ static bool test_single_page_program(onfi_interface &onfi_instance, bool verbose
     // Ensure the first byte of the spare area is not 0x00 to avoid marking as bad block
     pattern[onfi_instance.num_bytes_in_page] = 0xFF;
 
-    onfi_instance.program_page(block, page, pattern, true, verbose);
-    bool ok = onfi_instance.verify_program_page(block, page, pattern, verbose, MAX_ALLOWED_ERRORS);
+    onfi::OnfiController ctrl(onfi_instance);
+    onfi::NandDevice dev(ctrl);
+    dev.geometry.page_size_bytes = onfi_instance.num_bytes_in_page;
+    dev.geometry.spare_size_bytes = onfi_instance.num_spare_bytes_in_page;
+    dev.geometry.pages_per_block = onfi_instance.num_pages_in_block;
+    dev.geometry.blocks_per_lun = onfi_instance.num_blocks;
+    dev.geometry.column_cycles = onfi_instance.num_column_cycles;
+    dev.geometry.row_cycles = onfi_instance.num_row_cycles;
+    dev.interface_type = onfi_instance.interface_type;
+    dev.chip = onfi_instance.flash_chip;
+
+    dev.erase_block(block);
+    dev.program_page(block, page, pattern, true);
+    bool ok = dev.verify_program_page(block, page, pattern, /*including_spare*/false, verbose, MAX_ALLOWED_ERRORS);
     delete[] pattern;
     return ok;
 }
 
 static bool test_multi_page_program(onfi_interface &onfi_instance, bool verbose) {
     unsigned int block = rand() % onfi_instance.num_blocks;
+    onfi::OnfiController ctrl(onfi_instance);
+    onfi::NandDevice dev(ctrl);
+    dev.geometry.page_size_bytes = onfi_instance.num_bytes_in_page;
+    dev.geometry.spare_size_bytes = onfi_instance.num_spare_bytes_in_page;
+    dev.geometry.pages_per_block = onfi_instance.num_pages_in_block;
+    dev.geometry.blocks_per_lun = onfi_instance.num_blocks;
+    dev.geometry.column_cycles = onfi_instance.num_column_cycles;
+    dev.geometry.row_cycles = onfi_instance.num_row_cycles;
+    dev.interface_type = onfi_instance.interface_type;
+    dev.chip = onfi_instance.flash_chip;
 
-    onfi_instance.program_pages_in_a_block(block, false, false, slc_page_indices, 20, verbose);
-    return onfi_instance.verify_program_pages_in_a_block(block, false,
-                                                         slc_page_indices,
-                                                         20, verbose, MAX_ALLOWED_ERRORS);
+    dev.program_block(block, /*complete_block*/false, slc_page_indices, 20,
+                      /*provided_data*/nullptr, /*including_spare*/true, /*randomize*/false);
+    return dev.verify_program_block(block, /*complete_block*/false, slc_page_indices, 20,
+                                    /*expected*/nullptr, /*including_spare*/false, verbose, MAX_ALLOWED_ERRORS);
 }
 
 static bool test_page_reads(onfi_interface &onfi_instance, bool verbose) {
     unsigned int block = rand() % onfi_instance.num_blocks;
+    onfi::OnfiController ctrl(onfi_instance);
+    onfi::NandDevice dev(ctrl);
+    dev.geometry.page_size_bytes = onfi_instance.num_bytes_in_page;
+    dev.geometry.spare_size_bytes = onfi_instance.num_spare_bytes_in_page;
+    dev.geometry.pages_per_block = onfi_instance.num_pages_in_block;
+    dev.geometry.blocks_per_lun = onfi_instance.num_blocks;
+    dev.geometry.column_cycles = onfi_instance.num_column_cycles;
+    dev.geometry.row_cycles = onfi_instance.num_row_cycles;
+    dev.interface_type = onfi_instance.interface_type;
+    dev.chip = onfi_instance.flash_chip;
 
-    onfi_instance.read_and_spit_page(block, 0, true, verbose);
-    onfi_instance.read_and_spit_page(block, 1, true, verbose);
-    return true; // failures print directly
+    std::vector<uint8_t> page;
+
+    std::cout << "Page 0 (including spare) in hex:" << std::endl;
+    dev.read_page(block, 0, /*including_spare*/true, /*bytewise*/true, page);
+    {
+        onfi::HexOstreamDataSink hex(std::cout);
+        hex.write(page.data(), page.size());
+        hex.flush();
+    }
+    std::cout << std::endl;
+
+    std::cout << "Page 1 (including spare) in hex:" << std::endl;
+    dev.read_page(block, 1, /*including_spare*/true, /*bytewise*/true, page);
+    {
+        onfi::HexOstreamDataSink hex(std::cout);
+        hex.write(page.data(), page.size());
+        hex.flush();
+    }
+    return true;
 }
 
 static bool test_error_analysis(onfi_interface &onfi_instance, bool verbose) {
@@ -104,15 +164,26 @@ static bool test_error_analysis(onfi_interface &onfi_instance, bool verbose) {
     // Ensure the first byte of the spare area is not 0x00 to avoid marking as bad block
     pattern[onfi_instance.num_bytes_in_page] = 0xFF;
 
-    onfi_instance.erase_block(block, verbose);
-    onfi_instance.program_page(block, page, pattern, true, verbose);
+    onfi::OnfiController ctrl(onfi_instance);
+    onfi::NandDevice dev(ctrl);
+    dev.geometry.page_size_bytes = onfi_instance.num_bytes_in_page;
+    dev.geometry.spare_size_bytes = onfi_instance.num_spare_bytes_in_page;
+    dev.geometry.pages_per_block = onfi_instance.num_pages_in_block;
+    dev.geometry.blocks_per_lun = onfi_instance.num_blocks;
+    dev.geometry.column_cycles = onfi_instance.num_column_cycles;
+    dev.geometry.row_cycles = onfi_instance.num_row_cycles;
+    dev.interface_type = onfi_instance.interface_type;
+    dev.chip = onfi_instance.flash_chip;
 
-    uint8_t *read_data = new uint8_t[page_size];
-    onfi_instance.read_page_and_return_value(block, page, 0, read_data, true);
+    dev.erase_block(block);
+    dev.program_page(block, page, pattern, true);
+
+    std::vector<uint8_t> read_vec;
+    dev.read_page(block, page, /*including_spare*/true, /*bytewise*/false, read_vec);
 
     int errors = 0;
     for (size_t i = 0; i < onfi_instance.num_bytes_in_page; ++i) {
-        if (read_data[i] != pattern[i]) {
+        if (read_vec[i] != pattern[i]) {
             errors++;
         }
     }
@@ -121,7 +192,7 @@ static bool test_error_analysis(onfi_interface &onfi_instance, bool verbose) {
          << (static_cast<double>(errors) / onfi_instance.num_bytes_in_page) * 100 << "%)" << endl;
 
     delete[] pattern;
-    delete[] read_data;
+    
     return errors <= MAX_ALLOWED_ERRORS;
 }
 
@@ -200,19 +271,30 @@ static bool test_spare_area_io(onfi_interface &onfi_instance, bool verbose) {
         pattern[i] = 0x55;
     }
 
-    onfi_instance.erase_block(block, verbose);
-    onfi_instance.program_page(block, page, pattern, true, verbose);
+    onfi::OnfiController ctrl(onfi_instance);
+    onfi::NandDevice dev(ctrl);
+    dev.geometry.page_size_bytes = onfi_instance.num_bytes_in_page;
+    dev.geometry.spare_size_bytes = onfi_instance.num_spare_bytes_in_page;
+    dev.geometry.pages_per_block = onfi_instance.num_pages_in_block;
+    dev.geometry.blocks_per_lun = onfi_instance.num_blocks;
+    dev.geometry.column_cycles = onfi_instance.num_column_cycles;
+    dev.geometry.row_cycles = onfi_instance.num_row_cycles;
+    dev.interface_type = onfi_instance.interface_type;
+    dev.chip = onfi_instance.flash_chip;
 
-    uint8_t *read_data = new uint8_t[page_size];
-    onfi_instance.read_page_and_return_value(block, page, 0, read_data, true);
+    dev.erase_block(block);
+    dev.program_page(block, page, pattern, true);
+
+    std::vector<uint8_t> read_vec;
+    dev.read_page(block, page, /*including_spare*/true, /*bytewise*/false, read_vec);
 
     bool ok = true;
     // Only verify the spare area for this test
     for (size_t i = onfi_instance.num_bytes_in_page; i < page_size; ++i) {
-        if (read_data[i] != 0x55) {
+        if (read_vec[i] != 0x55) {
             ok = false;
             if (verbose) {
-                cout << "Mismatch in spare area at byte " << i << ": Expected 0x55, Got 0x" << hex << (int)read_data[i] << dec << endl;
+                cout << "Mismatch in spare area at byte " << i << ": Expected 0x55, Got 0x" << hex << (int)read_vec[i] << dec << endl;
             }
             break;
         }
@@ -220,19 +302,18 @@ static bool test_spare_area_io(onfi_interface &onfi_instance, bool verbose) {
 
     if (verbose) {
         cout << "Pattern (last 16 bytes of main + first 16 bytes of spare):" << endl;
-        for (size_t i = onfi_instance.num_bytes_in_page - 16; i < page_size && i < onfi_instance.num_bytes_in_page + 16; ++i) {
+        for (size_t i = static_cast<size_t>(onfi_instance.num_bytes_in_page) - 16; i < page_size && i < static_cast<size_t>(onfi_instance.num_bytes_in_page + 16); ++i) {
             cout << hex << (int)pattern[i] << " " << dec;
         }
         cout << endl;
         cout << "Read Data (last 16 bytes of main + first 16 bytes of spare):" << endl;
-        for (size_t i = onfi_instance.num_bytes_in_page - 16; i < page_size && i < onfi_instance.num_bytes_in_page + 16; ++i) {
-            cout << hex << (int)read_data[i] << " " << dec;
+        for (size_t i = static_cast<size_t>(onfi_instance.num_bytes_in_page) - 16; i < page_size && i < static_cast<size_t>(onfi_instance.num_bytes_in_page + 16); ++i) {
+            cout << hex << (int)read_vec[i] << " " << dec;
         }
         cout << endl;
     }
 
     delete[] pattern;
-    delete[] read_data;
     return ok;
 }
 

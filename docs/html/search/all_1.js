@@ -1,7 +1,6 @@
 var searchData=
 [
-  ['decode_5fonfi_5fversion_7',['decode_ONFI_version',['../classonfi__interface.html#a982ccfe0d355477505fd735dfbdbf2ed',1,'onfi_interface']]],
-  ['delay_5ffunction_8',['delay_function',['../classonfi__interface.html#a4ee57873eb28517c93de65f78555e6c4',1,'onfi_interface']]],
-  ['device_5finitialization_9',['device_initialization',['../classonfi__interface.html#a1facef909ae526427fa9841b34b391e3',1,'onfi_interface']]],
-  ['disable_5ferase_10',['disable_erase',['../classonfi__interface.html#a9d0f88fe547cc75de924b06acd4882b0',1,'onfi_interface']]]
+  ['address_2ecpp_0',['address.cpp',['../address_8cpp.html',1,'']]],
+  ['address_2eh_1',['address.h',['../address_8h.html',1,'']]],
+  ['asynchronous_2',['asynchronous',['../microprocessor__interface_8h.html#afecabb9b4014b79b672d794aa95ea425a0dba0a3a3dc587391c8f88e00515ea6b',1,'microprocessor_interface.h']]]
 ];

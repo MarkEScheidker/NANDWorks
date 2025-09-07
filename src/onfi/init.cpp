@@ -48,7 +48,6 @@ void onfi_interface::get_started(param_type ONFI_OR_JEDEC) {
     set_features(0x01, timing_mode_data, true);
 }
 
-// open_onfi_debug_file removed (legacy)
 
 void onfi_interface::open_onfi_data_file() {
     onfi_data_file.open("data_file.txt", std::fstream::out);
@@ -64,9 +63,7 @@ void onfi_interface::open_time_profile_file() {
 // .. please change this if the device has multiple dies
 void onfi_interface::initialize_onfi(bool verbose) {
     if (verbose) LOG_ONFI_INFO("initialize_onfi() start");
-    open_interface_debug_file(); // no-op (legacy)
-    // open the data file
-    open_onfi_data_file();
+    open_interface_debug_file();
 
     // No need for bridge_base_virtual or fd with pigpio
 

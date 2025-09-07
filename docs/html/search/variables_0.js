@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['jumper_5faddress_133',['jumper_address',['../classinterface.html#a7bb474f62d7d3a5ff0203cac90cecc2e',1,'interface']]]
+  ['blocks_5fper_5flun_0',['blocks_per_lun',['../structonfi_1_1Geometry.html#a392578b429f54251412110284d48711e',1,'onfi::Geometry']]]
 ];

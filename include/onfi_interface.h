@@ -220,7 +220,6 @@ public:
 	.. this function will read any random page and tries to verify if it was completely erased
 	.. for elaborate verifiying, please use a different function
 	*/
-	bool verify_block_erase_sample(unsigned int my_block_number, bool verbose = false);
 
 	/**
 	this is the function that can be used to elaborately verify the erase operation
@@ -247,15 +246,15 @@ public:
 	.. .. if including spare  = 1, then length of data_to_program should be (num of bytes in pages + num of spare bytes)
 	.. verbose is for priting messages
 	*/
-	void program_page(unsigned int my_block_number, unsigned int my_page_number, uint8_t* data_to_program,bool including_spare = true,bool verbose = false);
-	void partial_program_page(unsigned int my_block_number, unsigned int my_page_number,uint32_t loop_count,uint8_t* data_to_program,bool including_spare = true,bool verbose = false);
+    void program_page(unsigned int my_block_number, unsigned int my_page_number, uint8_t* data_to_program,bool including_spare = true,bool verbose = false);
+    void partial_program_page(unsigned int my_block_number, unsigned int my_page_number,uint32_t loop_count,uint8_t* data_to_program,bool including_spare = true,bool verbose = false);
 
 	/**
 	this function programs all 3 pages in TLC pages of TOSHIBA NAND flash memory
 	please see the datasheet or the function definition for the program operation
 	*/
-	void program_page_tlc_toshiba(unsigned int my_block_number,unsigned int my_page_number, uint8_t* data_to_program,bool including_spare = true,bool verbose = false);
-	void program_page_tlc_toshiba_subpage(unsigned int my_block_number,unsigned int my_page_number, unsigned int subpage_number, uint8_t* data_to_program,bool including_spare = true,bool verbose = false);
+    void program_page_tlc_toshiba(unsigned int my_block_number,unsigned int my_page_number, uint8_t* data_to_program,bool including_spare = true,bool verbose = false);
+    void program_page_tlc_toshiba_subpage(unsigned int my_block_number,unsigned int my_page_number, unsigned int subpage_number, uint8_t* data_to_program,bool including_spare = true,bool verbose = false);
 
 	/**
 	this function only verifies a single page as indicated by the address provided
@@ -266,7 +265,7 @@ public:
 	.. .. if including spare  = 1, then length of data_to_program should be (num of bytes in pages + num of spare bytes)
 	.. verbose is for priting messages
 	*/
-	    bool verify_program_page(unsigned int my_block_number, unsigned int my_page_number,uint8_t* data_to_program,bool verbose = false, int max_allowed_errors = 0);
+        bool verify_program_page(unsigned int my_block_number, unsigned int my_page_number,uint8_t* data_to_program,bool verbose = false, int max_allowed_errors = 0);
 
 	/**
 	let us program pages in the block with all 0s
@@ -277,7 +276,6 @@ public:
 	.. num_pages is the number of pages in the page_indices array
 	.. verbose is for printing
 	*/
-	void program_pages_in_a_block(unsigned int my_block_number,bool complete_block, bool data_random, uint16_t* page_indices,uint16_t num_pages, bool verbose);
 
 
 /**
@@ -289,7 +287,6 @@ public:
 	.. num_pages is the number of pages in the page_indices array
 	.. verbose is for printing
 */
-	void program_pages_in_a_block_data(unsigned int my_block_number,uint8_t* provided_data,bool complete_block = false,uint16_t* page_indices = page_indices_selected,uint16_t num_pages = num_pages_selected,bool verbose = false);
 
 /**
 	this function will program all the pages in a block with an array provided by user
@@ -297,7 +294,6 @@ public:
 	.. .. it is indicated through bool array_provided
 	.. .. the actual array is supposed to be in uint8_t* provided_array (lenght should be total number of bytes in a page)
 	*/
-	void program_n_pages_in_a_block(unsigned int my_block_number,uint16_t num_pages = 512,bool array_provided = false, uint8_t* provided_array = NULL,bool verbose=false);
 
 	/**
 	let us program pages in the block with all 0s
@@ -306,9 +302,6 @@ public:
 	.. num_pages is the number of pages in the page_indices array
 	.. verbose is for printing
 	*/
-	void program_pages_in_a_block_slc(unsigned int my_block_number,uint16_t num_pages = 256,bool verbose=false);
-
-	void partial_program_pages_in_a_block(unsigned int my_block_number,uint32_t loop_count,bool complete_block,uint16_t* page_indices,uint16_t num_pages,bool verbose);
 
 /**
 	let us verify program pages in the block
@@ -319,21 +312,17 @@ public:
 	.. num_pages is the number of pages in the page_indices array
 	.. verbose is for printing
 	*/
-	    bool verify_program_pages_in_a_block(unsigned int my_block_number,bool complete_block,uint16_t* page_indices,uint16_t num_pages,bool verbose, int max_allowed_errors = 0);
-	    bool verify_program_pages_in_a_block_slc(unsigned int my_block_number,bool verbose = false, int max_allowed_errors = 0);
 
 	/**
 	this function reads the single page address provided
 	each value is hex while the sequence is terminated by newline character
 	*/
-	void read_and_spit_page(unsigned int my_block_number, unsigned int my_page_number, bool bytewise = false, bool verbose = false);
 
 	/**
 	this function reads the page address provided from the TOSHIBA TLC chip
 	all three subpages data will be written to an output file
 	each value is hex while the sequence is terminated by newline character
 	*/
-	void read_and_spit_page_tlc_toshiba(unsigned int my_block_number, unsigned int my_page_number, bool verbose = false);
 
 	/**
 	this function reads the pages in the block
@@ -343,14 +332,12 @@ public:
 	.. if the indices of pages is used, the num_pages should indicate the numb er of pages listed in the array
 	.. verbose indicates the debug messages to be printed
 	*/
-	void read_block_data(unsigned int my_block_number, unsigned int my_page_number,bool complete_block = false,uint16_t* page_indices = page_indices_selected,uint16_t num_pages = num_pages_selected,bool verbose = false);
 
 
 	 /**
 	 This function read the page specified by the index value in the
 	.. block and puts the read value into the array passed " return_value" as argument
 	*/
-	void read_page_and_return_value(unsigned int my_block_number, unsigned int my_page_number,uint16_t index,uint8_t* return_value,bool including_spare = true);
 
 	/**
 	this function reads the pages in the block
@@ -358,7 +345,6 @@ public:
 	.. the num_pages should indicate the number of pages in block starting from beginning
 	.. verbose indicates the debug messages to be printed
 	*/
-	void read_block_data_n_pages(unsigned int my_block_number,uint16_t num_pages = 1,bool bytewise = false, bool verbose = false);
 
 	/**
 	The SET FEATURES (EFh) command writes the subfeature parameters (P1-P4) to the
@@ -380,12 +366,6 @@ public:
 	following function will convert a block from MLC mode to SLC mode
 	.. it uses set_features option to convert the block from SLC to MLC
 	*/
-	void convert_to_slc_set_features(unsigned int my_block_number);
-
-	void revert_to_mlc_set_features();
-
-	void convert_to_slc(unsigned int my_block_number, bool first_time = false);
-	void revert_to_mlc(unsigned int my_block_number);
 
 	/**
 	this function introduces delay

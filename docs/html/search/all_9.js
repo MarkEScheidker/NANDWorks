@@ -1,13 +1,10 @@
 var searchData=
 [
-  ['read_5fand_5fspit_5fpage_35',['read_and_spit_page',['../classonfi__interface.html#ab154f1372b9c14f5a5e1ad8ed60dc5cc',1,'onfi_interface']]],
-  ['read_5fand_5fspit_5fpage_5ftlc_5ftoshiba_36',['read_and_spit_page_tlc_toshiba',['../classonfi__interface.html#abd257040daba853c4f6f1fbe1d737bba',1,'onfi_interface']]],
-  ['read_5fblock_5fdata_37',['read_block_data',['../classonfi__interface.html#a6b075f9bb53990f4f526d785530d7b3e',1,'onfi_interface']]],
-  ['read_5fblock_5fdata_5fn_5fpages_38',['read_block_data_n_pages',['../classonfi__interface.html#a1b692df6feef2e48f09286e89d6f1d22',1,'onfi_interface']]],
-  ['read_5fid_39',['read_id',['../classonfi__interface.html#af2fa4bce38edcce8136fef2a59a19016',1,'onfi_interface']]],
-  ['read_5fpage_40',['read_page',['../classonfi__interface.html#af252055f18b4a3877023ee4f7d47ee5e',1,'onfi_interface']]],
-  ['read_5fpage_5fand_5freturn_5fvalue_41',['read_page_and_return_value',['../classonfi__interface.html#a4e73a02e90ce16083cdc57559917eec3',1,'onfi_interface']]],
-  ['read_5fparameters_42',['read_parameters',['../classonfi__interface.html#a503252ee5b69c6857a5b086f005897fc',1,'onfi_interface']]],
-  ['read_5fstatus_43',['read_status',['../classonfi__interface.html#ab43e82e2581835cf75a103a6a47fe51c',1,'onfi_interface']]],
-  ['reset_5fdevice_44',['reset_device',['../classonfi__interface.html#a77e46a6964d5fa7274bab7b40f6eb808',1,'onfi_interface']]]
+  ['identify_2ecpp_0',['identify.cpp',['../identify_8cpp.html',1,'']]],
+  ['init_2ecpp_1',['init.cpp',['../init_8cpp.html',1,'']]],
+  ['initialize_5fonfi_2',['initialize_onfi',['../classonfi__interface.html#a492b2cbadc4afdb6bf34a63e2248f1fc',1,'onfi_interface']]],
+  ['interface_3',['interface',['../classinterface.html',1,'interface'],['../classinterface.html#a13e0ee4b9df1714d747d62ec46220c55',1,'interface::interface()']]],
+  ['interface_5fdebug_5ffile_4',['interface_debug_file',['../classinterface.html#ab8d67c4f0a69dcdcf1f501c2af0894e4',1,'interface']]],
+  ['interface_5ftype_5',['interface_type',['../classinterface.html#a7821cc3f4b8297410aa77e3f3802ca43',1,'interface::interface_type()'],['../classonfi_1_1NandDevice.html#a7624a6832dc94a40da07009fe5a080ab',1,'onfi::NandDevice::interface_type()']]],
+  ['is_5fbad_5fblock_6',['is_bad_block',['../classonfi__interface.html#ac2ef9dba1b471b3e8059e66b81757cd8',1,'onfi_interface']]]
 ];
