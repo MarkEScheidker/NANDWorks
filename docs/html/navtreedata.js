@@ -25,6 +25,12 @@
 var NAVTREE =
 [
   [ "MastersThesis NAND Interface", "index.html", [
+    [ "ONFI NAND Interface API", "index.html", [
+      [ "Quick Start", "index.html#autotoc_md1", null ],
+      [ "Interface Hierarchy", "index.html#autotoc_md2", null ],
+      [ "Additional Resources", "index.html#autotoc_md3", null ]
+    ] ],
+    [ "Modules", "modules.html", "modules" ],
     [ "Namespaces", "namespaces.html", [
       [ "Namespace List", "namespaces.html", "namespaces_dup" ],
       [ "Namespace Members", "namespacemembers.html", [
@@ -58,8 +64,8 @@ var NAVTREE =
 
 var NAVTREEINDEX =
 [
-"address_8cpp.html",
-"hardware__locations_8h.html#ac124c246ddd743ae097038b86d949b76"
+"address_8h.html",
+"hardware__locations_8h.html#a4d358ada5ce5c2657accd05156f2b578"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

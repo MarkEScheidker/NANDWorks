@@ -2,15 +2,16 @@
 #include <vector>
 #include <string>
 #include <limits>
-#include <pigpio.h>
+#include <bcm2835.h>
 
 struct PinInfo {
     std::string name;
     int pin;
 };
 
-void wait_for_enter() {
+static void wait_for_enter() {
     std::cout << "Press Enter to continue...";
+    std::cout.flush();
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 }
 
@@ -18,8 +19,8 @@ int main() {
     std::cout << "GPIO test program is running." << std::endl;
     wait_for_enter();
 
-    if (gpioInitialise() < 0) {
-        std::cerr << "pigpio initialisation failed." << std::endl;
+    if (!bcm2835_init()) {
+        std::cerr << "Failed to initialise bcm2835 library." << std::endl;
         return 1;
     }
 
@@ -35,30 +36,27 @@ int main() {
         {"RB", 17}
     };
 
-    // Clear potential leftover input
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-
     for (const auto &pin_info: pins) {
         std::cout << std::endl;
         std::cout << "Testing Pin: " << pin_info.name << " (GPIO " << pin_info.pin << ")" << std::endl;
 
-        gpioSetMode(pin_info.pin, PI_OUTPUT);
+        bcm2835_gpio_fsel(pin_info.pin, BCM2835_GPIO_FSEL_OUTP);
 
         std::cout << "Pin is OFF. ";
         wait_for_enter();
 
         std::cout << "Turning pin ON." << std::endl;
-        gpioWrite(pin_info.pin, 1);
+        bcm2835_gpio_write(pin_info.pin, HIGH);
 
         std::cout << "Pin is ON. ";
         wait_for_enter();
 
         std::cout << "Turning pin OFF." << std::endl;
-        gpioWrite(pin_info.pin, 0);
+        bcm2835_gpio_write(pin_info.pin, LOW);
     }
 
     std::cout << std::endl << "GPIO test complete." << std::endl;
 
-    gpioTerminate();
+    bcm2835_close();
     return 0;
 }

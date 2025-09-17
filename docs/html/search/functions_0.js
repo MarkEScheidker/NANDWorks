@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['_5f_5fattribute_5f_5f_0',['__attribute__',['../microprocessor__interface_8cpp.html#a3820bc1f100245eeeed9a297566605be',1,'__attribute__((always_inline)) void interface:&#160;microprocessor_interface.cpp'],['../util_8cpp.html#a70c39a399e8f353cd0f914613292b504',1,'__attribute__((always_inline)) void onfi_interface:&#160;util.cpp']]]
+  ['busy_5fwait_5fcycles_0',['busy_wait_cycles',['../timing_8h.html#ac0d837eb9cbd9a9394bcd1719a47ddfe',1,'timing.h']]],
+  ['busy_5fwait_5fns_1',['busy_wait_ns',['../timing_8h.html#a85be116c6a3e82c3c8458a16eec87e31',1,'timing.h']]]
 ];

@@ -27,6 +27,7 @@
   <td id="projectalign">
    <div id="projectname">MastersThesis NAND Interface
    </div>
+   <div id="projectbrief">ONFI façade and supporting library for NAND flash characterization</div>
   </td>
  </tr>
  </tbody>
@@ -91,47 +92,47 @@ $(document).ready(function(){initNavTree('gpio_8h_source.html',''); initResizabl
 <div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#include &lt;stdint.h&gt;</span></div>
 <div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span> </div>
 <div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="comment">// Initialize the GPIO, including setting the real-time scheduler</span></div>
-<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="keywordtype">bool</span> <a class="code hl_function" href="gpio_8h.html#a4c985bd59d2f38ad7d27cebb944227b2">gpio_init</a>();</div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno"><a class="line" href="gpio_8h.html#a4c985bd59d2f38ad7d27cebb944227b2">    7</a></span><span class="keywordtype">bool</span> <a class="code hl_function" href="gpio_8h.html#a4c985bd59d2f38ad7d27cebb944227b2">gpio_init</a>();</div>
 <div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span> </div>
 <div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="comment">// Set the direction of a GPIO pin</span></div>
-<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="keywordtype">void</span> <a class="code hl_function" href="gpio_8h.html#a840aa7171edd44f14fd92fc187f98a4e">gpio_set_direction</a>(uint8_t pin, <span class="keywordtype">bool</span> is_output);</div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno"><a class="line" href="gpio_8h.html#a840aa7171edd44f14fd92fc187f98a4e">   10</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="gpio_8h.html#a840aa7171edd44f14fd92fc187f98a4e">gpio_set_direction</a>(uint8_t pin, <span class="keywordtype">bool</span> is_output);</div>
 <div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span> </div>
 <div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="comment">// Write a value to a GPIO pin</span></div>
-<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="keywordtype">void</span> <a class="code hl_function" href="gpio_8h.html#a6d89c02bcc3b28fedfd516a901337b3f">gpio_write</a>(uint8_t pin, <span class="keywordtype">bool</span> value);</div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno"><a class="line" href="gpio_8h.html#a6d89c02bcc3b28fedfd516a901337b3f">   13</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="gpio_8h.html#a6d89c02bcc3b28fedfd516a901337b3f">gpio_write</a>(uint8_t pin, <span class="keywordtype">bool</span> value);</div>
 <div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span> </div>
 <div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="comment">// Read a value from a GPIO pin</span></div>
-<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="keywordtype">bool</span> <a class="code hl_function" href="gpio_8h.html#ac3da3b4b3b4e0758d525dc9d9116636c">gpio_read</a>(uint8_t pin);</div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno"><a class="line" href="gpio_8h.html#ac3da3b4b3b4e0758d525dc9d9116636c">   16</a></span><span class="keywordtype">bool</span> <a class="code hl_function" href="gpio_8h.html#ac3da3b4b3b4e0758d525dc9d9116636c">gpio_read</a>(uint8_t pin);</div>
 <div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span> </div>
 <div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span><span class="comment">// Set the pull-up/down state of a GPIO pin</span></div>
-<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="keywordtype">void</span> <a class="code hl_function" href="gpio_8h.html#ae4416453cc20896bb6052e013e3fbc12">gpio_set_pud</a>(uint8_t pin, uint8_t pud);</div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno"><a class="line" href="gpio_8h.html#ae4416453cc20896bb6052e013e3fbc12">   19</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="gpio_8h.html#ae4416453cc20896bb6052e013e3fbc12">gpio_set_pud</a>(uint8_t pin, uint8_t pud);</div>
 <div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span> </div>
 <div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span><span class="comment">// Directly set a GPIO pin high</span></div>
-<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span><span class="keywordtype">void</span> <a class="code hl_function" href="gpio_8h.html#a09eac3614a4aca19543f68d17a167d6e">gpio_set_high</a>(uint8_t pin);</div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno"><a class="line" href="gpio_8h.html#a09eac3614a4aca19543f68d17a167d6e">   22</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="gpio_8h.html#a09eac3614a4aca19543f68d17a167d6e">gpio_set_high</a>(uint8_t pin);</div>
 <div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span> </div>
 <div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span><span class="comment">// Directly set a GPIO pin low</span></div>
-<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span><span class="keywordtype">void</span> <a class="code hl_function" href="gpio_8h.html#a46fda233ca97efb2345c9928bb9cdec0">gpio_set_low</a>(uint8_t pin);</div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno"><a class="line" href="gpio_8h.html#a46fda233ca97efb2345c9928bb9cdec0">   25</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="gpio_8h.html#a46fda233ca97efb2345c9928bb9cdec0">gpio_set_low</a>(uint8_t pin);</div>
 <div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span> </div>
 <div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span><span class="comment">// Set multiple GPIO pins high using a mask</span></div>
-<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span><span class="keywordtype">void</span> <a class="code hl_function" href="gpio_8h.html#aad821e8f27f62d585470442b4e7fb450">gpio_set_multi</a>(uint32_t mask);</div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno"><a class="line" href="gpio_8h.html#aad821e8f27f62d585470442b4e7fb450">   28</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="gpio_8h.html#aad821e8f27f62d585470442b4e7fb450">gpio_set_multi</a>(uint32_t mask);</div>
 <div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span> </div>
 <div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span><span class="comment">// Set multiple GPIO pins low using a mask</span></div>
-<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span><span class="keywordtype">void</span> <a class="code hl_function" href="gpio_8h.html#a6f31847907558d50c47e0fba70676c6c">gpio_clr_multi</a>(uint32_t mask);</div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno"><a class="line" href="gpio_8h.html#a6f31847907558d50c47e0fba70676c6c">   31</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="gpio_8h.html#a6f31847907558d50c47e0fba70676c6c">gpio_clr_multi</a>(uint32_t mask);</div>
 <div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span> </div>
 <div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span><span class="comment">// Read levels for GPIO 0..31 in a single register access (GPLEV0)</span></div>
 <div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span><span class="comment">// Useful for fast sampling of multiple input pins.</span></div>
-<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>uint32_t <a class="code hl_function" href="gpio_8h.html#a5009ee9b7b9f0023148f02d053cc078b">gpio_read_levels0</a>();</div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno"><a class="line" href="gpio_8h.html#a5009ee9b7b9f0023148f02d053cc078b">   35</a></span>uint32_t <a class="code hl_function" href="gpio_8h.html#a5009ee9b7b9f0023148f02d053cc078b">gpio_read_levels0</a>();</div>
 <div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span> </div>
 <div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span><span class="preprocessor">#endif </span><span class="comment">// GPIO_H</span></div>
-<div class="ttc" id="agpio_8h_html_a09eac3614a4aca19543f68d17a167d6e"><div class="ttname"><a href="gpio_8h.html#a09eac3614a4aca19543f68d17a167d6e">gpio_set_high</a></div><div class="ttdeci">void gpio_set_high(uint8_t pin)</div><div class="ttdef"><b>Definition:</b> gpio.cpp:38</div></div>
-<div class="ttc" id="agpio_8h_html_a46fda233ca97efb2345c9928bb9cdec0"><div class="ttname"><a href="gpio_8h.html#a46fda233ca97efb2345c9928bb9cdec0">gpio_set_low</a></div><div class="ttdeci">void gpio_set_low(uint8_t pin)</div><div class="ttdef"><b>Definition:</b> gpio.cpp:42</div></div>
-<div class="ttc" id="agpio_8h_html_a4c985bd59d2f38ad7d27cebb944227b2"><div class="ttname"><a href="gpio_8h.html#a4c985bd59d2f38ad7d27cebb944227b2">gpio_init</a></div><div class="ttdeci">bool gpio_init()</div><div class="ttdef"><b>Definition:</b> gpio.cpp:6</div></div>
-<div class="ttc" id="agpio_8h_html_a5009ee9b7b9f0023148f02d053cc078b"><div class="ttname"><a href="gpio_8h.html#a5009ee9b7b9f0023148f02d053cc078b">gpio_read_levels0</a></div><div class="ttdeci">uint32_t gpio_read_levels0()</div><div class="ttdef"><b>Definition:</b> gpio.cpp:54</div></div>
-<div class="ttc" id="agpio_8h_html_a6d89c02bcc3b28fedfd516a901337b3f"><div class="ttname"><a href="gpio_8h.html#a6d89c02bcc3b28fedfd516a901337b3f">gpio_write</a></div><div class="ttdeci">void gpio_write(uint8_t pin, bool value)</div><div class="ttdef"><b>Definition:</b> gpio.cpp:26</div></div>
-<div class="ttc" id="agpio_8h_html_a6f31847907558d50c47e0fba70676c6c"><div class="ttname"><a href="gpio_8h.html#a6f31847907558d50c47e0fba70676c6c">gpio_clr_multi</a></div><div class="ttdeci">void gpio_clr_multi(uint32_t mask)</div><div class="ttdef"><b>Definition:</b> gpio.cpp:50</div></div>
-<div class="ttc" id="agpio_8h_html_a840aa7171edd44f14fd92fc187f98a4e"><div class="ttname"><a href="gpio_8h.html#a840aa7171edd44f14fd92fc187f98a4e">gpio_set_direction</a></div><div class="ttdeci">void gpio_set_direction(uint8_t pin, bool is_output)</div><div class="ttdef"><b>Definition:</b> gpio.cpp:22</div></div>
-<div class="ttc" id="agpio_8h_html_aad821e8f27f62d585470442b4e7fb450"><div class="ttname"><a href="gpio_8h.html#aad821e8f27f62d585470442b4e7fb450">gpio_set_multi</a></div><div class="ttdeci">void gpio_set_multi(uint32_t mask)</div><div class="ttdef"><b>Definition:</b> gpio.cpp:46</div></div>
-<div class="ttc" id="agpio_8h_html_ac3da3b4b3b4e0758d525dc9d9116636c"><div class="ttname"><a href="gpio_8h.html#ac3da3b4b3b4e0758d525dc9d9116636c">gpio_read</a></div><div class="ttdeci">bool gpio_read(uint8_t pin)</div><div class="ttdef"><b>Definition:</b> gpio.cpp:30</div></div>
-<div class="ttc" id="agpio_8h_html_ae4416453cc20896bb6052e013e3fbc12"><div class="ttname"><a href="gpio_8h.html#ae4416453cc20896bb6052e013e3fbc12">gpio_set_pud</a></div><div class="ttdeci">void gpio_set_pud(uint8_t pin, uint8_t pud)</div><div class="ttdef"><b>Definition:</b> gpio.cpp:34</div></div>
+<div class="ttc" id="agpio_8h_html_a09eac3614a4aca19543f68d17a167d6e"><div class="ttname"><a href="gpio_8h.html#a09eac3614a4aca19543f68d17a167d6e">gpio_set_high</a></div><div class="ttdeci">void gpio_set_high(uint8_t pin)</div></div>
+<div class="ttc" id="agpio_8h_html_a46fda233ca97efb2345c9928bb9cdec0"><div class="ttname"><a href="gpio_8h.html#a46fda233ca97efb2345c9928bb9cdec0">gpio_set_low</a></div><div class="ttdeci">void gpio_set_low(uint8_t pin)</div></div>
+<div class="ttc" id="agpio_8h_html_a4c985bd59d2f38ad7d27cebb944227b2"><div class="ttname"><a href="gpio_8h.html#a4c985bd59d2f38ad7d27cebb944227b2">gpio_init</a></div><div class="ttdeci">bool gpio_init()</div></div>
+<div class="ttc" id="agpio_8h_html_a5009ee9b7b9f0023148f02d053cc078b"><div class="ttname"><a href="gpio_8h.html#a5009ee9b7b9f0023148f02d053cc078b">gpio_read_levels0</a></div><div class="ttdeci">uint32_t gpio_read_levels0()</div></div>
+<div class="ttc" id="agpio_8h_html_a6d89c02bcc3b28fedfd516a901337b3f"><div class="ttname"><a href="gpio_8h.html#a6d89c02bcc3b28fedfd516a901337b3f">gpio_write</a></div><div class="ttdeci">void gpio_write(uint8_t pin, bool value)</div></div>
+<div class="ttc" id="agpio_8h_html_a6f31847907558d50c47e0fba70676c6c"><div class="ttname"><a href="gpio_8h.html#a6f31847907558d50c47e0fba70676c6c">gpio_clr_multi</a></div><div class="ttdeci">void gpio_clr_multi(uint32_t mask)</div></div>
+<div class="ttc" id="agpio_8h_html_a840aa7171edd44f14fd92fc187f98a4e"><div class="ttname"><a href="gpio_8h.html#a840aa7171edd44f14fd92fc187f98a4e">gpio_set_direction</a></div><div class="ttdeci">void gpio_set_direction(uint8_t pin, bool is_output)</div></div>
+<div class="ttc" id="agpio_8h_html_aad821e8f27f62d585470442b4e7fb450"><div class="ttname"><a href="gpio_8h.html#aad821e8f27f62d585470442b4e7fb450">gpio_set_multi</a></div><div class="ttdeci">void gpio_set_multi(uint32_t mask)</div></div>
+<div class="ttc" id="agpio_8h_html_ac3da3b4b3b4e0758d525dc9d9116636c"><div class="ttname"><a href="gpio_8h.html#ac3da3b4b3b4e0758d525dc9d9116636c">gpio_read</a></div><div class="ttdeci">bool gpio_read(uint8_t pin)</div></div>
+<div class="ttc" id="agpio_8h_html_ae4416453cc20896bb6052e013e3fbc12"><div class="ttname"><a href="gpio_8h.html#ae4416453cc20896bb6052e013e3fbc12">gpio_set_pud</a></div><div class="ttdeci">void gpio_set_pud(uint8_t pin, uint8_t pud)</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

@@ -14,6 +14,7 @@ var classonfi_1_1NandDevice =
     [ "verify_program_block", "classonfi_1_1NandDevice.html#aa589bd73f9271ac0fca99f6039cf117c", null ],
     [ "verify_program_page", "classonfi_1_1NandDevice.html#a0efe95c68efc474f28721776157f94fd", null ],
     [ "chip", "classonfi_1_1NandDevice.html#ac99d13b2dc10109d7701a1adb44977bc", null ],
+    [ "ctrl_", "classonfi_1_1NandDevice.html#a95b6e0a3af827f6535ddd0b92b256a2e", null ],
     [ "geometry", "classonfi_1_1NandDevice.html#a2a9944b964dd4c93d2fa9818b280e909", null ],
     [ "interface_type", "classonfi_1_1NandDevice.html#a7624a6832dc94a40da07009fe5a080ab", null ]
 ];

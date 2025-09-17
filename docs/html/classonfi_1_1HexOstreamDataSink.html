@@ -27,6 +27,7 @@
   <td id="projectalign">
    <div id="projectname">MastersThesis NAND Interface
    </div>
+   <div id="projectbrief">ONFI façade and supporting library for NAND flash characterization</div>
   </td>
  </tr>
  </tbody>
@@ -84,6 +85,7 @@ $(document).ready(function(){initNavTree('classonfi_1_1HexOstreamDataSink.html',
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pri-attribs">Private Attributes</a> &#124;
 <a href="classonfi_1_1HexOstreamDataSink-members.html">List of all members</a>  </div>
   <div class="headertitle"><div class="title">onfi::HexOstreamDataSink Class Reference</div></div>
 </div><!--header-->
@@ -93,20 +95,14 @@ $(document).ready(function(){initNavTree('classonfi_1_1HexOstreamDataSink.html',
 <div class="dynheader">
 Inheritance diagram for onfi::HexOstreamDataSink:</div>
 <div class="dyncontent">
-<div class="center"><img src="classonfi_1_1HexOstreamDataSink__inherit__graph.png" border="0" usemap="#aonfi_1_1HexOstreamDataSink_inherit__map" alt="Inheritance graph"/></div>
-<map name="aonfi_1_1HexOstreamDataSink_inherit__map" id="aonfi_1_1HexOstreamDataSink_inherit__map">
-<area shape="rect" title=" " alt="" coords="5,80,200,107"/>
-<area shape="rect" href="classonfi_1_1DataSink.html" title=" " alt="" coords="46,5,159,32"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="classonfi_1_1HexOstreamDataSink__inherit__graph.svg" width="206" height="112"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+</div>
 <center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <div class="dynheader">
 Collaboration diagram for onfi::HexOstreamDataSink:</div>
 <div class="dyncontent">
-<div class="center"><img src="classonfi_1_1HexOstreamDataSink__coll__graph.png" border="0" usemap="#aonfi_1_1HexOstreamDataSink_coll__map" alt="Collaboration graph"/></div>
-<map name="aonfi_1_1HexOstreamDataSink_coll__map" id="aonfi_1_1HexOstreamDataSink_coll__map">
-<area shape="rect" title=" " alt="" coords="5,80,200,107"/>
-<area shape="rect" href="classonfi_1_1DataSink.html" title=" " alt="" coords="46,5,159,32"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="classonfi_1_1HexOstreamDataSink__coll__graph.svg" width="206" height="112"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+</div>
 <center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
@@ -128,6 +124,17 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:addac97373f0eaf6366873bdf9f4d5074 inherit pub_methods_classonfi_1_1DataSink"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a774b689890d7de3cf8572204bccbe54f inherit pub_methods_classonfi_1_1DataSink"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classonfi_1_1DataSink.html#a774b689890d7de3cf8572204bccbe54f">flush</a> ()</td></tr>
 <tr class="separator:a774b689890d7de3cf8572204bccbe54f inherit pub_methods_classonfi_1_1DataSink"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pri-attribs" name="pri-attribs"></a>
+Private Attributes</h2></td></tr>
+<tr class="memitem:a5465488aeb568c44fdd85578a5f09b7c"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classonfi_1_1HexOstreamDataSink.html#a5465488aeb568c44fdd85578a5f09b7c">out_</a></td></tr>
+<tr class="separator:a5465488aeb568c44fdd85578a5f09b7c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab5adc599f61a487abebdf50d5a49707d"><td class="memItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classonfi_1_1HexOstreamDataSink.html#ab5adc599f61a487abebdf50d5a49707d">bytes_per_line_</a></td></tr>
+<tr class="separator:ab5adc599f61a487abebdf50d5a49707d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa96a97ae030cb7d4f08d758523c36f0b"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classonfi_1_1HexOstreamDataSink.html#aa96a97ae030cb7d4f08d758523c36f0b">show_offsets_</a></td></tr>
+<tr class="separator:aa96a97ae030cb7d4f08d758523c36f0b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaddb609b8ea79b0e624822c2f2b8cd85"><td class="memItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classonfi_1_1HexOstreamDataSink.html#aaddb609b8ea79b0e624822c2f2b8cd85">offset_</a> = 0</td></tr>
+<tr class="separator:aaddb609b8ea79b0e624822c2f2b8cd85"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a0c91ea05092a424a8e7738204adbf549" name="a0c91ea05092a424a8e7738204adbf549"></a>
@@ -262,6 +269,95 @@ Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Implements <a class="el" href="classonfi_1_1DataSink.html#a438ab33e1d1953daefb0737263f77bdf">onfi::DataSink</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Member Data Documentation</h2>
+<a id="ab5adc599f61a487abebdf50d5a49707d" name="ab5adc599f61a487abebdf50d5a49707d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab5adc599f61a487abebdf50d5a49707d">&#9670;&nbsp;</a></span>bytes_per_line_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::size_t onfi::HexOstreamDataSink::bytes_per_line_</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aaddb609b8ea79b0e624822c2f2b8cd85" name="aaddb609b8ea79b0e624822c2f2b8cd85"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaddb609b8ea79b0e624822c2f2b8cd85">&#9670;&nbsp;</a></span>offset_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::size_t onfi::HexOstreamDataSink::offset_ = 0</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a5465488aeb568c44fdd85578a5f09b7c" name="a5465488aeb568c44fdd85578a5f09b7c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5465488aeb568c44fdd85578a5f09b7c">&#9670;&nbsp;</a></span>out_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::ostream&amp; onfi::HexOstreamDataSink::out_</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aa96a97ae030cb7d4f08d758523c36f0b" name="aa96a97ae030cb7d4f08d758523c36f0b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa96a97ae030cb7d4f08d758523c36f0b">&#9670;&nbsp;</a></span>show_offsets_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool onfi::HexOstreamDataSink::show_offsets_</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
 
 </div>
 </div>

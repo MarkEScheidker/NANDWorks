@@ -1,19 +1,6 @@
 var searchData=
 [
-  ['data_5fsink_2ecpp_0',['data_sink.cpp',['../data__sink_8cpp.html',1,'']]],
-  ['data_5fsink_2eh_1',['data_sink.h',['../data__sink_8h.html',1,'']]],
-  ['datasink_2',['DataSink',['../classonfi_1_1DataSink.html',1,'onfi']]],
-  ['debug_5finterface_3',['DEBUG_INTERFACE',['../microprocessor__interface_8h.html#a1b2104874076f12ba460311d74f43906',1,'microprocessor_interface.h']]],
-  ['debug_5fonfi_4',['DEBUG_ONFI',['../onfi__interface_8h.html#a3be68b6fb18f5c9f909f2aa7a5c11bad',1,'onfi_interface.h']]],
-  ['decode_5fonfi_5fversion_5',['decode_ONFI_version',['../classonfi__interface.html#a982ccfe0d355477505fd735dfbdbf2ed',1,'onfi_interface']]],
-  ['decode_5fonfi_5fversion_6',['decode_onfi_version',['../namespaceonfi.html#a705deb70b8e41d5dfdc95f6446077af8',1,'onfi']]],
-  ['default_5fasync_7',['default_async',['../microprocessor__interface_8h.html#a8b15bc584d38a735307f3ade02d73391af03d3b5453559ab89fb1db74d3f7d7f8',1,'microprocessor_interface.h']]],
-  ['default_5finterface_5ftype_8',['default_interface_type',['../microprocessor__interface_8h.html#afecabb9b4014b79b672d794aa95ea425',1,'microprocessor_interface.h']]],
-  ['deinitialize_5fonfi_9',['deinitialize_onfi',['../classonfi__interface.html#aec25908ee35b4f9f325c4bd5a52d6851',1,'onfi_interface']]],
-  ['delay_5ffunction_10',['delay_function',['../classonfi__interface.html#a4ee57873eb28517c93de65f78555e6c4',1,'onfi_interface']]],
-  ['device_2ecpp_11',['device.cpp',['../device_8cpp.html',1,'']]],
-  ['device_2eh_12',['device.h',['../device_8h.html',1,'']]],
-  ['device_5finitialization_13',['device_initialization',['../classonfi__interface.html#a1facef909ae526427fa9841b34b391e3',1,'onfi_interface']]],
-  ['device_5fmodel_14',['device_model',['../classonfi__interface.html#af16918c38a9bd444d31258aee67e917f',1,'onfi_interface']]],
-  ['disable_5ferase_15',['disable_erase',['../classonfi__interface.html#a9d0f88fe547cc75de924b06acd4882b0',1,'onfi_interface']]]
+  ['enable_5ferase_0',['enable_erase',['../classonfi__interface.html#a92ce39b3f49cd2098b7c1ad87ad85657',1,'onfi_interface']]],
+  ['end_5ftime_1',['END_TIME',['../hardware__locations_8h.html#af0acdd9d42d243fe36f3e67d6fb9e452',1,'hardware_locations.h']]],
+  ['erase_5fblock_2',['erase_block',['../classonfi_1_1OnfiController.html#add0e28b66c7a7a137614c2ac60e2306c',1,'onfi::OnfiController::erase_block()'],['../classonfi_1_1NandDevice.html#ab37d665ef7de387f20d753d773ff49f2',1,'onfi::NandDevice::erase_block()'],['../classonfi__interface.html#a24ed1d96b73ac62a9ab702746a57afba',1,'onfi_interface::erase_block()']]]
 ];

@@ -21,5 +21,9 @@ var logging_8h =
     [ "LOG_ONFI_TRACE", "logging_8h.html#af98fabcbf69aaa015a99f6b4ddc792df", null ],
     [ "LOG_ONFI_TRACE_IF", "logging_8h.html#afa792ab43c3840e1edd1b2a8ec846ce3", null ],
     [ "LOG_ONFI_WARN", "logging_8h.html#a250f930032466a2b808a9e2149864e3e", null ],
-    [ "LOG_ONFI_WARN_IF", "logging_8h.html#a5944830dc6f63bca4666762a6da1e7e0", null ]
+    [ "LOG_ONFI_WARN_IF", "logging_8h.html#a5944830dc6f63bca4666762a6da1e7e0", null ],
+    [ "logger_log", "logging_8h.html#a7def12205f3fb1fd587bf920a1918178", null ],
+    [ "logger_output", "logging_8h.html#afa4dcf704235fa9da094518407267c7c", null ],
+    [ "logger_set_output_file", "logging_8h.html#ac56ee45f1db3be582e75cecd40293cd7", null ],
+    [ "logger_vlog", "logging_8h.html#abc4226d3a5bd33cf7936e3e223a0da34", null ]
 ];

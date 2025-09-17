@@ -1,6 +1,7 @@
 var searchData=
 [
-  ['page_5findices_5fselected_0',['page_indices_selected',['../onfi__interface_8h.html#ac927120305564b7907f00ccb2e747807',1,'page_indices_selected():&#160;util.cpp'],['../util_8cpp.html#ac927120305564b7907f00ccb2e747807',1,'page_indices_selected():&#160;util.cpp']]],
-  ['page_5fsize_5fbytes_1',['page_size_bytes',['../structonfi_1_1Geometry.html#a87d6796e701982e839e10a24b8b23e84',1,'onfi::Geometry']]],
-  ['pages_5fper_5fblock_2',['pages_per_block',['../structonfi_1_1Geometry.html#a252f25dbdeb5fd80f1a4a1a426bef0b3',1,'onfi::Geometry']]]
+  ['offset_5f_0',['offset_',['../classonfi_1_1HexOstreamDataSink.html#aaddb609b8ea79b0e624822c2f2b8cd85',1,'onfi::HexOstreamDataSink']]],
+  ['onfi_5fdata_5ffile_1',['onfi_data_file',['../classonfi__interface.html#ac40e12dce6f31f3570d7076b14777c02',1,'onfi_interface']]],
+  ['onfi_5fversion_2',['onfi_version',['../classonfi__interface.html#ae60d6c873637c32b3708f808bea311a5',1,'onfi_interface']]],
+  ['out_5f_3',['out_',['../classonfi_1_1FileDataSink.html#a69524cdbc9c8e1b2056f9dad9bb3f9d4',1,'onfi::FileDataSink::out_()'],['../classonfi_1_1OstreamDataSink.html#a99250c0b2029aa4872caa11d9750214f',1,'onfi::OstreamDataSink::out_()'],['../classonfi_1_1HexOstreamDataSink.html#a5465488aeb568c44fdd85578a5f09b7c',1,'onfi::HexOstreamDataSink::out_()']]]
 ];

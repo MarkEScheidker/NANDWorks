@@ -27,6 +27,7 @@
   <td id="projectalign">
    <div id="projectname">MastersThesis NAND Interface
    </div>
+   <div id="projectbrief">ONFI façade and supporting library for NAND flash characterization</div>
   </td>
  </tr>
  </tbody>
@@ -91,22 +92,22 @@ $(document).ready(function(){initNavTree('timing_8h_source.html',''); initResiza
 <div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#include &lt;stdint.h&gt;</span></div>
 <div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span> </div>
 <div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="comment">// Get the current timestamp in nanoseconds</span></div>
-<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span>uint64_t <a class="code hl_function" href="timing_8h.html#a39b87de7e582017d965787fa97e41f79">get_timestamp_ns</a>();</div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno"><a class="line" href="timing_8h.html#a39b87de7e582017d965787fa97e41f79">    7</a></span>uint64_t <a class="code hl_function" href="timing_8h.html#a39b87de7e582017d965787fa97e41f79">get_timestamp_ns</a>();</div>
 <div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span> </div>
 <div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="comment">// Busy-wait for a specified number of nanoseconds</span></div>
-<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="keywordtype">void</span> <a class="code hl_function" href="timing_8h.html#a85be116c6a3e82c3c8458a16eec87e31">busy_wait_ns</a>(uint64_t ns);</div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno"><a class="line" href="timing_8h.html#a85be116c6a3e82c3c8458a16eec87e31">   10</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="timing_8h.html#a85be116c6a3e82c3c8458a16eec87e31">busy_wait_ns</a>(uint64_t ns);</div>
 <div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span> </div>
 <div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="comment">// Busy-wait for a specific number of cycles.</span></div>
-<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="keywordtype">void</span> <a class="code hl_function" href="timing_8h.html#ac0d837eb9cbd9a9394bcd1719a47ddfe">busy_wait_cycles</a>(uint32_t cycles);</div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno"><a class="line" href="timing_8h.html#ac0d837eb9cbd9a9394bcd1719a47ddfe">   13</a></span><span class="keywordtype">void</span> <a class="code hl_function" href="timing_8h.html#ac0d837eb9cbd9a9394bcd1719a47ddfe">busy_wait_cycles</a>(uint32_t cycles);</div>
 <div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span> </div>
 <div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span> </div>
 <div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span> </div>
 <div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span> </div>
 <div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span> </div>
 <div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="preprocessor">#endif </span><span class="comment">// TIMING_H</span></div>
-<div class="ttc" id="atiming_8h_html_a39b87de7e582017d965787fa97e41f79"><div class="ttname"><a href="timing_8h.html#a39b87de7e582017d965787fa97e41f79">get_timestamp_ns</a></div><div class="ttdeci">uint64_t get_timestamp_ns()</div><div class="ttdef"><b>Definition:</b> timing.cpp:5</div></div>
-<div class="ttc" id="atiming_8h_html_a85be116c6a3e82c3c8458a16eec87e31"><div class="ttname"><a href="timing_8h.html#a85be116c6a3e82c3c8458a16eec87e31">busy_wait_ns</a></div><div class="ttdeci">void busy_wait_ns(uint64_t ns)</div><div class="ttdef"><b>Definition:</b> timing.cpp:12</div></div>
-<div class="ttc" id="atiming_8h_html_ac0d837eb9cbd9a9394bcd1719a47ddfe"><div class="ttname"><a href="timing_8h.html#ac0d837eb9cbd9a9394bcd1719a47ddfe">busy_wait_cycles</a></div><div class="ttdeci">void busy_wait_cycles(uint32_t cycles)</div><div class="ttdef"><b>Definition:</b> timing.cpp:18</div></div>
+<div class="ttc" id="atiming_8h_html_a39b87de7e582017d965787fa97e41f79"><div class="ttname"><a href="timing_8h.html#a39b87de7e582017d965787fa97e41f79">get_timestamp_ns</a></div><div class="ttdeci">uint64_t get_timestamp_ns()</div></div>
+<div class="ttc" id="atiming_8h_html_a85be116c6a3e82c3c8458a16eec87e31"><div class="ttname"><a href="timing_8h.html#a85be116c6a3e82c3c8458a16eec87e31">busy_wait_ns</a></div><div class="ttdeci">void busy_wait_ns(uint64_t ns)</div></div>
+<div class="ttc" id="atiming_8h_html_ac0d837eb9cbd9a9394bcd1719a47ddfe"><div class="ttname"><a href="timing_8h.html#ac0d837eb9cbd9a9394bcd1719a47ddfe">busy_wait_cycles</a></div><div class="ttdeci">void busy_wait_cycles(uint32_t cycles)</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

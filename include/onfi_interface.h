@@ -13,6 +13,14 @@ Date: 			18 July 2020
 // include our next header
 #include "microprocessor_interface.h"
 
+/**
+ * @defgroup onfi_interface_api ONFI Interface Facade
+ * @brief User-facing API for exercising ONFI NAND flash devices.
+ * @details Contains the primary `onfi_interface` class plus helpers that can be used by
+ *          applications, benchmarks, and automated tests to communicate with ONFI NAND parts.
+ */
+/** @{ */
+
 enum param_type
 {
 	JEDEC = 0,
@@ -27,9 +35,16 @@ extern uint16_t num_pages_selected;
 extern uint16_t page_indices_selected[];
 
 /**
-let us define a class that includes all the lowest level functions that are needed for
-.. interfacing with NAND device.
-*/
+ * @class onfi_interface
+ * @brief High-level façade for interacting with ONFI-compliant NAND devices.
+ * @details Wraps the low-level `interface` HAL with helpers for initialization,
+ *          block erase/program/verify cycles, parameter queries, and common
+ *          maintenance routines required by the Micron 3D NAND parts used in
+ *          this project. All public members are exposed so tooling and sample
+ *          applications can orchestrate self-tests or production flows without
+ *          duplicating protocol logic.
+ * @ingroup onfi_interface_api
+ */
 class onfi_interface: public interface
 {
 private:
@@ -40,9 +55,7 @@ private:
 public:
 	// public items go here: this should be almost all the required functions
 
-	/**
-	 let us create a constructor of onfi_interface that initializes the physical_interface
-	 */
+	/** @brief Construct the interface using asynchronous signalling defaults. */
 	onfi_interface(){
 		interface_type = asynchronous;
 		flash_chip = default_async;
@@ -67,318 +80,221 @@ public:
 
 
 	/**
-	This function initializes everything and gets thing started.
-	*/
+	 * @brief Initialize the ONFI stack and underlying HAL resources.
+	 * @param ONFI_OR_JEDEC Select ONFI (default) or JEDEC parameter parsing.
+	 */
 	void get_started(param_type ONFI_OR_JEDEC=ONFI);
 
 /**
-	let us create a function that performs initialization
-	.. opens ONFI debug file
-	.. this function gets the bridge based address
-	.. converts the peripheral addresses
-	.. tests the LEDs
-*/
+	 * @brief Bring up the hardware bridge, map registers, and perform power-on checks.
+	 * @param verbose Emit detailed status to stdout if true.
+	 */
 	void initialize_onfi(bool verbose = false);
 	void deinitialize_onfi(bool verbose = false);
 
-/**
-	this function can be used to test the LEDs if they are properly set up
-	 since it is called as a part of onfi_interface, if this works
-	.. the interface is set up properly
-*/
+	/** @brief Drive indicator LEDs to confirm GPIO wiring. */
 	void test_onfi_leds(bool verbose = false);
 
-/**
-	open the data file
-*/
+	/** @brief Open the onfi debug data capture stream. */
 	void open_onfi_data_file();
 
 /**
-	function to receive data from the NAND device
-	.. data is output from the cache regsiter of selected die
-	.. it is supported following a read operation of NAND array
-*/
+	 * @brief Read raw bytes from the NAND cache/register output path.
+	 * @param data_received Destination buffer.
+	 * @param num_data Number of bytes to read.
+	 */
 	void get_data(uint8_t* data_received,uint16_t num_data) const;
 
 /**
-	Function to get the status code of the last operation 
-*/
+	 * @brief Read the NAND status register corresponding to the last command.
+	 * @return Raw ONFI status byte.
+	 */
 	uint8_t get_status();
 
 /**
-	Function to check and print if the last operation failed
-*/	
+	 * @brief Print a human-readable failure interpretation of the status register.
+	 */
 	void print_status_on_fail();
 
 /**
-	function to initialize the NAND device
-	.. following are the tasks to be performed for initialization of NAND device
-	.. provide Vcc (ie ramp Vcc)
-	.. host must wait for R/B to be valid (R/B should be low for certain duration and be high
-	.. .. to indicate device is ready) R/B is output from the NAND device
-	.. issue 0xFF command after R/B goes high (Reset is the first command to be issued)
-	.. R/B should be monotired again after issuing 0XFF command
-*/
+	 * @brief Execute the ONFI device initialization sequence after power-on.
+	 * @param verbose Emit detailed timing/status output if true.
+	 */
 	void device_initialization(bool verbose = false);
 
 /**
-	function to reset the whole device
-	.. issue a command 0xFF for reset operation
-	.. following operations should be performed for this
-	.. .. enable command cycle
-	.. .. command to be sent is 0xFF
-	.. .. check for R/B signal to be high after certain duration (should go low(busy) and go high (ready))
-*/
+	 * @brief Issue an ONFI reset and wait for the device to report ready.
+	 * @param verbose Emit detailed timing/status output if true.
+	 */
 	void reset_device(bool verbose = false);
 
 	/**
-	following function reads the ONFI parameter page
-	.. the ONFI parameter page consists of ONFI parameter data structure
-	.. this data structure consists of critical information about the internal organization of memory
-	.. the data structure is 256 bytes
-	.. the data will be available for read with a command sequence of ECh followed by an address of 40h
-	*/
+	 * @brief Read and decode the ONFI parameter page.
+	 * @param ONFI_OR_JEDEC Select ONFI (default) or JEDEC parameter parsing.
+	 * @param bytewise Read data byte-by-byte (true) or word-wise (false).
+	 * @param verbose Emit raw page contents and decoded information.
+	 */
 	void read_parameters(param_type ONFI_OR_JEDEC=ONFI,bool bytewise = true, bool verbose = false);
 
-	/**
-	 read id of the device from three locations
-	 */
+	/** @brief Issue the ONFI Read-ID sequence. */
 	void read_id();
 
 	/**
-	based on the values read from the ONFI paramters, we will figure out the ONFI version
-	*/
+	 * @brief Decode major/minor ONFI version fields from the parameter page.
+	 * @param byte_4 MSB of the version field.
+	 * @param byte_5 LSB of the version field.
+	 * @param ret_whole Stores decoded major version.
+	 * @param ret_decimal Stores decoded minor revision.
+	 */
 	void decode_ONFI_version(uint8_t byte_4,uint8_t byte_5,uint8_t* ret_whole,uint8_t* ret_decimal);
 
-	/**
-	 following function will set the size of page based on value read
-	*/
+	/** @brief Cache page size geometry read from the parameter page. */
 	void set_page_size(uint8_t byte_83,uint8_t byte_82,uint8_t byte_81,uint8_t byte_80);
 
-	/**
-	following function will set the size of spare bytes in a page based on value read
-	*/
+	/** @brief Cache spare (OOB) size read from the parameter page. */
 	void set_page_size_spare(uint8_t byte_85,uint8_t byte_84);
 
-	/**
-	following function will set the number of pages in a block
-	*/
+	/** @brief Cache pages-per-block geometry read from the parameter page. */
 	void set_block_size(uint8_t byte_95,uint8_t byte_94,uint8_t byte_93,uint8_t byte_92);
 
-	/**
-	this will populate the number of blocks in a LUN
-	*/
+	/** @brief Cache blocks-per-LUN geometry read from the parameter page. */
 	void set_lun_size(uint8_t byte_99,uint8_t byte_98,uint8_t byte_97,uint8_t byte_96);
-
-	/**
-	following function tests if the block address sent was a bad block or not
-	the ONFI requirement is that the first byte in the spare area of the first page
-	.. should have 0x00 in it to indicate if the block is bad
-	this function takes in a block address
-	.. and reads the first spare byte of the first page to determine if it is a bad block
-	*/
+/**
+ * @brief Test a block for factory bad-block markers in spare area.
+ * @param my_block_number Block index to inspect.
+ * @return true if the block is marked bad.
+ */
 	bool is_bad_block(unsigned int my_block_number);
 
 	/**
-	write a function to perform an read operation from NAND flash to cache register
-	.. reads one page from the NAND to the cache register
-	.. during the read, you can use change_read_column and change_row_address
-	*/
+	 * @brief Populate the cache register with a page of data.
+	 * @param my_block_number Block to access.
+	 * @param my_page_number Page within the block.
+	 * @param address_length Column+row cycles (default 5).
+	 * @param verbose Emit trace-level logs.
+	 */
 	void read_page(unsigned int my_block_number, unsigned int my_page_number,uint8_t address_length=5,bool verbose=false);
 
-	/**
-	this function opens a file named time_info_file.txt
-	.. this file will log all the duration from the timing operations as necessary
-	*/
+	/** @brief Open the timing profile output stream used by benchmarking tools. */
 	void open_time_profile_file();
 
 	/**
-	follow the following function call by get_data() function call
-	.. please change this if the device has multiple dies
-	*/
+	 * @brief Adjust the NAND read column pointer between cache fetches.
+	 * @param col_address Pointer to address bytes to send.
+	 */
 	void change_read_column(uint8_t* col_address);
 
 	/**
-	following function erases the block address provided as the parameter to the function
-	.. the address provided should be three 8-bit number array that corresponds to
-	.. .. R1,R2 and R3 for the block to be erased
-	*/
+	 * @brief Issue a block erase operation.
+	 * @param my_block_number Target block index.
+	 * @param verbose Emit extra logging during the command sequence.
+	 */
 	void erase_block(unsigned int my_block_number, bool verbose = false);
 
+	/** @brief Drive WP#/command pins high for voltage margin checks. */
 	void test_device_voltage_high();
+	/** @brief Drive WP#/command pins low for voltage margin checks. */
 	void test_device_voltage_low();
 
 	/**
-	following function erases the block address provided as the parameter to the function
-	.. the address provided should be three 8-bit number array that corresponds to
-	.. .. R1,R2 and R3 for the block to be erased
-	.. loop_count is the partial erase times, a value of 10 will correspond to 1 ns delay
-	*/
+	 * @brief Perform a timed partial erase pulse for characterization experiments.
+	 * @param my_block_number Block to operate on.
+	 * @param my_page_number Page seed used by the controller helper.
+	 * @param loop_count Delay loop iterations controlling pulse width.
+	 * @param verbose Emit additional diagnostic output.
+	 */
 	void partial_erase_block(unsigned int my_block_number, unsigned int my_page_number, uint32_t loop_count = 30000,bool verbose = false);
 
 	/**
-	.. this function will read any random page and tries to verify if it was completely erased
-	.. for elaborate verifiying, please use a different function
-	*/
-
-	/**
-	this is the function that can be used to elaborately verify the erase operation
-	.. the first argument is the address of the block
-	.. the second argument defines if the complete block is to be verified
-	.. .. if the second argument is false, then the pages from page_indices_selected are taken
-	*/
+	 * @brief Verify that a block erase left all bits in the expected erased state.
+	 * @param my_block_number Block to inspect.
+	 * @param complete_block Verify every page when true; otherwise use `page_indices`.
+	 * @param page_indices Specific page indices to check when `complete_block` is false.
+	 * @param num_pages Number of entries in `page_indices`.
+	 * @param verbose Emit per-page statistics.
+	 * @return true when the block verifies successfully.
+	 */
 	bool verify_block_erase(unsigned int my_block_number, bool complete_block = false,uint16_t* page_indices = page_indices_selected,uint16_t num_pages = num_pages_selected, bool verbose = false);
 
-	/**
-	function to disable Program and Erase operation
-	.. when WP is low, program and erase operation are disabled
-	.. when WP is high, program and erase operation are enabled
-	*/
+	/** @brief Assert the hardware write-protect to block program/erase operations. */
 	void disable_erase();
+	/** @brief Release hardware write-protect so program/erase are allowed. */
 	void enable_erase();
 
 	/**
-	this function only programs a single page as indicated by the address provided
-	for the arguments,
-	.. page_address is the address of the page 5-byte address
-	.. data_to_progra is the data to write
-	.. including_spare is to indicate if you want to program the spare section as well
-	.. .. if including spare  = 1, then length of data_to_program should be (num of bytes in pages + num of spare bytes)
-	.. verbose is for priting messages
-	*/
-    void program_page(unsigned int my_block_number, unsigned int my_page_number, uint8_t* data_to_program,bool including_spare = true,bool verbose = false);
-    void partial_program_page(unsigned int my_block_number, unsigned int my_page_number,uint32_t loop_count,uint8_t* data_to_program,bool including_spare = true,bool verbose = false);
+	 * @brief Program a page from a buffer.
+	 * @param my_block_number Block containing the page.
+	 * @param my_page_number Page index inside the block.
+	 * @param data_to_program Pointer to payload (optionally includes spare).
+	 * @param including_spare Program spare/OOB region when true.
+	 * @param verbose Emit detailed command logging.
+	 */
+	void program_page(unsigned int my_block_number, unsigned int my_page_number, uint8_t* data_to_program,bool including_spare = true,bool verbose = false);
+	/**
+	 * @brief Program using a reduced pulse width for characterization sweeps.
+	 * @param my_block_number Block containing the page.
+	 * @param my_page_number Page index inside the block.
+	 * @param loop_count Delay loop iterations controlling pulse width.
+	 * @param data_to_program Buffer to write.
+	 * @param including_spare Program spare/OOB region when true.
+	 * @param verbose Emit detailed command logging.
+	 */
+	void partial_program_page(unsigned int my_block_number, unsigned int my_page_number,uint32_t loop_count,uint8_t* data_to_program,bool including_spare = true,bool verbose = false);
 
 	/**
-	this function programs all 3 pages in TLC pages of TOSHIBA NAND flash memory
-	please see the datasheet or the function definition for the program operation
-	*/
-    void program_page_tlc_toshiba(unsigned int my_block_number,unsigned int my_page_number, uint8_t* data_to_program,bool including_spare = true,bool verbose = false);
-    void program_page_tlc_toshiba_subpage(unsigned int my_block_number,unsigned int my_page_number, unsigned int subpage_number, uint8_t* data_to_program,bool including_spare = true,bool verbose = false);
+	 * @brief Program TLC pages on Toshiba parts using vendor specific sequencing.
+	 */
+	void program_page_tlc_toshiba(unsigned int my_block_number,unsigned int my_page_number, uint8_t* data_to_program,bool including_spare = true,bool verbose = false);
+	/**
+	 * @brief Program a single subpage of a TLC location on Toshiba parts.
+	 */
+	void program_page_tlc_toshiba_subpage(unsigned int my_block_number,unsigned int my_page_number, unsigned int subpage_number, uint8_t* data_to_program,bool including_spare = true,bool verbose = false);
 
 	/**
-	this function only verifies a single page as indicated by the address provided
-	for the arguments,
-	.. page_address is the address of the page 5-byte address
-	.. data_to_progra is the data expected
-	.. including_spare is to indicate if you want to program the spare section as well
-	.. .. if including spare  = 1, then length of data_to_program should be (num of bytes in pages + num of spare bytes)
-	.. verbose is for priting messages
-	*/
-        bool verify_program_page(unsigned int my_block_number, unsigned int my_page_number,uint8_t* data_to_program,bool verbose = false, int max_allowed_errors = 0);
+	 * @brief Verify a programmed page against expected data.
+	 * @param my_block_number Block containing the page.
+	 * @param my_page_number Page index inside the block.
+	 * @param data_to_program Expected data buffer.
+	 * @param verbose Emit per-byte mismatch details.
+	 * @param max_allowed_errors Allowable bit errors before failing.
+	 * @return true when the verification passes within tolerance.
+	 */
+	bool verify_program_page(unsigned int my_block_number, unsigned int my_page_number,uint8_t* data_to_program,bool verbose = false, int max_allowed_errors = 0);
 
 	/**
-	let us program pages in the block with all 0s
-	the paramters are:
-	.. my_test_block_address is the address of the block (starting address)
-	.. complete_block if this is true all the pages in the block will be programmed
-	.. page_indices is an array of indices inside the block that we want to program
-	.. num_pages is the number of pages in the page_indices array
-	.. verbose is for printing
-	*/
-
-
-/**
-	let us program pages in the block with all uint8_t* provided_data
-	the paramters are:
-	.. my_test_block_address is the address of the block (starting address)
-	.. complete_block if this is true all the pages in the block will be programmed
-	.. page_indices is an array of indices inside the block that we want to program
-	.. num_pages is the number of pages in the page_indices array
-	.. verbose is for printing
-*/
-
-/**
-	this function will program all the pages in a block with an array provided by user
-	.. if the user wants to give an array
-	.. .. it is indicated through bool array_provided
-	.. .. the actual array is supposed to be in uint8_t* provided_array (lenght should be total number of bytes in a page)
-	*/
-
-	/**
-	let us program pages in the block with all 0s
-	the paramters are:
-	.. my_test_block_address is the address of the block (starting address)
-	.. num_pages is the number of pages in the page_indices array
-	.. verbose is for printing
-	*/
-
-/**
-	let us verify program pages in the block
-	the paramters are:
-	.. my_test_block_address is the address of the block (starting address)
-	.. complete_block if this is true all the pages in the block will be verified
-	.. page_indices is an array of indices inside the block that we want to verify
-	.. num_pages is the number of pages in the page_indices array
-	.. verbose is for printing
-	*/
-
-	/**
-	this function reads the single page address provided
-	each value is hex while the sequence is terminated by newline character
-	*/
-
-	/**
-	this function reads the page address provided from the TOSHIBA TLC chip
-	all three subpages data will be written to an output file
-	each value is hex while the sequence is terminated by newline character
-	*/
-
-	/**
-	this function reads the pages in the block
-	.. since the complete data from the block might be too much data, the parameter complete_block can be used to limit the data
-	.. if complete_block is true, the compete block will be read
-	.. if complete_block is false, the indices of the pages to be read cane be provided as an array
-	.. if the indices of pages is used, the num_pages should indicate the numb er of pages listed in the array
-	.. verbose indicates the debug messages to be printed
-	*/
-
-
-	 /**
-	 This function read the page specified by the index value in the
-	.. block and puts the read value into the array passed " return_value" as argument
-	*/
-
-	/**
-	this function reads the pages in the block
-	.. since the complete data from the block might be too much data, the parameter num_pages can be used to limit the data
-	.. the num_pages should indicate the number of pages in block starting from beginning
-	.. verbose indicates the debug messages to be printed
-	*/
-
-	/**
-	The SET FEATURES (EFh) command writes the subfeature parameters (P1-P4) to the
-	.. specified feature address to enable or disable target-specific features. This command is
-	.. accepted by the target only when all die (LUNs) on the target are idle.
-	.. the parameters P1-P4 are in data_to_send argument
-	*/
+	 * @brief Write ONFI feature parameters (EFh command).
+	 * @param address Feature address within the NAND.
+	 * @param data_to_send Four-byte payload describing the feature configuration.
+	 * @param command Optional override for the command code.
+	 */
 	void set_features(uint8_t address, uint8_t* data_to_send, uint8_t command = 0xef);
 
 	/**
-	The GET FEATURES (EEh) command reads the subfeature parameters (P1-P4) from the
-	.. specified feature address. This command is accepted by the target only when all die
-	.. (LUNs) on the target are idle.
-	.. the parameters P1-P4 are in data_received argument
-	*/
+	 * @brief Read ONFI feature parameters (EEh command).
+	 * @param address Feature address within the NAND.
+	 * @param data_received Buffer to receive four bytes of feature data.
+	 * @param command Optional override for the command code.
+	 */
 	void get_features(uint8_t address, uint8_t* data_received, uint8_t command = 0xee) const;
 
 	/**
-	following function will convert a block from MLC mode to SLC mode
-	.. it uses set_features option to convert the block from SLC to MLC
-	*/
-
-	/**
-	this function introduces delay
-	.. the delay is caused using a for loop
-	*/
+	 * @brief Busy-wait delay used by profiling and margining routines.
+	 * @param loop_count Iterations of the internal delay loop.
+	 */
 	void delay_function(uint32_t loop_count);
+	/** @brief Capture timing data for the most recent operation. */
 	void profile_time();
 
 	/**
-	following function converts the my_page_number inside the my_block_number to {x,x,x,x,x} and saves to my_test_block_address
-	my_test_block_address is an array [c1,c2,r1,r2,r3]
-	*/
+	 * @brief Translate block/page IDs to the column/row address tuple expected by ONFI.
+	 * @param my_block_number Block containing the page.
+	 * @param my_page_number Page index inside the block.
+	 * @param my_test_block_address Output buffer populated with {c1,c2,r1,r2,r3} bytes.
+	 * @param verbose Emit detailed arithmetic steps when true.
+	 */
 	void convert_pagenumber_to_columnrow_address(unsigned int my_block_number, unsigned int my_page_number, uint8_t* my_test_block_address, bool verbose);
 };
+
+/** @} */
 
 #endif

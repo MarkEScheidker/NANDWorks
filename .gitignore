@@ -6,6 +6,7 @@ benchmark
 profiler
 erase_chip
 tester
+docs/html/
 
 # Temporary files
 *.o

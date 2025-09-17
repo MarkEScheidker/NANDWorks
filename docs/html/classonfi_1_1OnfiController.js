@@ -12,5 +12,6 @@ var classonfi_1_1OnfiController =
     [ "program_page_confirm", "classonfi_1_1OnfiController.html#a067a83e77b73c62325d6ee58dcf0a246", null ],
     [ "read_data", "classonfi_1_1OnfiController.html#ae4bfca281222632548c0627217b84302", null ],
     [ "reset", "classonfi_1_1OnfiController.html#a48879e202bbecc5417d643c45bc81b8e", null ],
-    [ "set_features", "classonfi_1_1OnfiController.html#a0f34640d1f946e0a4b699e697c846cb0", null ]
+    [ "set_features", "classonfi_1_1OnfiController.html#a0f34640d1f946e0a4b699e697c846cb0", null ],
+    [ "hal_", "classonfi_1_1OnfiController.html#a5b1f741a73c7eb24b4eb09b7d5261546", null ]
 ];

@@ -27,6 +27,7 @@
   <td id="projectalign">
    <div id="projectname">MastersThesis NAND Interface
    </div>
+   <div id="projectbrief">ONFI façade and supporting library for NAND flash characterization</div>
   </td>
  </tr>
  </tbody>
@@ -85,112 +86,148 @@ $(document).ready(function(){initNavTree('classonfi__interface.html',''); initRe
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-attribs">Public Attributes</a> &#124;
+<a href="#pri-attribs">Private Attributes</a> &#124;
 <a href="classonfi__interface-members.html">List of all members</a>  </div>
-  <div class="headertitle"><div class="title">onfi_interface Class Reference</div></div>
+  <div class="headertitle"><div class="title">onfi_interface Class Reference<div class="ingroups"><a class="el" href="group__onfi__interface__api.html">ONFI Interface Facade</a></div></div></div>
 </div><!--header-->
 <div class="contents">
+
+<p>High-level façade for interacting with ONFI-compliant NAND devices.  
+ <a href="classonfi__interface.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="onfi__interface_8h_source.html">onfi_interface.h</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for onfi_interface:</div>
 <div class="dyncontent">
-<div class="center"><img src="classonfi__interface__inherit__graph.png" border="0" usemap="#aonfi__interface_inherit__map" alt="Inheritance graph"/></div>
-<map name="aonfi__interface_inherit__map" id="aonfi__interface_inherit__map">
-<area shape="rect" title=" " alt="" coords="5,80,116,107"/>
-<area shape="rect" href="classinterface.html" title=" " alt="" coords="21,5,101,32"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="classonfi__interface__inherit__graph.svg" width="122" height="112"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+</div>
 <center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <div class="dynheader">
 Collaboration diagram for onfi_interface:</div>
 <div class="dyncontent">
-<div class="center"><img src="classonfi__interface__coll__graph.png" border="0" usemap="#aonfi__interface_coll__map" alt="Collaboration graph"/></div>
-<map name="aonfi__interface_coll__map" id="aonfi__interface_coll__map">
-<area shape="rect" title=" " alt="" coords="5,80,116,107"/>
-<area shape="rect" href="classinterface.html" title=" " alt="" coords="21,5,101,32"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="classonfi__interface__coll__graph.svg" width="122" height="112"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+</div>
 <center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:af2951c5c746ad9422f4c94c7ae0d82a1"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classonfi__interface.html#af2951c5c746ad9422f4c94c7ae0d82a1">onfi_interface</a> ()</td></tr>
+<tr class="memdesc:af2951c5c746ad9422f4c94c7ae0d82a1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct the interface using asynchronous signalling defaults.  <a href="classonfi__interface.html#af2951c5c746ad9422f4c94c7ae0d82a1">More...</a><br /></td></tr>
 <tr class="separator:af2951c5c746ad9422f4c94c7ae0d82a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a369712f07b3158953f42f3e9efcfe533"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classonfi__interface.html#a369712f07b3158953f42f3e9efcfe533">~onfi_interface</a> ()</td></tr>
 <tr class="separator:a369712f07b3158953f42f3e9efcfe533"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ababf8968a7342ab7ce6ef97d3c7b9a06"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classonfi__interface.html#ababf8968a7342ab7ce6ef97d3c7b9a06">get_started</a> (<a class="el" href="onfi__interface_8h.html#a448f647fca8391a8e5ce382ab398474e">param_type</a> ONFI_OR_JEDEC=<a class="el" href="onfi__interface_8h.html#a448f647fca8391a8e5ce382ab398474eaeb65d284c35c79a13312f57393d1d2cb">ONFI</a>)</td></tr>
+<tr class="memitem:ababf8968a7342ab7ce6ef97d3c7b9a06"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classonfi__interface.html#ababf8968a7342ab7ce6ef97d3c7b9a06">get_started</a> (<a class="el" href="group__onfi__interface__api.html#ga448f647fca8391a8e5ce382ab398474e">param_type</a> ONFI_OR_JEDEC=<a class="el" href="group__onfi__interface__api.html#gga448f647fca8391a8e5ce382ab398474eaeb65d284c35c79a13312f57393d1d2cb">ONFI</a>)</td></tr>
+<tr class="memdesc:ababf8968a7342ab7ce6ef97d3c7b9a06"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the ONFI stack and underlying HAL resources.  <a href="classonfi__interface.html#ababf8968a7342ab7ce6ef97d3c7b9a06">More...</a><br /></td></tr>
 <tr class="separator:ababf8968a7342ab7ce6ef97d3c7b9a06"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a492b2cbadc4afdb6bf34a63e2248f1fc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classonfi__interface.html#a492b2cbadc4afdb6bf34a63e2248f1fc">initialize_onfi</a> (bool verbose=false)</td></tr>
+<tr class="memdesc:a492b2cbadc4afdb6bf34a63e2248f1fc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Bring up the hardware bridge, map registers, and perform power-on checks.  <a href="classonfi__interface.html#a492b2cbadc4afdb6bf34a63e2248f1fc">More...</a><br /></td></tr>
 <tr class="separator:a492b2cbadc4afdb6bf34a63e2248f1fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aec25908ee35b4f9f325c4bd5a52d6851"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classonfi__interface.html#aec25908ee35b4f9f325c4bd5a52d6851">deinitialize_onfi</a> (bool verbose=false)</td></tr>
 <tr class="separator:aec25908ee35b4f9f325c4bd5a52d6851"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a814ddf39cf3c807af7ab6c5f61911ac9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classonfi__interface.html#a814ddf39cf3c807af7ab6c5f61911ac9">test_onfi_leds</a> (bool verbose=false)</td></tr>
+<tr class="memdesc:a814ddf39cf3c807af7ab6c5f61911ac9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Drive indicator LEDs to confirm GPIO wiring.  <a href="classonfi__interface.html#a814ddf39cf3c807af7ab6c5f61911ac9">More...</a><br /></td></tr>
 <tr class="separator:a814ddf39cf3c807af7ab6c5f61911ac9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaf50581b58fd3600a2f4d125c1c15810"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classonfi__interface.html#aaf50581b58fd3600a2f4d125c1c15810">open_onfi_data_file</a> ()</td></tr>
+<tr class="memdesc:aaf50581b58fd3600a2f4d125c1c15810"><td class="mdescLeft">&#160;</td><td class="mdescRight">Open the onfi debug data capture stream.  <a href="classonfi__interface.html#aaf50581b58fd3600a2f4d125c1c15810">More...</a><br /></td></tr>
 <tr class="separator:aaf50581b58fd3600a2f4d125c1c15810"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaa0b263e533910d56952865b292bdba8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classonfi__interface.html#aaa0b263e533910d56952865b292bdba8">get_data</a> (uint8_t *data_received, uint16_t num_data) const</td></tr>
+<tr class="memdesc:aaa0b263e533910d56952865b292bdba8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read raw bytes from the NAND cache/register output path.  <a href="classonfi__interface.html#aaa0b263e533910d56952865b292bdba8">More...</a><br /></td></tr>
 <tr class="separator:aaa0b263e533910d56952865b292bdba8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0284ea620c555f0f2aa8c4412a0a2967"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classonfi__interface.html#a0284ea620c555f0f2aa8c4412a0a2967">get_status</a> ()</td></tr>
+<tr class="memdesc:a0284ea620c555f0f2aa8c4412a0a2967"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read the NAND status register corresponding to the last command.  <a href="classonfi__interface.html#a0284ea620c555f0f2aa8c4412a0a2967">More...</a><br /></td></tr>
 <tr class="separator:a0284ea620c555f0f2aa8c4412a0a2967"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aeee5ee7daa7345dcee577b30c70be4fd"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classonfi__interface.html#aeee5ee7daa7345dcee577b30c70be4fd">print_status_on_fail</a> ()</td></tr>
+<tr class="memdesc:aeee5ee7daa7345dcee577b30c70be4fd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Print a human-readable failure interpretation of the status register.  <a href="classonfi__interface.html#aeee5ee7daa7345dcee577b30c70be4fd">More...</a><br /></td></tr>
 <tr class="separator:aeee5ee7daa7345dcee577b30c70be4fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1facef909ae526427fa9841b34b391e3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classonfi__interface.html#a1facef909ae526427fa9841b34b391e3">device_initialization</a> (bool verbose=false)</td></tr>
+<tr class="memdesc:a1facef909ae526427fa9841b34b391e3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Execute the ONFI device initialization sequence after power-on.  <a href="classonfi__interface.html#a1facef909ae526427fa9841b34b391e3">More...</a><br /></td></tr>
 <tr class="separator:a1facef909ae526427fa9841b34b391e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7233439daa3bca095d416ab11b231a23"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classonfi__interface.html#a7233439daa3bca095d416ab11b231a23">reset_device</a> (bool verbose=false)</td></tr>
+<tr class="memdesc:a7233439daa3bca095d416ab11b231a23"><td class="mdescLeft">&#160;</td><td class="mdescRight">Issue an ONFI reset and wait for the device to report ready.  <a href="classonfi__interface.html#a7233439daa3bca095d416ab11b231a23">More...</a><br /></td></tr>
 <tr class="separator:a7233439daa3bca095d416ab11b231a23"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a503252ee5b69c6857a5b086f005897fc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classonfi__interface.html#a503252ee5b69c6857a5b086f005897fc">read_parameters</a> (<a class="el" href="onfi__interface_8h.html#a448f647fca8391a8e5ce382ab398474e">param_type</a> ONFI_OR_JEDEC=<a class="el" href="onfi__interface_8h.html#a448f647fca8391a8e5ce382ab398474eaeb65d284c35c79a13312f57393d1d2cb">ONFI</a>, bool bytewise=true, bool verbose=false)</td></tr>
+<tr class="memitem:a503252ee5b69c6857a5b086f005897fc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classonfi__interface.html#a503252ee5b69c6857a5b086f005897fc">read_parameters</a> (<a class="el" href="group__onfi__interface__api.html#ga448f647fca8391a8e5ce382ab398474e">param_type</a> ONFI_OR_JEDEC=<a class="el" href="group__onfi__interface__api.html#gga448f647fca8391a8e5ce382ab398474eaeb65d284c35c79a13312f57393d1d2cb">ONFI</a>, bool bytewise=true, bool verbose=false)</td></tr>
+<tr class="memdesc:a503252ee5b69c6857a5b086f005897fc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read and decode the ONFI parameter page.  <a href="classonfi__interface.html#a503252ee5b69c6857a5b086f005897fc">More...</a><br /></td></tr>
 <tr class="separator:a503252ee5b69c6857a5b086f005897fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af2fa4bce38edcce8136fef2a59a19016"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classonfi__interface.html#af2fa4bce38edcce8136fef2a59a19016">read_id</a> ()</td></tr>
+<tr class="memdesc:af2fa4bce38edcce8136fef2a59a19016"><td class="mdescLeft">&#160;</td><td class="mdescRight">Issue the ONFI Read-ID sequence.  <a href="classonfi__interface.html#af2fa4bce38edcce8136fef2a59a19016">More...</a><br /></td></tr>
 <tr class="separator:af2fa4bce38edcce8136fef2a59a19016"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a982ccfe0d355477505fd735dfbdbf2ed"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classonfi__interface.html#a982ccfe0d355477505fd735dfbdbf2ed">decode_ONFI_version</a> (uint8_t byte_4, uint8_t byte_5, uint8_t *ret_whole, uint8_t *ret_decimal)</td></tr>
+<tr class="memdesc:a982ccfe0d355477505fd735dfbdbf2ed"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decode major/minor ONFI version fields from the parameter page.  <a href="classonfi__interface.html#a982ccfe0d355477505fd735dfbdbf2ed">More...</a><br /></td></tr>
 <tr class="separator:a982ccfe0d355477505fd735dfbdbf2ed"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa2694e3fd0ebfb2d7ca5bac4876e7332"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classonfi__interface.html#aa2694e3fd0ebfb2d7ca5bac4876e7332">set_page_size</a> (uint8_t byte_83, uint8_t byte_82, uint8_t byte_81, uint8_t byte_80)</td></tr>
+<tr class="memdesc:aa2694e3fd0ebfb2d7ca5bac4876e7332"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cache page size geometry read from the parameter page.  <a href="classonfi__interface.html#aa2694e3fd0ebfb2d7ca5bac4876e7332">More...</a><br /></td></tr>
 <tr class="separator:aa2694e3fd0ebfb2d7ca5bac4876e7332"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8e053f8a634b97f09b922d534c35bda2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classonfi__interface.html#a8e053f8a634b97f09b922d534c35bda2">set_page_size_spare</a> (uint8_t byte_85, uint8_t byte_84)</td></tr>
+<tr class="memdesc:a8e053f8a634b97f09b922d534c35bda2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cache spare (OOB) size read from the parameter page.  <a href="classonfi__interface.html#a8e053f8a634b97f09b922d534c35bda2">More...</a><br /></td></tr>
 <tr class="separator:a8e053f8a634b97f09b922d534c35bda2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a14a36958a17c9b7f968c68a35256dc0d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classonfi__interface.html#a14a36958a17c9b7f968c68a35256dc0d">set_block_size</a> (uint8_t byte_95, uint8_t byte_94, uint8_t byte_93, uint8_t byte_92)</td></tr>
+<tr class="memdesc:a14a36958a17c9b7f968c68a35256dc0d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cache pages-per-block geometry read from the parameter page.  <a href="classonfi__interface.html#a14a36958a17c9b7f968c68a35256dc0d">More...</a><br /></td></tr>
 <tr class="separator:a14a36958a17c9b7f968c68a35256dc0d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad666aee1b951af832d04546a9b2cf6c2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classonfi__interface.html#ad666aee1b951af832d04546a9b2cf6c2">set_lun_size</a> (uint8_t byte_99, uint8_t byte_98, uint8_t byte_97, uint8_t byte_96)</td></tr>
+<tr class="memdesc:ad666aee1b951af832d04546a9b2cf6c2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cache blocks-per-LUN geometry read from the parameter page.  <a href="classonfi__interface.html#ad666aee1b951af832d04546a9b2cf6c2">More...</a><br /></td></tr>
 <tr class="separator:ad666aee1b951af832d04546a9b2cf6c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac2ef9dba1b471b3e8059e66b81757cd8"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classonfi__interface.html#ac2ef9dba1b471b3e8059e66b81757cd8">is_bad_block</a> (unsigned int my_block_number)</td></tr>
+<tr class="memdesc:ac2ef9dba1b471b3e8059e66b81757cd8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Test a block for factory bad-block markers in spare area.  <a href="classonfi__interface.html#ac2ef9dba1b471b3e8059e66b81757cd8">More...</a><br /></td></tr>
 <tr class="separator:ac2ef9dba1b471b3e8059e66b81757cd8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af252055f18b4a3877023ee4f7d47ee5e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classonfi__interface.html#af252055f18b4a3877023ee4f7d47ee5e">read_page</a> (unsigned int my_block_number, unsigned int my_page_number, uint8_t address_length=5, bool verbose=false)</td></tr>
+<tr class="memdesc:af252055f18b4a3877023ee4f7d47ee5e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Populate the cache register with a page of data.  <a href="classonfi__interface.html#af252055f18b4a3877023ee4f7d47ee5e">More...</a><br /></td></tr>
 <tr class="separator:af252055f18b4a3877023ee4f7d47ee5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac8b5721d89de1873340f7ec1f0ef43ac"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classonfi__interface.html#ac8b5721d89de1873340f7ec1f0ef43ac">open_time_profile_file</a> ()</td></tr>
+<tr class="memdesc:ac8b5721d89de1873340f7ec1f0ef43ac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Open the timing profile output stream used by benchmarking tools.  <a href="classonfi__interface.html#ac8b5721d89de1873340f7ec1f0ef43ac">More...</a><br /></td></tr>
 <tr class="separator:ac8b5721d89de1873340f7ec1f0ef43ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1bb78945bd6f39cdaaf26e6ed2d9eb37"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classonfi__interface.html#a1bb78945bd6f39cdaaf26e6ed2d9eb37">change_read_column</a> (uint8_t *col_address)</td></tr>
+<tr class="memdesc:a1bb78945bd6f39cdaaf26e6ed2d9eb37"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adjust the NAND read column pointer between cache fetches.  <a href="classonfi__interface.html#a1bb78945bd6f39cdaaf26e6ed2d9eb37">More...</a><br /></td></tr>
 <tr class="separator:a1bb78945bd6f39cdaaf26e6ed2d9eb37"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a24ed1d96b73ac62a9ab702746a57afba"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classonfi__interface.html#a24ed1d96b73ac62a9ab702746a57afba">erase_block</a> (unsigned int my_block_number, bool verbose=false)</td></tr>
+<tr class="memdesc:a24ed1d96b73ac62a9ab702746a57afba"><td class="mdescLeft">&#160;</td><td class="mdescRight">Issue a block erase operation.  <a href="classonfi__interface.html#a24ed1d96b73ac62a9ab702746a57afba">More...</a><br /></td></tr>
 <tr class="separator:a24ed1d96b73ac62a9ab702746a57afba"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3d5d56715be5e4d846a5b2d5ef55c874"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classonfi__interface.html#a3d5d56715be5e4d846a5b2d5ef55c874">test_device_voltage_high</a> ()</td></tr>
+<tr class="memdesc:a3d5d56715be5e4d846a5b2d5ef55c874"><td class="mdescLeft">&#160;</td><td class="mdescRight">Drive WP#/command pins high for voltage margin checks.  <a href="classonfi__interface.html#a3d5d56715be5e4d846a5b2d5ef55c874">More...</a><br /></td></tr>
 <tr class="separator:a3d5d56715be5e4d846a5b2d5ef55c874"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a37a35e102d9dd0488238ba9ce0271ddb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classonfi__interface.html#a37a35e102d9dd0488238ba9ce0271ddb">test_device_voltage_low</a> ()</td></tr>
+<tr class="memdesc:a37a35e102d9dd0488238ba9ce0271ddb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Drive WP#/command pins low for voltage margin checks.  <a href="classonfi__interface.html#a37a35e102d9dd0488238ba9ce0271ddb">More...</a><br /></td></tr>
 <tr class="separator:a37a35e102d9dd0488238ba9ce0271ddb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afbc78d1e5ce04498bc57036522c981ed"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classonfi__interface.html#afbc78d1e5ce04498bc57036522c981ed">partial_erase_block</a> (unsigned int my_block_number, unsigned int my_page_number, uint32_t loop_count=30000, bool verbose=false)</td></tr>
+<tr class="memdesc:afbc78d1e5ce04498bc57036522c981ed"><td class="mdescLeft">&#160;</td><td class="mdescRight">Perform a timed partial erase pulse for characterization experiments.  <a href="classonfi__interface.html#afbc78d1e5ce04498bc57036522c981ed">More...</a><br /></td></tr>
 <tr class="separator:afbc78d1e5ce04498bc57036522c981ed"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adcc03353a6572cf3b94ff3817abebb11"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classonfi__interface.html#adcc03353a6572cf3b94ff3817abebb11">verify_block_erase</a> (unsigned int my_block_number, bool complete_block=false, uint16_t *page_indices=<a class="el" href="util_8cpp.html#ac927120305564b7907f00ccb2e747807">page_indices_selected</a>, uint16_t num_pages=<a class="el" href="util_8cpp.html#abe3b87d047a4f55dae8887da7cfa395d">num_pages_selected</a>, bool verbose=false)</td></tr>
+<tr class="memitem:adcc03353a6572cf3b94ff3817abebb11"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classonfi__interface.html#adcc03353a6572cf3b94ff3817abebb11">verify_block_erase</a> (unsigned int my_block_number, bool complete_block=false, uint16_t *page_indices=<a class="el" href="group__onfi__interface__api.html#gac927120305564b7907f00ccb2e747807">page_indices_selected</a>, uint16_t num_pages=<a class="el" href="group__onfi__interface__api.html#gabe3b87d047a4f55dae8887da7cfa395d">num_pages_selected</a>, bool verbose=false)</td></tr>
+<tr class="memdesc:adcc03353a6572cf3b94ff3817abebb11"><td class="mdescLeft">&#160;</td><td class="mdescRight">Verify that a block erase left all bits in the expected erased state.  <a href="classonfi__interface.html#adcc03353a6572cf3b94ff3817abebb11">More...</a><br /></td></tr>
 <tr class="separator:adcc03353a6572cf3b94ff3817abebb11"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9d0f88fe547cc75de924b06acd4882b0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classonfi__interface.html#a9d0f88fe547cc75de924b06acd4882b0">disable_erase</a> ()</td></tr>
+<tr class="memdesc:a9d0f88fe547cc75de924b06acd4882b0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assert the hardware write-protect to block program/erase operations.  <a href="classonfi__interface.html#a9d0f88fe547cc75de924b06acd4882b0">More...</a><br /></td></tr>
 <tr class="separator:a9d0f88fe547cc75de924b06acd4882b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a92ce39b3f49cd2098b7c1ad87ad85657"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classonfi__interface.html#a92ce39b3f49cd2098b7c1ad87ad85657">enable_erase</a> ()</td></tr>
+<tr class="memdesc:a92ce39b3f49cd2098b7c1ad87ad85657"><td class="mdescLeft">&#160;</td><td class="mdescRight">Release hardware write-protect so program/erase are allowed.  <a href="classonfi__interface.html#a92ce39b3f49cd2098b7c1ad87ad85657">More...</a><br /></td></tr>
 <tr class="separator:a92ce39b3f49cd2098b7c1ad87ad85657"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a280b86c77a5737672dea9001c80e8d17"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classonfi__interface.html#a280b86c77a5737672dea9001c80e8d17">program_page</a> (unsigned int my_block_number, unsigned int my_page_number, uint8_t *data_to_program, bool including_spare=true, bool verbose=false)</td></tr>
+<tr class="memdesc:a280b86c77a5737672dea9001c80e8d17"><td class="mdescLeft">&#160;</td><td class="mdescRight">Program a page from a buffer.  <a href="classonfi__interface.html#a280b86c77a5737672dea9001c80e8d17">More...</a><br /></td></tr>
 <tr class="separator:a280b86c77a5737672dea9001c80e8d17"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a66f822cbed352c3066622aca4510cb92"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classonfi__interface.html#a66f822cbed352c3066622aca4510cb92">partial_program_page</a> (unsigned int my_block_number, unsigned int my_page_number, uint32_t loop_count, uint8_t *data_to_program, bool including_spare=true, bool verbose=false)</td></tr>
+<tr class="memdesc:a66f822cbed352c3066622aca4510cb92"><td class="mdescLeft">&#160;</td><td class="mdescRight">Program using a reduced pulse width for characterization sweeps.  <a href="classonfi__interface.html#a66f822cbed352c3066622aca4510cb92">More...</a><br /></td></tr>
 <tr class="separator:a66f822cbed352c3066622aca4510cb92"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abe6ba91ab13d3961b6a32f648aa1a210"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classonfi__interface.html#abe6ba91ab13d3961b6a32f648aa1a210">program_page_tlc_toshiba</a> (unsigned int my_block_number, unsigned int my_page_number, uint8_t *data_to_program, bool including_spare=true, bool verbose=false)</td></tr>
+<tr class="memdesc:abe6ba91ab13d3961b6a32f648aa1a210"><td class="mdescLeft">&#160;</td><td class="mdescRight">Program TLC pages on Toshiba parts using vendor specific sequencing.  <a href="classonfi__interface.html#abe6ba91ab13d3961b6a32f648aa1a210">More...</a><br /></td></tr>
 <tr class="separator:abe6ba91ab13d3961b6a32f648aa1a210"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0bdf7a37eebc81a753f8199247cff52a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classonfi__interface.html#a0bdf7a37eebc81a753f8199247cff52a">program_page_tlc_toshiba_subpage</a> (unsigned int my_block_number, unsigned int my_page_number, unsigned int subpage_number, uint8_t *data_to_program, bool including_spare=true, bool verbose=false)</td></tr>
+<tr class="memdesc:a0bdf7a37eebc81a753f8199247cff52a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Program a single subpage of a TLC location on Toshiba parts.  <a href="classonfi__interface.html#a0bdf7a37eebc81a753f8199247cff52a">More...</a><br /></td></tr>
 <tr class="separator:a0bdf7a37eebc81a753f8199247cff52a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9e14a47ec6189613a3b2000acb98874a"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classonfi__interface.html#a9e14a47ec6189613a3b2000acb98874a">verify_program_page</a> (unsigned int my_block_number, unsigned int my_page_number, uint8_t *data_to_program, bool verbose=false, int max_allowed_errors=0)</td></tr>
+<tr class="memdesc:a9e14a47ec6189613a3b2000acb98874a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Verify a programmed page against expected data.  <a href="classonfi__interface.html#a9e14a47ec6189613a3b2000acb98874a">More...</a><br /></td></tr>
 <tr class="separator:a9e14a47ec6189613a3b2000acb98874a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a59108a7916ba2e9e2c3bd977845cd316"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classonfi__interface.html#a59108a7916ba2e9e2c3bd977845cd316">set_features</a> (uint8_t address, uint8_t *data_to_send, uint8_t command=0xef)</td></tr>
+<tr class="memdesc:a59108a7916ba2e9e2c3bd977845cd316"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write ONFI feature parameters (EFh command).  <a href="classonfi__interface.html#a59108a7916ba2e9e2c3bd977845cd316">More...</a><br /></td></tr>
 <tr class="separator:a59108a7916ba2e9e2c3bd977845cd316"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5a95932b8fd046780e1f0080be81ed8a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classonfi__interface.html#a5a95932b8fd046780e1f0080be81ed8a">get_features</a> (uint8_t address, uint8_t *data_received, uint8_t command=0xee) const</td></tr>
+<tr class="memdesc:a5a95932b8fd046780e1f0080be81ed8a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read ONFI feature parameters (EEh command).  <a href="classonfi__interface.html#a5a95932b8fd046780e1f0080be81ed8a">More...</a><br /></td></tr>
 <tr class="separator:a5a95932b8fd046780e1f0080be81ed8a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4ee57873eb28517c93de65f78555e6c4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classonfi__interface.html#a4ee57873eb28517c93de65f78555e6c4">delay_function</a> (uint32_t loop_count)</td></tr>
+<tr class="memdesc:a4ee57873eb28517c93de65f78555e6c4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Busy-wait delay used by profiling and margining routines.  <a href="classonfi__interface.html#a4ee57873eb28517c93de65f78555e6c4">More...</a><br /></td></tr>
 <tr class="separator:a4ee57873eb28517c93de65f78555e6c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a452d9fdaf02578b6a94e521866f741ec"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classonfi__interface.html#a452d9fdaf02578b6a94e521866f741ec">profile_time</a> ()</td></tr>
+<tr class="memdesc:a452d9fdaf02578b6a94e521866f741ec"><td class="mdescLeft">&#160;</td><td class="mdescRight">Capture timing data for the most recent operation.  <a href="classonfi__interface.html#a452d9fdaf02578b6a94e521866f741ec">More...</a><br /></td></tr>
 <tr class="separator:a452d9fdaf02578b6a94e521866f741ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa31f2ee8a28415393bea02722143552e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classonfi__interface.html#aa31f2ee8a28415393bea02722143552e">convert_pagenumber_to_columnrow_address</a> (unsigned int my_block_number, unsigned int my_page_number, uint8_t *my_test_block_address, bool verbose)</td></tr>
+<tr class="memdesc:aa31f2ee8a28415393bea02722143552e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Translate block/page IDs to the column/row address tuple expected by ONFI.  <a href="classonfi__interface.html#aa31f2ee8a28415393bea02722143552e">More...</a><br /></td></tr>
 <tr class="separator:aa31f2ee8a28415393bea02722143552e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classinterface"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classinterface')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classinterface.html">interface</a></td></tr>
 <tr class="memitem:a13e0ee4b9df1714d747d62ec46220c55 inherit pub_methods_classinterface"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classinterface.html#a13e0ee4b9df1714d747d62ec46220c55">interface</a> ()</td></tr>
@@ -260,6 +297,13 @@ Public Attributes</h2></td></tr>
 <tr class="memitem:aa1ab06ef627035b40717ed44a48e8ed5 inherit pub_attribs_classinterface"><td class="memItemLeft" align="right" valign="top"><a class="el" href="microprocessor__interface_8h.html#a8b15bc584d38a735307f3ade02d73391">chip_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classinterface.html#aa1ab06ef627035b40717ed44a48e8ed5">flash_chip</a></td></tr>
 <tr class="separator:aa1ab06ef627035b40717ed44a48e8ed5 inherit pub_attribs_classinterface"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pri-attribs" name="pri-attribs"></a>
+Private Attributes</h2></td></tr>
+<tr class="memitem:ac40e12dce6f31f3570d7076b14777c02"><td class="memItemLeft" align="right" valign="top">std::fstream&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classonfi__interface.html#ac40e12dce6f31f3570d7076b14777c02">onfi_data_file</a></td></tr>
+<tr class="separator:ac40e12dce6f31f3570d7076b14777c02"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a97182ae8ed88b080d9dc95317b41e8b1"><td class="memItemLeft" align="right" valign="top">std::fstream&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classonfi__interface.html#a97182ae8ed88b080d9dc95317b41e8b1">time_info_file</a></td></tr>
+<tr class="separator:a97182ae8ed88b080d9dc95317b41e8b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="inherited" name="inherited"></a>
 Additional Inherited Members</h2></td></tr>
 <tr class="inherit_header pro_attribs_classinterface"><td colspan="2" onclick="javascript:toggleInherit('pro_attribs_classinterface')"><img src="closed.png" alt="-"/>&#160;Protected Attributes inherited from <a class="el" href="classinterface.html">interface</a></td></tr>
@@ -269,7 +313,8 @@ Additional Inherited Members</h2></td></tr>
 <tr class="separator:ab8d67c4f0a69dcdcf1f501c2af0894e4 inherit pro_attribs_classinterface"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p >let us define a class that includes all the lowest level functions that are needed for .. interfacing with NAND device. </p>
+<div class="textblock"><p >High-level façade for interacting with ONFI-compliant NAND devices. </p>
+<p >Wraps the low-level <code>interface</code> HAL with helpers for initialization, block erase/program/verify cycles, parameter queries, and common maintenance routines required by the Micron 3D NAND parts used in this project. All public members are exposed so tooling and sample applications can orchestrate self-tests or production flows without duplicating protocol logic. </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="af2951c5c746ad9422f4c94c7ae0d82a1" name="af2951c5c746ad9422f4c94c7ae0d82a1"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#af2951c5c746ad9422f4c94c7ae0d82a1">&#9670;&nbsp;</a></span>onfi_interface()</h2>
@@ -293,7 +338,8 @@ Additional Inherited Members</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p >let us create a constructor of <a class="el" href="classonfi__interface.html">onfi_interface</a> that initializes the physical_interface </p>
+
+<p>Construct the interface using asynchronous signalling defaults. </p>
 
 </div>
 </div>
@@ -319,6 +365,12 @@ Additional Inherited Members</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+<div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><iframe scrolling="no" frameborder="0" src="classonfi__interface_a369712f07b3158953f42f3e9efcfe533_cgraph.svg" width="436" height="52"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+</div>
+</div>
 
 </div>
 </div>
@@ -338,7 +390,14 @@ Additional Inherited Members</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >follow the following function call by <a class="el" href="classonfi__interface.html#aaa0b263e533910d56952865b292bdba8">get_data()</a> function call .. please change this if the device has multiple dies </p>
+
+<p>Adjust the NAND read column pointer between cache fetches. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">col_address</td><td>Pointer to address bytes to send. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -379,7 +438,17 @@ Additional Inherited Members</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >following function converts the my_page_number inside the my_block_number to {x,x,x,x,x} and saves to my_test_block_address my_test_block_address is an array [c1,c2,r1,r2,r3] </p>
+
+<p>Translate block/page IDs to the column/row address tuple expected by ONFI. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">my_block_number</td><td>Block containing the page. </td></tr>
+    <tr><td class="paramname">my_page_number</td><td>Page index inside the block. </td></tr>
+    <tr><td class="paramname">my_test_block_address</td><td>Output buffer populated with {c1,c2,r1,r2,r3} bytes. </td></tr>
+    <tr><td class="paramname">verbose</td><td>Emit detailed arithmetic steps when true. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -420,7 +489,17 @@ Additional Inherited Members</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >based on the values read from the ONFI paramters, we will figure out the ONFI version </p>
+
+<p>Decode major/minor ONFI version fields from the parameter page. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">byte_4</td><td>MSB of the version field. </td></tr>
+    <tr><td class="paramname">byte_5</td><td>LSB of the version field. </td></tr>
+    <tr><td class="paramname">ret_whole</td><td>Stores decoded major version. </td></tr>
+    <tr><td class="paramname">ret_decimal</td><td>Stores decoded minor revision. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -439,6 +518,12 @@ Additional Inherited Members</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+<div class="dynheader">
+Here is the caller graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><iframe scrolling="no" frameborder="0" src="classonfi__interface_aec25908ee35b4f9f325c4bd5a52d6851_icgraph.svg" width="436" height="52"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+</div>
+</div>
 
 </div>
 </div>
@@ -457,7 +542,14 @@ Additional Inherited Members</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >following function will convert a block from MLC mode to SLC mode .. it uses set_features option to convert the block from SLC to MLC this function introduces delay .. the delay is caused using a for loop </p>
+
+<p>Busy-wait delay used by profiling and margining routines. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">loop_count</td><td>Iterations of the internal delay loop. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -476,7 +568,14 @@ Additional Inherited Members</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >function to initialize the NAND device .. following are the tasks to be performed for initialization of NAND device .. provide Vcc (ie ramp Vcc) .. host must wait for R/B to be valid (R/B should be low for certain duration and be high .. .. to indicate device is ready) R/B is output from the NAND device .. issue 0xFF command after R/B goes high (Reset is the first command to be issued) .. R/B should be monotired again after issuing 0XFF command </p>
+
+<p>Execute the ONFI device initialization sequence after power-on. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">verbose</td><td>Emit detailed timing/status output if true. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -494,7 +593,8 @@ Additional Inherited Members</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >function to disable Program and Erase operation .. when WP is low, program and erase operation are disabled .. when WP is high, program and erase operation are enabled </p>
+
+<p>Assert the hardware write-protect to block program/erase operations. </p>
 
 </div>
 </div>
@@ -512,6 +612,8 @@ Additional Inherited Members</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Release hardware write-protect so program/erase are allowed. </p>
 
 </div>
 </div>
@@ -540,7 +642,15 @@ Additional Inherited Members</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >following function erases the block address provided as the parameter to the function .. the address provided should be three 8-bit number array that corresponds to .. .. R1,R2 and R3 for the block to be erased </p>
+
+<p>Issue a block erase operation. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">my_block_number</td><td>Target block index. </td></tr>
+    <tr><td class="paramname">verbose</td><td>Emit extra logging during the command sequence. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -569,7 +679,15 @@ Additional Inherited Members</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >function to receive data from the NAND device .. data is output from the cache regsiter of selected die .. it is supported following a read operation of NAND array </p>
+
+<p>Read raw bytes from the NAND cache/register output path. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">data_received</td><td>Destination buffer. </td></tr>
+    <tr><td class="paramname">num_data</td><td>Number of bytes to read. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -604,7 +722,16 @@ Additional Inherited Members</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >The GET FEATURES (EEh) command reads the subfeature parameters (P1-P4) from the .. specified feature address. This command is accepted by the target only when all die .. (LUNs) on the target are idle. .. the parameters P1-P4 are in data_received argument </p>
+
+<p>Read ONFI feature parameters (EEh command). </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">address</td><td>Feature address within the NAND. </td></tr>
+    <tr><td class="paramname">data_received</td><td>Buffer to receive four bytes of feature data. </td></tr>
+    <tr><td class="paramname">command</td><td>Optional override for the command code. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -617,16 +744,20 @@ Additional Inherited Members</h2></td></tr>
         <tr>
           <td class="memname">void onfi_interface::get_started </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="onfi__interface_8h.html#a448f647fca8391a8e5ce382ab398474e">param_type</a>&#160;</td>
-          <td class="paramname"><em>ONFI_OR_JEDEC</em> = <code><a class="el" href="onfi__interface_8h.html#a448f647fca8391a8e5ce382ab398474eaeb65d284c35c79a13312f57393d1d2cb">ONFI</a></code></td><td>)</td>
+          <td class="paramtype"><a class="el" href="group__onfi__interface__api.html#ga448f647fca8391a8e5ce382ab398474e">param_type</a>&#160;</td>
+          <td class="paramname"><em>ONFI_OR_JEDEC</em> = <code><a class="el" href="group__onfi__interface__api.html#gga448f647fca8391a8e5ce382ab398474eaeb65d284c35c79a13312f57393d1d2cb">ONFI</a></code></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >This function initializes everything and gets thing started. </p>
-<p >now that the object is created .. the object should go and initialize itself by looking at the addresses and map to them .. let us test if the LEDs test will succeed</p>
-<p >for the NAND chip, let us initialize the chip .. this should follow a pattern of power cycle as mentioned in the datasheet .. then we will do a reset operation</p>
-<p >now let test the NAND chip and print its properties as read from the chip memory itself .. please make sure that the pin connections is appropriate as mentioned in <a class="el" href="hardware__locations_8h.html">hardware_locations.h</a> .. this function call is also important to establish the parameters like: .. onfi_instance.num_bytes_in_page, onfi_instance.num_spare_bytes_in_page and num_pages_in_block</p>
+
+<p>Initialize the ONFI stack and underlying HAL resources. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">ONFI_OR_JEDEC</td><td>Select ONFI (default) or JEDEC parameter parsing. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -644,7 +775,9 @@ Additional Inherited Members</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >Function to get the status code of the last operation </p>
+
+<p>Read the NAND status register corresponding to the last command. </p>
+<dl class="section return"><dt>Returns</dt><dd>Raw ONFI status byte. </dd></dl>
 
 </div>
 </div>
@@ -663,7 +796,14 @@ Additional Inherited Members</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >let us create a function that performs initialization .. opens ONFI debug file .. this function gets the bridge based address .. converts the peripheral addresses .. tests the LEDs </p>
+
+<p>Bring up the hardware bridge, map registers, and perform power-on checks. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">verbose</td><td>Emit detailed status to stdout if true. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -682,7 +822,15 @@ Additional Inherited Members</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >following function tests if the block address sent was a bad block or not the ONFI requirement is that the first byte in the spare area of the first page .. should have 0x00 in it to indicate if the block is bad this function takes in a block address .. and reads the first spare byte of the first page to determine if it is a bad block </p>
+
+<p>Test a block for factory bad-block markers in spare area. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">my_block_number</td><td>Block index to inspect. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true if the block is marked bad. </dd></dl>
 
 </div>
 </div>
@@ -700,7 +848,8 @@ Additional Inherited Members</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >open the data file </p>
+
+<p>Open the onfi debug data capture stream. </p>
 
 </div>
 </div>
@@ -718,7 +867,8 @@ Additional Inherited Members</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >this function opens a file named time_info_file.txt .. this file will log all the duration from the timing operations as necessary </p>
+
+<p>Open the timing profile output stream used by benchmarking tools. </p>
 
 </div>
 </div>
@@ -759,7 +909,17 @@ Additional Inherited Members</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >following function erases the block address provided as the parameter to the function .. the address provided should be three 8-bit number array that corresponds to .. .. R1,R2 and R3 for the block to be erased .. loop_count is the partial erase times, a value of 10 will correspond to 1 ns delay </p>
+
+<p>Perform a timed partial erase pulse for characterization experiments. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">my_block_number</td><td>Block to operate on. </td></tr>
+    <tr><td class="paramname">my_page_number</td><td>Page seed used by the controller helper. </td></tr>
+    <tr><td class="paramname">loop_count</td><td>Delay loop iterations controlling pulse width. </td></tr>
+    <tr><td class="paramname">verbose</td><td>Emit additional diagnostic output. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -813,6 +973,19 @@ Additional Inherited Members</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Program using a reduced pulse width for characterization sweeps. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">my_block_number</td><td>Block containing the page. </td></tr>
+    <tr><td class="paramname">my_page_number</td><td>Page index inside the block. </td></tr>
+    <tr><td class="paramname">loop_count</td><td>Delay loop iterations controlling pulse width. </td></tr>
+    <tr><td class="paramname">data_to_program</td><td>Buffer to write. </td></tr>
+    <tr><td class="paramname">including_spare</td><td>Program spare/OOB region when true. </td></tr>
+    <tr><td class="paramname">verbose</td><td>Emit detailed command logging. </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
 <a id="aeee5ee7daa7345dcee577b30c70be4fd" name="aeee5ee7daa7345dcee577b30c70be4fd"></a>
@@ -829,7 +1002,8 @@ Additional Inherited Members</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >Function to check and print if the last operation failed </p>
+
+<p>Print a human-readable failure interpretation of the status register. </p>
 
 </div>
 </div>
@@ -847,6 +1021,8 @@ Additional Inherited Members</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Capture timing data for the most recent operation. </p>
 
 </div>
 </div>
@@ -893,7 +1069,18 @@ Additional Inherited Members</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >this function only programs a single page as indicated by the address provided for the arguments, .. page_address is the address of the page 5-byte address .. data_to_progra is the data to write .. including_spare is to indicate if you want to program the spare section as well .. .. if including spare = 1, then length of data_to_program should be (num of bytes in pages + num of spare bytes) .. verbose is for priting messages </p>
+
+<p>Program a page from a buffer. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">my_block_number</td><td>Block containing the page. </td></tr>
+    <tr><td class="paramname">my_page_number</td><td>Page index inside the block. </td></tr>
+    <tr><td class="paramname">data_to_program</td><td>Pointer to payload (optionally includes spare). </td></tr>
+    <tr><td class="paramname">including_spare</td><td>Program spare/OOB region when true. </td></tr>
+    <tr><td class="paramname">verbose</td><td>Emit detailed command logging. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -940,7 +1127,8 @@ Additional Inherited Members</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >this function programs all 3 pages in TLC pages of TOSHIBA NAND flash memory please see the datasheet or the function definition for the program operation </p>
+
+<p>Program TLC pages on Toshiba parts using vendor specific sequencing. </p>
 
 </div>
 </div>
@@ -994,6 +1182,8 @@ Additional Inherited Members</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Program a single subpage of a TLC location on Toshiba parts. </p>
+
 </div>
 </div>
 <a id="af2fa4bce38edcce8136fef2a59a19016" name="af2fa4bce38edcce8136fef2a59a19016"></a>
@@ -1010,7 +1200,8 @@ Additional Inherited Members</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >read id of the device from three locations </p>
+
+<p>Issue the ONFI Read-ID sequence. </p>
 
 </div>
 </div>
@@ -1051,7 +1242,17 @@ Additional Inherited Members</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >write a function to perform an read operation from NAND flash to cache register .. reads one page from the NAND to the cache register .. during the read, you can use change_read_column and change_row_address </p>
+
+<p>Populate the cache register with a page of data. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">my_block_number</td><td>Block to access. </td></tr>
+    <tr><td class="paramname">my_page_number</td><td>Page within the block. </td></tr>
+    <tr><td class="paramname">address_length</td><td>Column+row cycles (default 5). </td></tr>
+    <tr><td class="paramname">verbose</td><td>Emit trace-level logs. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -1064,8 +1265,8 @@ Additional Inherited Members</h2></td></tr>
         <tr>
           <td class="memname">void onfi_interface::read_parameters </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="onfi__interface_8h.html#a448f647fca8391a8e5ce382ab398474e">param_type</a>&#160;</td>
-          <td class="paramname"><em>ONFI_OR_JEDEC</em> = <code><a class="el" href="onfi__interface_8h.html#a448f647fca8391a8e5ce382ab398474eaeb65d284c35c79a13312f57393d1d2cb">ONFI</a></code>, </td>
+          <td class="paramtype"><a class="el" href="group__onfi__interface__api.html#ga448f647fca8391a8e5ce382ab398474e">param_type</a>&#160;</td>
+          <td class="paramname"><em>ONFI_OR_JEDEC</em> = <code><a class="el" href="group__onfi__interface__api.html#gga448f647fca8391a8e5ce382ab398474eaeb65d284c35c79a13312f57393d1d2cb">ONFI</a></code>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1086,7 +1287,16 @@ Additional Inherited Members</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >following function reads the ONFI parameter page .. the ONFI parameter page consists of ONFI parameter data structure .. this data structure consists of critical information about the internal organization of memory .. the data structure is 256 bytes .. the data will be available for read with a command sequence of ECh followed by an address of 40h </p>
+
+<p>Read and decode the ONFI parameter page. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">ONFI_OR_JEDEC</td><td>Select ONFI (default) or JEDEC parameter parsing. </td></tr>
+    <tr><td class="paramname">bytewise</td><td>Read data byte-by-byte (true) or word-wise (false). </td></tr>
+    <tr><td class="paramname">verbose</td><td>Emit raw page contents and decoded information. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -1105,7 +1315,14 @@ Additional Inherited Members</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >function to reset the whole device .. issue a command 0xFF for reset operation .. following operations should be performed for this .. .. enable command cycle .. .. command to be sent is 0xFF .. .. check for R/B signal to be high after certain duration (should go low(busy) and go high (ready)) </p>
+
+<p>Issue an ONFI reset and wait for the device to report ready. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">verbose</td><td>Emit detailed timing/status output if true. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -1146,7 +1363,8 @@ Additional Inherited Members</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >following function will set the number of pages in a block </p>
+
+<p>Cache pages-per-block geometry read from the parameter page. </p>
 
 </div>
 </div>
@@ -1181,7 +1399,16 @@ Additional Inherited Members</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >let us program pages in the block with all 0s the paramters are: .. my_test_block_address is the address of the block (starting address) .. complete_block if this is true all the pages in the block will be programmed .. page_indices is an array of indices inside the block that we want to program .. num_pages is the number of pages in the page_indices array .. verbose is for printing let us program pages in the block with all uint8_t* provided_data the paramters are: .. my_test_block_address is the address of the block (starting address) .. complete_block if this is true all the pages in the block will be programmed .. page_indices is an array of indices inside the block that we want to program .. num_pages is the number of pages in the page_indices array .. verbose is for printing this function will program all the pages in a block with an array provided by user .. if the user wants to give an array .. .. it is indicated through bool array_provided .. .. the actual array is supposed to be in uint8_t* provided_array (lenght should be total number of bytes in a page) let us program pages in the block with all 0s the paramters are: .. my_test_block_address is the address of the block (starting address) .. num_pages is the number of pages in the page_indices array .. verbose is for printing let us verify program pages in the block the paramters are: .. my_test_block_address is the address of the block (starting address) .. complete_block if this is true all the pages in the block will be verified .. page_indices is an array of indices inside the block that we want to verify .. num_pages is the number of pages in the page_indices array .. verbose is for printing this function reads the single page address provided each value is hex while the sequence is terminated by newline character this function reads the page address provided from the TOSHIBA TLC chip all three subpages data will be written to an output file each value is hex while the sequence is terminated by newline character this function reads the pages in the block .. since the complete data from the block might be too much data, the parameter complete_block can be used to limit the data .. if complete_block is true, the compete block will be read .. if complete_block is false, the indices of the pages to be read cane be provided as an array .. if the indices of pages is used, the num_pages should indicate the numb er of pages listed in the array .. verbose indicates the debug messages to be printed This function read the page specified by the index value in the .. block and puts the read value into the array passed " return_value" as argument this function reads the pages in the block .. since the complete data from the block might be too much data, the parameter num_pages can be used to limit the data .. the num_pages should indicate the number of pages in block starting from beginning .. verbose indicates the debug messages to be printed The SET FEATURES (EFh) command writes the subfeature parameters (P1-P4) to the .. specified feature address to enable or disable target-specific features. This command is .. accepted by the target only when all die (LUNs) on the target are idle. .. the parameters P1-P4 are in data_to_send argument </p>
+
+<p>Write ONFI feature parameters (EFh command). </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">address</td><td>Feature address within the NAND. </td></tr>
+    <tr><td class="paramname">data_to_send</td><td>Four-byte payload describing the feature configuration. </td></tr>
+    <tr><td class="paramname">command</td><td>Optional override for the command code. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -1222,7 +1449,8 @@ Additional Inherited Members</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >this will populate the number of blocks in a LUN </p>
+
+<p>Cache blocks-per-LUN geometry read from the parameter page. </p>
 
 </div>
 </div>
@@ -1263,7 +1491,8 @@ Additional Inherited Members</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >following function will set the size of page based on value read </p>
+
+<p>Cache page size geometry read from the parameter page. </p>
 
 </div>
 </div>
@@ -1292,7 +1521,8 @@ Additional Inherited Members</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >following function will set the size of spare bytes in a page based on value read </p>
+
+<p>Cache spare (OOB) size read from the parameter page. </p>
 
 </div>
 </div>
@@ -1311,6 +1541,8 @@ Additional Inherited Members</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Drive WP#/command pins high for voltage margin checks. </p>
+
 </div>
 </div>
 <a id="a37a35e102d9dd0488238ba9ce0271ddb" name="a37a35e102d9dd0488238ba9ce0271ddb"></a>
@@ -1327,6 +1559,8 @@ Additional Inherited Members</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Drive WP#/command pins low for voltage margin checks. </p>
 
 </div>
 </div>
@@ -1345,7 +1579,8 @@ Additional Inherited Members</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >this function can be used to test the LEDs if they are properly set up since it is called as a part of <a class="el" href="classonfi__interface.html">onfi_interface</a>, if this works .. the interface is set up properly </p>
+
+<p>Drive indicator LEDs to confirm GPIO wiring. </p>
 
 </div>
 </div>
@@ -1371,13 +1606,13 @@ Additional Inherited Members</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">uint16_t *&#160;</td>
-          <td class="paramname"><em>page_indices</em> = <code><a class="el" href="util_8cpp.html#ac927120305564b7907f00ccb2e747807">page_indices_selected</a></code>, </td>
+          <td class="paramname"><em>page_indices</em> = <code><a class="el" href="group__onfi__interface__api.html#gac927120305564b7907f00ccb2e747807">page_indices_selected</a></code>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">uint16_t&#160;</td>
-          <td class="paramname"><em>num_pages</em> = <code><a class="el" href="util_8cpp.html#abe3b87d047a4f55dae8887da7cfa395d">num_pages_selected</a></code>, </td>
+          <td class="paramname"><em>num_pages</em> = <code><a class="el" href="group__onfi__interface__api.html#gabe3b87d047a4f55dae8887da7cfa395d">num_pages_selected</a></code>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1392,7 +1627,19 @@ Additional Inherited Members</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >.. this function will read any random page and tries to verify if it was completely erased .. for elaborate verifiying, please use a different function this is the function that can be used to elaborately verify the erase operation .. the first argument is the address of the block .. the second argument defines if the complete block is to be verified .. .. if the second argument is false, then the pages from page_indices_selected are taken </p>
+
+<p>Verify that a block erase left all bits in the expected erased state. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">my_block_number</td><td>Block to inspect. </td></tr>
+    <tr><td class="paramname">complete_block</td><td>Verify every page when true; otherwise use <code>page_indices</code>. </td></tr>
+    <tr><td class="paramname">page_indices</td><td>Specific page indices to check when <code>complete_block</code> is false. </td></tr>
+    <tr><td class="paramname">num_pages</td><td>Number of entries in <code>page_indices</code>. </td></tr>
+    <tr><td class="paramname">verbose</td><td>Emit per-page statistics. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true when the block verifies successfully. </dd></dl>
 
 </div>
 </div>
@@ -1439,7 +1686,19 @@ Additional Inherited Members</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p >this function only verifies a single page as indicated by the address provided for the arguments, .. page_address is the address of the page 5-byte address .. data_to_progra is the data expected .. including_spare is to indicate if you want to program the spare section as well .. .. if including spare = 1, then length of data_to_program should be (num of bytes in pages + num of spare bytes) .. verbose is for priting messages </p>
+
+<p>Verify a programmed page against expected data. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">my_block_number</td><td>Block containing the page. </td></tr>
+    <tr><td class="paramname">my_page_number</td><td>Page index inside the block. </td></tr>
+    <tr><td class="paramname">data_to_program</td><td>Expected data buffer. </td></tr>
+    <tr><td class="paramname">verbose</td><td>Emit per-byte mismatch details. </td></tr>
+    <tr><td class="paramname">max_allowed_errors</td><td>Allowable bit errors before failing. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true when the verification passes within tolerance. </dd></dl>
 
 </div>
 </div>
@@ -1556,6 +1815,28 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
+<a id="ac40e12dce6f31f3570d7076b14777c02" name="ac40e12dce6f31f3570d7076b14777c02"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac40e12dce6f31f3570d7076b14777c02">&#9670;&nbsp;</a></span>onfi_data_file</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::fstream onfi_interface::onfi_data_file</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="ae60d6c873637c32b3708f808bea311a5" name="ae60d6c873637c32b3708f808bea311a5"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ae60d6c873637c32b3708f808bea311a5">&#9670;&nbsp;</a></span>onfi_version</h2>
 
@@ -1566,6 +1847,28 @@ Additional Inherited Members</h2></td></tr>
           <td class="memname">char onfi_interface::onfi_version[5]</td>
         </tr>
       </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a97182ae8ed88b080d9dc95317b41e8b1" name="a97182ae8ed88b080d9dc95317b41e8b1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a97182ae8ed88b080d9dc95317b41e8b1">&#9670;&nbsp;</a></span>time_info_file</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::fstream onfi_interface::time_info_file</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 </div>
@@ -1584,14 +1887,8 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
-<hr/>The documentation for this class was generated from the following files:<ul>
+<hr/>The documentation for this class was generated from the following file:<ul>
 <li><a class="el" href="onfi__interface_8h_source.html">onfi_interface.h</a></li>
-<li><a class="el" href="erase_8cpp.html">erase.cpp</a></li>
-<li><a class="el" href="identify_8cpp.html">identify.cpp</a></li>
-<li><a class="el" href="init_8cpp.html">init.cpp</a></li>
-<li><a class="el" href="program_8cpp.html">program.cpp</a></li>
-<li><a class="el" href="read_8cpp.html">read.cpp</a></li>
-<li><a class="el" href="util_8cpp.html">util.cpp</a></li>
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->

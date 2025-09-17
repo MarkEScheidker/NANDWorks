@@ -1,8 +1,5 @@
 <map id="types.h" name="types.h">
-<area shape="rect" id="node1" title=" " alt="" coords="76,5,147,32"/>
-<area shape="rect" id="node2" href="$device_8h.html" title=" " alt="" coords="13,80,90,107"/>
-<area shape="rect" id="node4" href="$param__page_8h.html" title=" " alt="" coords="114,80,229,107"/>
-<area shape="rect" id="node3" href="$device_8cpp.html" title=" " alt="" coords="5,155,97,181"/>
-<area shape="rect" id="node5" href="$identify_8cpp.html" title=" " alt="" coords="122,155,218,181"/>
-<area shape="rect" id="node6" href="$param__page_8cpp.html" title=" " alt="" coords="242,155,373,181"/>
+<area shape="rect" id="node1" title=" " alt="" coords="69,5,139,32"/>
+<area shape="rect" id="node2" href="$device_8h.html" title=" " alt="" coords="5,80,83,107"/>
+<area shape="rect" id="node3" href="$param__page_8h.html" title=" " alt="" coords="107,80,221,107"/>
 </map>

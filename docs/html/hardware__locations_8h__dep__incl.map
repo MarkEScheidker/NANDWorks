@@ -1,16 +1,7 @@
 <map id="hardware_locations.h" name="hardware_locations.h">
-<area shape="rect" id="node1" title=" " alt="" coords="209,5,370,32"/>
-<area shape="rect" id="node2" href="$microprocessor__interface_8cpp.html" title=" " alt="" coords="86,155,301,181"/>
-<area shape="rect" id="node3" href="$microprocessor__interface_8h.html" title=" " alt="" coords="273,80,471,107"/>
-<area shape="rect" id="node4" href="$device_8h.html" title=" " alt="" coords="611,304,688,331"/>
-<area shape="rect" id="node6" href="$onfi__interface_8h.html" title=" " alt="" coords="325,155,448,181"/>
-<area shape="rect" id="node5" href="$device_8cpp.html" title=" " alt="" coords="603,379,695,405"/>
-<area shape="rect" id="node7" href="$controller_8h.html" title=" " alt="" coords="211,229,306,256"/>
-<area shape="rect" id="node9" href="$erase_8cpp.html" title=" " alt="" coords="479,304,564,331"/>
-<area shape="rect" id="node10" href="$program_8cpp.html" title=" " alt="" coords="5,304,109,331"/>
-<area shape="rect" id="node11" href="$read_8cpp.html" title=" " alt="" coords="134,304,213,331"/>
-<area shape="rect" id="node12" href="$util_8cpp.html" title=" " alt="" coords="371,304,442,331"/>
-<area shape="rect" id="node13" href="$identify_8cpp.html" title=" " alt="" coords="381,229,477,256"/>
-<area shape="rect" id="node14" href="$init_8cpp.html" title=" " alt="" coords="502,229,573,256"/>
-<area shape="rect" id="node8" href="$controller_8cpp.html" title=" " alt="" coords="237,304,347,331"/>
+<area shape="rect" id="node1" title=" " alt="" coords="24,5,185,32"/>
+<area shape="rect" id="node2" href="$microprocessor__interface_8h.html" title=" " alt="" coords="5,80,204,107"/>
+<area shape="rect" id="node3" href="$device_8h.html" title=" " alt="" coords="59,304,137,331"/>
+<area shape="rect" id="node4" href="$onfi__interface_8h.html" title=" " alt="" coords="93,155,215,181"/>
+<area shape="rect" id="node5" href="$controller_8h.html" title=" " alt="" coords="100,229,195,256"/>
 </map>

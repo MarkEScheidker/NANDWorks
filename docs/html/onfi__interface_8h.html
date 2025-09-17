@@ -27,6 +27,7 @@
   <td id="projectalign">
    <div id="projectname">MastersThesis NAND Interface
    </div>
+   <div id="projectbrief">ONFI façade and supporting library for NAND flash characterization</div>
   </td>
  </tr>
  </tbody>
@@ -94,35 +95,14 @@ $(document).ready(function(){initNavTree('onfi__interface_8h.html',''); initResi
 </div><div class="textblock"><div class="dynheader">
 Include dependency graph for onfi_interface.h:</div>
 <div class="dyncontent">
-<div class="center"><img src="onfi__interface_8h__incl.png" border="0" usemap="#aonfi__interface_8h" alt=""/></div>
-<map name="aonfi__interface_8h" id="aonfi__interface_8h">
-<area shape="rect" title=" " alt="" coords="88,5,210,32"/>
-<area shape="rect" href="microprocessor__interface_8h.html" title=" " alt="" coords="50,80,248,107"/>
-<area shape="rect" title=" " alt="" coords="16,304,87,331"/>
-<area shape="rect" title=" " alt="" coords="219,229,292,256"/>
-<area shape="rect" title=" " alt="" coords="305,155,385,181"/>
-<area shape="rect" href="gpio_8h.html" title=" " alt="" coords="20,229,83,256"/>
-<area shape="rect" href="hardware__locations_8h.html" title=" " alt="" coords="68,155,230,181"/>
-<area shape="rect" href="timing_8h.html" title=" " alt="" coords="108,229,184,256"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="onfi__interface_8h__incl.svg" width="391" height="336"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+</div>
 </div>
 </div><div class="textblock"><div class="dynheader">
 This graph shows which files directly or indirectly include this file:</div>
 <div class="dyncontent">
-<div class="center"><img src="onfi__interface_8h__dep__incl.png" border="0" usemap="#aonfi__interface_8hdep" alt=""/></div>
-<map name="aonfi__interface_8hdep" id="aonfi__interface_8hdep">
-<area shape="rect" title=" " alt="" coords="425,5,548,32"/>
-<area shape="rect" href="controller_8h.html" title=" " alt="" coords="303,80,398,107"/>
-<area shape="rect" href="erase_8cpp.html" title=" " alt="" coords="5,155,91,181"/>
-<area shape="rect" href="program_8cpp.html" title=" " alt="" coords="352,155,456,181"/>
-<area shape="rect" href="read_8cpp.html" title=" " alt="" coords="481,155,559,181"/>
-<area shape="rect" href="util_8cpp.html" title=" " alt="" coords="583,155,654,181"/>
-<area shape="rect" href="identify_8cpp.html" title=" " alt="" coords="575,80,671,107"/>
-<area shape="rect" href="init_8cpp.html" title=" " alt="" coords="695,80,766,107"/>
-<area shape="rect" href="controller_8cpp.html" title=" " alt="" coords="115,155,226,181"/>
-<area shape="rect" href="device_8h.html" title=" " alt="" coords="251,155,328,181"/>
-<area shape="rect" href="device_8cpp.html" title=" " alt="" coords="243,229,335,256"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="onfi__interface_8h__dep__incl.svg" width="134" height="187"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+</div>
 </div>
 </div>
 <p><a href="onfi__interface_8h_source.html">Go to the source code of this file.</a></p>
@@ -130,124 +110,30 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="nested-classes" name="nested-classes"></a>
 Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classonfi__interface.html">onfi_interface</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">High-level façade for interacting with ONFI-compliant NAND devices.  <a href="classonfi__interface.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="define-members" name="define-members"></a>
 Macros</h2></td></tr>
-<tr class="memitem:a3be68b6fb18f5c9f909f2aa7a5c11bad"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="onfi__interface_8h.html#a3be68b6fb18f5c9f909f2aa7a5c11bad">DEBUG_ONFI</a>&#160;&#160;&#160;false</td></tr>
-<tr class="separator:a3be68b6fb18f5c9f909f2aa7a5c11bad"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaef8bc4dc671082854c788f06b1c379c"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="onfi__interface_8h.html#aaef8bc4dc671082854c788f06b1c379c">PROFILE_DELAY_TIME</a>&#160;&#160;&#160;true</td></tr>
-<tr class="separator:aaef8bc4dc671082854c788f06b1c379c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga3be68b6fb18f5c9f909f2aa7a5c11bad"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__onfi__interface__api.html#ga3be68b6fb18f5c9f909f2aa7a5c11bad">DEBUG_ONFI</a>&#160;&#160;&#160;false</td></tr>
+<tr class="separator:ga3be68b6fb18f5c9f909f2aa7a5c11bad"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaaef8bc4dc671082854c788f06b1c379c"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__onfi__interface__api.html#gaaef8bc4dc671082854c788f06b1c379c">PROFILE_DELAY_TIME</a>&#160;&#160;&#160;true</td></tr>
+<tr class="separator:gaaef8bc4dc671082854c788f06b1c379c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="enum-members" name="enum-members"></a>
 Enumerations</h2></td></tr>
-<tr class="memitem:a448f647fca8391a8e5ce382ab398474e"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="onfi__interface_8h.html#a448f647fca8391a8e5ce382ab398474e">param_type</a> { <a class="el" href="onfi__interface_8h.html#a448f647fca8391a8e5ce382ab398474ea4f098ba3947392c35301e0accf0efb50">JEDEC</a> = 0
-, <a class="el" href="onfi__interface_8h.html#a448f647fca8391a8e5ce382ab398474eaeb65d284c35c79a13312f57393d1d2cb">ONFI</a> = 1
+<tr class="memitem:ga448f647fca8391a8e5ce382ab398474e"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__onfi__interface__api.html#ga448f647fca8391a8e5ce382ab398474e">param_type</a> { <a class="el" href="group__onfi__interface__api.html#gga448f647fca8391a8e5ce382ab398474ea4f098ba3947392c35301e0accf0efb50">JEDEC</a> = 0
+, <a class="el" href="group__onfi__interface__api.html#gga448f647fca8391a8e5ce382ab398474eaeb65d284c35c79a13312f57393d1d2cb">ONFI</a> = 1
  }</td></tr>
-<tr class="separator:a448f647fca8391a8e5ce382ab398474e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="separator:ga448f647fca8391a8e5ce382ab398474e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
-<tr class="memitem:abe3b87d047a4f55dae8887da7cfa395d"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="onfi__interface_8h.html#abe3b87d047a4f55dae8887da7cfa395d">num_pages_selected</a></td></tr>
-<tr class="separator:abe3b87d047a4f55dae8887da7cfa395d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac927120305564b7907f00ccb2e747807"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="onfi__interface_8h.html#ac927120305564b7907f00ccb2e747807">page_indices_selected</a> []</td></tr>
-<tr class="separator:ac927120305564b7907f00ccb2e747807"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gabe3b87d047a4f55dae8887da7cfa395d"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__onfi__interface__api.html#gabe3b87d047a4f55dae8887da7cfa395d">num_pages_selected</a></td></tr>
+<tr class="separator:gabe3b87d047a4f55dae8887da7cfa395d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gac927120305564b7907f00ccb2e747807"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__onfi__interface__api.html#gac927120305564b7907f00ccb2e747807">page_indices_selected</a> []</td></tr>
+<tr class="separator:gac927120305564b7907f00ccb2e747807"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Macro Definition Documentation</h2>
-<a id="a3be68b6fb18f5c9f909f2aa7a5c11bad" name="a3be68b6fb18f5c9f909f2aa7a5c11bad"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3be68b6fb18f5c9f909f2aa7a5c11bad">&#9670;&nbsp;</a></span>DEBUG_ONFI</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define DEBUG_ONFI&#160;&#160;&#160;false</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="aaef8bc4dc671082854c788f06b1c379c" name="aaef8bc4dc671082854c788f06b1c379c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aaef8bc4dc671082854c788f06b1c379c">&#9670;&nbsp;</a></span>PROFILE_DELAY_TIME</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define PROFILE_DELAY_TIME&#160;&#160;&#160;true</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<h2 class="groupheader">Enumeration Type Documentation</h2>
-<a id="a448f647fca8391a8e5ce382ab398474e" name="a448f647fca8391a8e5ce382ab398474e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a448f647fca8391a8e5ce382ab398474e">&#9670;&nbsp;</a></span>param_type</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">enum <a class="el" href="onfi__interface_8h.html#a448f647fca8391a8e5ce382ab398474e">param_type</a></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p >File: <a class="el" href="onfi__interface_8h.html">onfi_interface.h</a> Description: This file contains the necessary functions that are defined by the ONFI protocol .. for interfacing with a serial NAND memory. The implementation here is tested on NAND memory from Micron. Author: Prawar Poudel, pp0030 (at) uah (dot) edu Date: 18 July 2020 </p>
-<table class="fieldtable">
-<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a448f647fca8391a8e5ce382ab398474ea4f098ba3947392c35301e0accf0efb50" name="a448f647fca8391a8e5ce382ab398474ea4f098ba3947392c35301e0accf0efb50"></a>JEDEC&#160;</td><td class="fielddoc"></td></tr>
-<tr><td class="fieldname"><a id="a448f647fca8391a8e5ce382ab398474eaeb65d284c35c79a13312f57393d1d2cb" name="a448f647fca8391a8e5ce382ab398474eaeb65d284c35c79a13312f57393d1d2cb"></a>ONFI&#160;</td><td class="fielddoc"></td></tr>
-</table>
-
-</div>
-</div>
-<h2 class="groupheader">Variable Documentation</h2>
-<a id="abe3b87d047a4f55dae8887da7cfa395d" name="abe3b87d047a4f55dae8887da7cfa395d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abe3b87d047a4f55dae8887da7cfa395d">&#9670;&nbsp;</a></span>num_pages_selected</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">uint16_t num_pages_selected</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p >Following is the list of carefull chosen page indices in any block .. please read "Testing Latency on Shared Pages" in readme.md in "sources/Data" folder </p>
-
-</div>
-</div>
-<a id="ac927120305564b7907f00ccb2e747807" name="ac927120305564b7907f00ccb2e747807"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac927120305564b7907f00ccb2e747807">&#9670;&nbsp;</a></span>page_indices_selected</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">uint16_t page_indices_selected[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

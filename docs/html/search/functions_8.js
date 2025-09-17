@@ -1,6 +1,7 @@
 var searchData=
 [
-  ['initialize_5fonfi_0',['initialize_onfi',['../classonfi__interface.html#a492b2cbadc4afdb6bf34a63e2248f1fc',1,'onfi_interface']]],
-  ['interface_1',['interface',['../classinterface.html#a13e0ee4b9df1714d747d62ec46220c55',1,'interface']]],
-  ['is_5fbad_5fblock_2',['is_bad_block',['../classonfi__interface.html#ac2ef9dba1b471b3e8059e66b81757cd8',1,'onfi_interface']]]
+  ['logger_5flog_0',['logger_log',['../logging_8h.html#a7def12205f3fb1fd587bf920a1918178',1,'logging.h']]],
+  ['logger_5foutput_1',['logger_output',['../logging_8h.html#afa4dcf704235fa9da094518407267c7c',1,'logging.h']]],
+  ['logger_5fset_5foutput_5ffile_2',['logger_set_output_file',['../logging_8h.html#ac56ee45f1db3be582e75cecd40293cd7',1,'logging.h']]],
+  ['logger_5fvlog_3',['logger_vlog',['../logging_8h.html#abc4226d3a5bd33cf7936e3e223a0da34',1,'logging.h']]]
 ];

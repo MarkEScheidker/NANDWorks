@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['major_0',['major',['../structonfi_1_1Version.html#a55e0299356ee51daa7caa0ffd431576a',1,'onfi::Version']]],
-  ['manufacturer_5fid_1',['manufacturer_id',['../classonfi__interface.html#ae7774464e0fb467cc8f4f7822a1bd78e',1,'onfi_interface']]],
-  ['minor_2',['minor',['../structonfi_1_1Version.html#afcd6f3599092ef5b3a5b8e160b674773',1,'onfi::Version']]]
+  ['interface_5fdebug_5ffile_0',['interface_debug_file',['../classinterface.html#ab8d67c4f0a69dcdcf1f501c2af0894e4',1,'interface']]],
+  ['interface_5ftype_1',['interface_type',['../classinterface.html#a7821cc3f4b8297410aa77e3f3802ca43',1,'interface::interface_type()'],['../classonfi_1_1NandDevice.html#a7624a6832dc94a40da07009fe5a080ab',1,'onfi::NandDevice::interface_type()']]]
 ];

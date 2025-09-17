@@ -27,6 +27,7 @@
   <td id="projectalign">
    <div id="projectname">MastersThesis NAND Interface
    </div>
+   <div id="projectbrief">ONFI façade and supporting library for NAND flash characterization</div>
   </td>
  </tr>
  </tbody>
@@ -83,7 +84,8 @@ $(document).ready(function(){initNavTree('logging_8h.html',''); initResizable();
 
 <div class="header">
   <div class="summary">
-<a href="#define-members">Macros</a>  </div>
+<a href="#define-members">Macros</a> &#124;
+<a href="#func-members">Functions</a>  </div>
   <div class="headertitle"><div class="title">logging.h File Reference</div></div>
 </div><!--header-->
 <div class="contents">
@@ -94,29 +96,8 @@ $(document).ready(function(){initNavTree('logging_8h.html',''); initResizable();
 </div><div class="textblock"><div class="dynheader">
 Include dependency graph for logging.h:</div>
 <div class="dyncontent">
-<div class="center"><img src="logging_8h__incl.png" border="0" usemap="#alogging_8h" alt=""/></div>
-<map name="alogging_8h" id="alogging_8h">
-<area shape="rect" title=" " alt="" coords="129,5,212,32"/>
-<area shape="rect" title=" " alt="" coords="5,80,72,107"/>
-<area shape="rect" title=" " alt="" coords="96,80,171,107"/>
-<area shape="rect" title=" " alt="" coords="210,155,281,181"/>
-<area shape="rect" href="timing_8h.html" title=" " alt="" coords="246,80,322,107"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="logging_8h__incl.svg" width="328" height="187"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
-</div><div class="textblock"><div class="dynheader">
-This graph shows which files directly or indirectly include this file:</div>
-<div class="dyncontent">
-<div class="center"><img src="logging_8h__dep__incl.png" border="0" usemap="#alogging_8hdep" alt=""/></div>
-<map name="alogging_8hdep" id="alogging_8hdep">
-<area shape="rect" title=" " alt="" coords="396,5,479,32"/>
-<area shape="rect" href="erase_8cpp.html" title=" " alt="" coords="5,80,91,107"/>
-<area shape="rect" href="identify_8cpp.html" title=" " alt="" coords="115,80,211,107"/>
-<area shape="rect" href="init_8cpp.html" title=" " alt="" coords="235,80,306,107"/>
-<area shape="rect" href="microprocessor__interface_8cpp.html" title=" " alt="" coords="330,80,545,107"/>
-<area shape="rect" href="program_8cpp.html" title=" " alt="" coords="569,80,673,107"/>
-<area shape="rect" href="read_8cpp.html" title=" " alt="" coords="698,80,777,107"/>
-<area shape="rect" href="util_8cpp.html" title=" " alt="" coords="801,80,871,107"/>
-</map>
 </div>
 </div>
 <p><a href="logging_8h_source.html">Go to the source code of this file.</a></p>
@@ -167,6 +148,17 @@ Macros</h2></td></tr>
 <tr class="separator:a7169a493516c6d5455c1b94b9f3ce488"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae97de3578b7be0dec6c8c47f5af43145"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="logging_8h.html#ae97de3578b7be0dec6c8c47f5af43145">LOG_HAL_ERROR_IF</a>(...)&#160;&#160;&#160;do{}while(0)</td></tr>
 <tr class="separator:ae97de3578b7be0dec6c8c47f5af43145"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:afa4dcf704235fa9da094518407267c7c"><td class="memItemLeft" align="right" valign="top">static FILE *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="logging_8h.html#afa4dcf704235fa9da094518407267c7c">logger_output</a> ()</td></tr>
+<tr class="separator:afa4dcf704235fa9da094518407267c7c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac56ee45f1db3be582e75cecd40293cd7"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="logging_8h.html#ac56ee45f1db3be582e75cecd40293cd7">logger_set_output_file</a> (FILE *f)</td></tr>
+<tr class="separator:ac56ee45f1db3be582e75cecd40293cd7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abc4226d3a5bd33cf7936e3e223a0da34"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="logging_8h.html#abc4226d3a5bd33cf7936e3e223a0da34">logger_vlog</a> (const char *comp, const char *level, const char *fmt, va_list ap)</td></tr>
+<tr class="separator:abc4226d3a5bd33cf7936e3e223a0da34"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7def12205f3fb1fd587bf920a1918178"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="logging_8h.html#a7def12205f3fb1fd587bf920a1918178">logger_log</a> (const char *comp, const char *level, const char *fmt,...)</td></tr>
+<tr class="separator:a7def12205f3fb1fd587bf920a1918178"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
 <a id="a8c81bc36898ca58e54906a8fb59476a1" name="a8c81bc36898ca58e54906a8fb59476a1"></a>
@@ -554,6 +546,184 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+</div>
+</div>
+<h2 class="groupheader">Function Documentation</h2>
+<a id="a7def12205f3fb1fd587bf920a1918178" name="a7def12205f3fb1fd587bf920a1918178"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7def12205f3fb1fd587bf920a1918178">&#9670;&nbsp;</a></span>logger_log()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void logger_log </td>
+          <td>(</td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>comp</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>level</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>fmt</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>...</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><iframe scrolling="no" frameborder="0" src="logging_8h_a7def12205f3fb1fd587bf920a1918178_cgraph.svg" width="439" height="88"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+</div>
+</div>
+
+</div>
+</div>
+<a id="afa4dcf704235fa9da094518407267c7c" name="afa4dcf704235fa9da094518407267c7c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afa4dcf704235fa9da094518407267c7c">&#9670;&nbsp;</a></span>logger_output()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static FILE * logger_output </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<div class="dynheader">
+Here is the caller graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><iframe scrolling="no" frameborder="0" src="logging_8h_afa4dcf704235fa9da094518407267c7c_icgraph.svg" width="476" height="88"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+</div>
+</div>
+
+</div>
+</div>
+<a id="ac56ee45f1db3be582e75cecd40293cd7" name="ac56ee45f1db3be582e75cecd40293cd7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac56ee45f1db3be582e75cecd40293cd7">&#9670;&nbsp;</a></span>logger_set_output_file()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void logger_set_output_file </td>
+          <td>(</td>
+          <td class="paramtype">FILE *&#160;</td>
+          <td class="paramname"><em>f</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><iframe scrolling="no" frameborder="0" src="logging_8h_ac56ee45f1db3be582e75cecd40293cd7_cgraph.svg" width="338" height="38"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+</div>
+</div>
+
+</div>
+</div>
+<a id="abc4226d3a5bd33cf7936e3e223a0da34" name="abc4226d3a5bd33cf7936e3e223a0da34"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abc4226d3a5bd33cf7936e3e223a0da34">&#9670;&nbsp;</a></span>logger_vlog()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void logger_vlog </td>
+          <td>(</td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>comp</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>level</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>fmt</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">va_list&#160;</td>
+          <td class="paramname"><em>ap</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><iframe scrolling="no" frameborder="0" src="logging_8h_abc4226d3a5bd33cf7936e3e223a0da34_cgraph.svg" width="300" height="88"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+</div>
+</div>
+<div class="dynheader">
+Here is the caller graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><iframe scrolling="no" frameborder="0" src="logging_8h_abc4226d3a5bd33cf7936e3e223a0da34_icgraph.svg" width="248" height="38"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+</div>
+</div>
 
 </div>
 </div>

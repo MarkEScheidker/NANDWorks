@@ -1,11 +1,17 @@
 var searchData=
 [
-  ['change_5fread_5fcolumn_0',['change_read_column',['../classonfi_1_1OnfiController.html#a1ac2ce3273a724f002cd27c08cde4556',1,'onfi::OnfiController::change_read_column()'],['../classonfi__interface.html#a1bb78945bd6f39cdaaf26e6ed2d9eb37',1,'onfi_interface::change_read_column()']]],
-  ['chip_1',['chip',['../classonfi_1_1NandDevice.html#ac99d13b2dc10109d7701a1adb44977bc',1,'onfi::NandDevice']]],
-  ['chip_5ftype_2',['chip_type',['../microprocessor__interface_8h.html#a8b15bc584d38a735307f3ade02d73391',1,'microprocessor_interface.h']]],
-  ['close_5finterface_5fdebug_5ffile_3',['close_interface_debug_file',['../classinterface.html#abb76eb4476b2b062cedd389abc035b3f',1,'interface']]],
-  ['column_5fcycles_4',['column_cycles',['../structonfi_1_1Geometry.html#a6ed2ba394533b89e0d44f42b067baebd',1,'onfi::Geometry']]],
-  ['controller_2ecpp_5',['controller.cpp',['../controller_8cpp.html',1,'']]],
-  ['controller_2eh_6',['controller.h',['../controller_8h.html',1,'']]],
-  ['convert_5fpagenumber_5fto_5fcolumnrow_5faddress_7',['convert_pagenumber_to_columnrow_address',['../classonfi__interface.html#aa31f2ee8a28415393bea02722143552e',1,'onfi_interface']]]
+  ['data_5fsink_2eh_0',['data_sink.h',['../data__sink_8h.html',1,'']]],
+  ['datasink_1',['DataSink',['../classonfi_1_1DataSink.html',1,'onfi']]],
+  ['debug_5finterface_2',['DEBUG_INTERFACE',['../microprocessor__interface_8h.html#a1b2104874076f12ba460311d74f43906',1,'microprocessor_interface.h']]],
+  ['debug_5fonfi_3',['DEBUG_ONFI',['../group__onfi__interface__api.html#ga3be68b6fb18f5c9f909f2aa7a5c11bad',1,'onfi_interface.h']]],
+  ['decode_5fonfi_5fversion_4',['decode_ONFI_version',['../classonfi__interface.html#a982ccfe0d355477505fd735dfbdbf2ed',1,'onfi_interface']]],
+  ['decode_5fonfi_5fversion_5',['decode_onfi_version',['../namespaceonfi.html#a705deb70b8e41d5dfdc95f6446077af8',1,'onfi']]],
+  ['default_5fasync_6',['default_async',['../microprocessor__interface_8h.html#a8b15bc584d38a735307f3ade02d73391af03d3b5453559ab89fb1db74d3f7d7f8',1,'microprocessor_interface.h']]],
+  ['default_5finterface_5ftype_7',['default_interface_type',['../microprocessor__interface_8h.html#afecabb9b4014b79b672d794aa95ea425',1,'microprocessor_interface.h']]],
+  ['deinitialize_5fonfi_8',['deinitialize_onfi',['../classonfi__interface.html#aec25908ee35b4f9f325c4bd5a52d6851',1,'onfi_interface']]],
+  ['delay_5ffunction_9',['delay_function',['../classonfi__interface.html#a4ee57873eb28517c93de65f78555e6c4',1,'onfi_interface']]],
+  ['device_2eh_10',['device.h',['../device_8h.html',1,'']]],
+  ['device_5finitialization_11',['device_initialization',['../classonfi__interface.html#a1facef909ae526427fa9841b34b391e3',1,'onfi_interface']]],
+  ['device_5fmodel_12',['device_model',['../classonfi__interface.html#af16918c38a9bd444d31258aee67e917f',1,'onfi_interface']]],
+  ['disable_5ferase_13',['disable_erase',['../classonfi__interface.html#a9d0f88fe547cc75de924b06acd4882b0',1,'onfi_interface']]]
 ];

@@ -48,6 +48,8 @@ var classonfi__interface =
     [ "num_pages_in_block", "classonfi__interface.html#a622e3864667a5750bb32387f5cd87bf9", null ],
     [ "num_row_cycles", "classonfi__interface.html#a01ab6dfa9d0c263abdcd61cdff3d3326", null ],
     [ "num_spare_bytes_in_page", "classonfi__interface.html#a85b332b45b3f52c2348526c10e5f7d85", null ],
+    [ "onfi_data_file", "classonfi__interface.html#ac40e12dce6f31f3570d7076b14777c02", null ],
     [ "onfi_version", "classonfi__interface.html#ae60d6c873637c32b3708f808bea311a5", null ],
+    [ "time_info_file", "classonfi__interface.html#a97182ae8ed88b080d9dc95317b41e8b1", null ],
     [ "unique_id", "classonfi__interface.html#af480b2eeeb0d335908b16e850ac6bfca", null ]
 ];

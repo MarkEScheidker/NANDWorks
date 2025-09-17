@@ -1,7 +1,4 @@
 <map id="address.h" name="address.h">
-<area shape="rect" id="node1" title=" " alt="" coords="125,5,210,32"/>
-<area shape="rect" id="node2" href="$address_8cpp.html" title=" " alt="" coords="5,80,105,107"/>
-<area shape="rect" id="node3" href="$device_8h.html" title=" " alt="" coords="129,80,206,107"/>
-<area shape="rect" id="node5" href="$util_8cpp.html" title=" " alt="" coords="231,80,301,107"/>
-<area shape="rect" id="node4" href="$device_8cpp.html" title=" " alt="" coords="121,155,213,181"/>
+<area shape="rect" id="node1" title=" " alt="" coords="5,5,91,32"/>
+<area shape="rect" id="node2" href="$device_8h.html" title=" " alt="" coords="9,80,87,107"/>
 </map>

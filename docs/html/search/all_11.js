@@ -1,19 +1,15 @@
 var searchData=
 [
-  ['send_5faddresses_0',['send_addresses',['../classinterface.html#a6d52e8ecd5e39b27c3fd56ae0e709351',1,'interface']]],
-  ['send_5fcommand_1',['send_command',['../classinterface.html#a0ec651839190c56d700453aa5ee6dc25',1,'interface']]],
-  ['send_5fdata_2',['send_data',['../classinterface.html#a312f8d159b72fbd8b342af359739b942',1,'interface']]],
-  ['set_5fblock_5fsize_3',['set_block_size',['../classonfi__interface.html#a14a36958a17c9b7f968c68a35256dc0d',1,'onfi_interface']]],
-  ['set_5fce_5flow_4',['set_ce_low',['../classinterface.html#a63d9774c2185df93ac5560db2f4c8ee1',1,'interface']]],
-  ['set_5fdatalines_5fdirection_5fdefault_5',['set_datalines_direction_default',['../classinterface.html#af806acc962f31f7cd6a56fcbb5bc0ce1',1,'interface']]],
-  ['set_5fdatalines_5fdirection_5finput_6',['set_datalines_direction_input',['../classinterface.html#aa40ced322788b653a3effe64c480e794',1,'interface']]],
-  ['set_5fdefault_5fpin_5fvalues_7',['set_default_pin_values',['../classinterface.html#aae6cd3ba9fb4296fdcdd3a3f41615844',1,'interface']]],
-  ['set_5fdq_5fpins_8',['set_dq_pins',['../classinterface.html#a553d22c3df6141b4df5790779a3a5738',1,'interface']]],
-  ['set_5ffeatures_9',['set_features',['../classonfi_1_1OnfiController.html#a0f34640d1f946e0a4b699e697c846cb0',1,'onfi::OnfiController::set_features()'],['../classonfi__interface.html#a59108a7916ba2e9e2c3bd977845cd316',1,'onfi_interface::set_features(uint8_t address, uint8_t *data_to_send, uint8_t command=0xef)']]],
-  ['set_5flun_5fsize_10',['set_lun_size',['../classonfi__interface.html#ad666aee1b951af832d04546a9b2cf6c2',1,'onfi_interface']]],
-  ['set_5fpage_5fsize_11',['set_page_size',['../classonfi__interface.html#aa2694e3fd0ebfb2d7ca5bac4876e7332',1,'onfi_interface']]],
-  ['set_5fpage_5fsize_5fspare_12',['set_page_size_spare',['../classonfi__interface.html#a8e053f8a634b97f09b922d534c35bda2',1,'onfi_interface']]],
-  ['set_5fpin_5fdirection_5finactive_13',['set_pin_direction_inactive',['../classinterface.html#a2402c55084a964bc45c7d822c41f4bba',1,'interface']]],
-  ['spare_5fsize_5fbytes_14',['spare_size_bytes',['../structonfi_1_1Geometry.html#abe10e966e675725afe323f8a4b7b12dd',1,'onfi::Geometry']]],
-  ['start_5ftime_15',['START_TIME',['../hardware__locations_8h.html#a8cfe47a626c35a858e809a41829a2cd4',1,'hardware_locations.h']]]
+  ['test_5fdevice_5fvoltage_5fhigh_0',['test_device_voltage_high',['../classonfi__interface.html#a3d5d56715be5e4d846a5b2d5ef55c874',1,'onfi_interface']]],
+  ['test_5fdevice_5fvoltage_5flow_1',['test_device_voltage_low',['../classonfi__interface.html#a37a35e102d9dd0488238ba9ce0271ddb',1,'onfi_interface']]],
+  ['test_5fleds_5fincrement_2',['test_leds_increment',['../classinterface.html#a07cf5fe9d845318c65d1c0527c554928',1,'interface']]],
+  ['test_5fonfi_5fleds_3',['test_onfi_leds',['../classonfi__interface.html#a814ddf39cf3c807af7ab6c5f61911ac9',1,'onfi_interface']]],
+  ['time_5finfo_5ffile_4',['time_info_file',['../classinterface.html#a67978a22737465bbfff8874638263d0a',1,'interface::time_info_file()'],['../classonfi__interface.html#a97182ae8ed88b080d9dc95317b41e8b1',1,'onfi_interface::time_info_file()']]],
+  ['timing_2eh_5',['timing.h',['../timing_8h.html',1,'']]],
+  ['to_5fcol_5frow_5faddress_6',['to_col_row_address',['../namespaceonfi.html#ab8ae8f352d56f13f487676c404b6739e',1,'onfi']]],
+  ['toggle_7',['toggle',['../microprocessor__interface_8h.html#afecabb9b4014b79b672d794aa95ea425a092819a2032e8d9810e80313491acd21',1,'microprocessor_interface.h']]],
+  ['toshiba_5ftlc_5ftoggle_8',['toshiba_tlc_toggle',['../microprocessor__interface_8h.html#a8b15bc584d38a735307f3ade02d73391a9b1bf139a380be0d2f37eb30de7f3eac',1,'microprocessor_interface.h']]],
+  ['turn_5fleds_5foff_9',['turn_leds_off',['../classinterface.html#abb8c8485bd57fe55bc052efaa700892f',1,'interface']]],
+  ['turn_5fleds_5fon_10',['turn_leds_on',['../classinterface.html#a80f1e2f4f73f99bb85a4881ce19a03ad',1,'interface']]],
+  ['types_2eh_11',['types.h',['../types_8h.html',1,'']]]
 ];

@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.4"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>MastersThesis NAND Interface: Main Page</title>
+<title>MastersThesis NAND Interface: ONFI NAND Interface API</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -27,6 +27,7 @@
   <td id="projectalign">
    <div id="projectname">MastersThesis NAND Interface
    </div>
+   <div id="projectbrief">ONFI façade and supporting library for NAND flash characterization</div>
   </td>
  </tr>
  </tbody>
@@ -81,10 +82,35 @@ $(document).ready(function(){initNavTree('index.html',''); initResizable(); });
 </iframe>
 </div>
 
-<div class="header">
-  <div class="headertitle"><div class="title">MastersThesis NAND Interface Documentation</div></div>
+<div><div class="header">
+  <div class="headertitle"><div class="title">ONFI NAND Interface API </div></div>
 </div><!--header-->
 <div class="contents">
+<div class="textblock"><p ><a class="anchor" id="md_docs_api_overview"></a> This reference concentrates on the <code><a class="el" href="classonfi__interface.html" title="High-level façade for interacting with ONFI-compliant NAND devices.">onfi_interface</a></code> façade and the supporting classes that power the NAND flash tooling in this repository. Use the navigation pane to explore the high-level operations (erase, program, verify) and the lower-level helpers that back them.</p>
+<h1><a class="anchor" id="autotoc_md1"></a>
+Quick Start</h1>
+<ol type="1">
+<li>Call <code><a class="el" href="classonfi__interface.html#ababf8968a7342ab7ce6ef97d3c7b9a06" title="Initialize the ONFI stack and underlying HAL resources.">onfi_interface::get_started()</a></code> to power-up the hardware abstraction layer and parse the ONFI parameter page.</li>
+<li>Inspect geometry fields such as <code>num_bytes_in_page</code> or <code>num_pages_in_block</code> to size your buffers.</li>
+<li>Use the program/read/verify helpers to drive higher-level workflows or to compose your own NAND test routines.</li>
+</ol>
+<h1><a class="anchor" id="autotoc_md2"></a>
+Interface Hierarchy</h1>
+<ul>
+<li><code><a class="el" href="classonfi__interface.html" title="High-level façade for interacting with ONFI-compliant NAND devices.">onfi_interface</a></code> (main entry point)<ul>
+<li>derives from <code>interface</code> (hardware abstraction for the GPIO bridge)</li>
+<li>collaborates with <code><a class="el" href="classonfi_1_1OnfiController.html">onfi::OnfiController</a></code> and <code><a class="el" href="classonfi_1_1NandDevice.html">onfi::NandDevice</a></code> to execute protocol sequences</li>
+</ul>
+</li>
+</ul>
+<p >Each class page links to collaboration diagrams showing how data flows from application code, through the controller helpers, and down to the HAL.</p>
+<h1><a class="anchor" id="autotoc_md3"></a>
+Additional Resources</h1>
+<ul>
+<li>See the <code>docs/</code> directory for hardware setup details.</li>
+<li>Example command-line tools live under <code>apps/</code> and <code>examples/</code> and rely on the same API documented here. </li>
+</ul>
+</div></div><!-- PageDoc -->
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

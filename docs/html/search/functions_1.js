@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['busy_5fwait_5fcycles_0',['busy_wait_cycles',['../timing_8h.html#ac0d837eb9cbd9a9394bcd1719a47ddfe',1,'busy_wait_cycles(uint32_t cycles):&#160;timing.cpp'],['../timing_8cpp.html#ac0d837eb9cbd9a9394bcd1719a47ddfe',1,'busy_wait_cycles(uint32_t cycles):&#160;timing.cpp']]],
-  ['busy_5fwait_5fns_1',['busy_wait_ns',['../timing_8h.html#a85be116c6a3e82c3c8458a16eec87e31',1,'busy_wait_ns(uint64_t ns):&#160;timing.cpp'],['../timing_8cpp.html#a85be116c6a3e82c3c8458a16eec87e31',1,'busy_wait_ns(uint64_t ns):&#160;timing.cpp']]]
+  ['change_5fread_5fcolumn_0',['change_read_column',['../classonfi_1_1OnfiController.html#a1ac2ce3273a724f002cd27c08cde4556',1,'onfi::OnfiController::change_read_column()'],['../classonfi__interface.html#a1bb78945bd6f39cdaaf26e6ed2d9eb37',1,'onfi_interface::change_read_column()']]],
+  ['close_5finterface_5fdebug_5ffile_1',['close_interface_debug_file',['../classinterface.html#abb76eb4476b2b062cedd389abc035b3f',1,'interface']]],
+  ['convert_5fpagenumber_5fto_5fcolumnrow_5faddress_2',['convert_pagenumber_to_columnrow_address',['../classonfi__interface.html#aa31f2ee8a28415393bea02722143552e',1,'onfi_interface']]]
 ];
