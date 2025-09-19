@@ -1,8 +1,0 @@
-<map id="gpio.h" name="gpio.h">
-<area shape="rect" id="node1" title=" " alt="" coords="113,5,176,32"/>
-<area shape="rect" id="node2" href="$hardware__locations_8h.html" title=" " alt="" coords="5,80,167,107"/>
-<area shape="rect" id="node3" href="$microprocessor__interface_8h.html" title=" " alt="" coords="45,155,244,181"/>
-<area shape="rect" id="node4" href="$device_8h.html" title=" " alt="" coords="99,379,177,405"/>
-<area shape="rect" id="node5" href="$onfi__interface_8h.html" title=" " alt="" coords="133,229,255,256"/>
-<area shape="rect" id="node6" href="$controller_8h.html" title=" " alt="" coords="140,304,235,331"/>
-</map>

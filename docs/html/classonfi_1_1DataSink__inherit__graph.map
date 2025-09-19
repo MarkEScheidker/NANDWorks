@@ -1,6 +1,0 @@
-<map id="onfi::DataSink" name="onfi::DataSink">
-<area shape="rect" id="node1" title=" " alt="" coords="206,5,319,32"/>
-<area shape="rect" id="node2" href="$classonfi_1_1FileDataSink.html" title=" " alt="" coords="5,80,141,107"/>
-<area shape="rect" id="node3" href="$classonfi_1_1HexOstreamDataSink.html" title=" " alt="" coords="165,80,360,107"/>
-<area shape="rect" id="node4" href="$classonfi_1_1OstreamDataSink.html" title=" " alt="" coords="385,80,554,107"/>
-</map>

@@ -1,9 +1,0 @@
-<map id="timing.h" name="timing.h">
-<area shape="rect" id="node1" title=" " alt="" coords="140,5,216,32"/>
-<area shape="rect" id="node2" href="$hardware__locations_8h.html" title=" " alt="" coords="24,80,185,107"/>
-<area shape="rect" id="node7" href="$logging_8h.html" title=" " alt="" coords="210,80,293,107"/>
-<area shape="rect" id="node3" href="$microprocessor__interface_8h.html" title=" " alt="" coords="5,155,204,181"/>
-<area shape="rect" id="node4" href="$device_8h.html" title=" " alt="" coords="59,379,137,405"/>
-<area shape="rect" id="node5" href="$onfi__interface_8h.html" title=" " alt="" coords="93,229,215,256"/>
-<area shape="rect" id="node6" href="$controller_8h.html" title=" " alt="" coords="100,304,195,331"/>
-</map>
