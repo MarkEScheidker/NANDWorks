@@ -157,8 +157,9 @@ public:
 
     /**
     \make this function inline in definition
-    \param: address_to_send is the address value to be sent to the NAND device
-    \num_address_bytes is the number of bytes in the address
+    \param address_to_send Pointer to the address buffer sent to the NAND device
+    \param num_address_bytes Number of bytes from the address buffer to transmit
+    \param verbose When true, logs the address transactions for debugging
 
     \.. CLE goes low
     \.. CLE should be 0 from before
