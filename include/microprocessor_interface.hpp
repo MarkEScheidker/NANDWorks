@@ -4,8 +4,9 @@
 #include <stdint.h>
 #include <fstream>
 #include <iostream>
-#include "gpio.h"
-#include "hardware_locations.h"
+#include <stdexcept>
+#include "gpio.hpp"
+#include "hardware_locations.hpp"
 
 /// following flag keeps the debug information active
 #define DEBUG_INTERFACE false
@@ -34,7 +35,7 @@ enum chip_type {
 /**
 this interface class defines the pins, location etc required
 .. this may change based on system in use
-.. please verfiy and change its locations in hardware_locations.h
+.. please verfiy and change its locations in hardware_locations.hpp
 */
 class interface {
 private:
@@ -50,13 +51,12 @@ protected:
 public:
     interface() {
         if (!gpio_init()) {
-            std::cerr << "GPIO initialisation failed\n";
-            exit(1);
+            throw std::runtime_error("GPIO initialisation failed");
         }
     }
 
-    ~interface() {
-        // The bcm2835 library doesn't require explicit termination in the same way as pigpio
+    virtual ~interface() {
+        gpio_shutdown();
     }
 
 
@@ -179,7 +179,7 @@ public:
     \insert delay here
     \make sure to call set_default_pin_values()
     */
-    void send_addresses(uint8_t *address_to_send, uint8_t num_address_bytes = 1, bool verbose = false) const;
+    void send_addresses(const uint8_t *address_to_send, uint8_t num_address_bytes = 1, bool verbose = false) const;
 
     /**
     \send data to the flash memory
@@ -199,7 +199,7 @@ public:
     \.. this might be unnecesary
     \make sure to call set_default_pin_values()
     */
-    void send_data(uint8_t *data_to_send, uint16_t num_data) const;
+    void send_data(const uint8_t *data_to_send, uint16_t num_data) const;
 
     void set_dq_pins(uint8_t data) const;
 

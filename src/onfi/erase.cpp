@@ -1,14 +1,14 @@
-#include "onfi_interface.h"
-#include "gpio.h"
-#include "timing.h"
+#include "onfi_interface.hpp"
+#include "gpio.hpp"
+#include "timing.hpp"
 #include <stdio.h>
 #include <stdlib.h>
 #include <cstring>
 #include <cstdint>
 #include <iomanip>
 #include <algorithm>
-#include "logging.h"
-#include "onfi/controller.h"
+#include "logging.hpp"
+#include "onfi/controller.hpp"
 
 void onfi_interface::disable_erase() {
     // check to see if the device is busy

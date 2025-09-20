@@ -1,4 +1,4 @@
-#include "onfi/param_page.h"
+#include "onfi/param_page.hpp"
 
 namespace onfi {
 

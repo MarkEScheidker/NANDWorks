@@ -1,5 +1,5 @@
-#include "gpio.h"
-#include "timing.h"
+#include "gpio.hpp"
+#include "timing.hpp"
 #include <iostream>
 #include <bcm2835.h>
 

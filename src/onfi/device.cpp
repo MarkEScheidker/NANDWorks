@@ -1,7 +1,7 @@
-#include "onfi/device.h"
+#include "onfi/device.hpp"
 #include <algorithm>
 #include <vector>
-//#include "logging.h"  // add if needed for verbose prints
+//#include "logging.hpp"  // add if needed for verbose prints
 
 namespace onfi {
 

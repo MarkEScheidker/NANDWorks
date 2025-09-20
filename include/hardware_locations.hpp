@@ -2,8 +2,8 @@
 #define HARDWARE_LOCATIONS_H
 
 #include <fstream>
-#include "timing.h"
-#include "gpio.h"
+#include "timing.hpp"
+#include "gpio.hpp"
 
 // Enables/disables detailed timing profiles for operations.
 #ifndef PROFILE_TIME

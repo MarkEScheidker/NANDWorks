@@ -6,11 +6,11 @@ Description: This source file is to test the basic functionality of the interfac
                         .. .. erase, program etc
 */
 
-// onfi_interface.h has the necessary functionalities defined
-#include "onfi_interface.h"
-#include "onfi/device.h"
-#include "onfi/controller.h"
-#include "onfi/data_sink.h"
+// onfi_interface.hpp has the necessary functionalities defined
+#include "onfi_interface.hpp"
+#include "onfi/device.hpp"
+#include "onfi/controller.hpp"
+#include "onfi/data_sink.hpp"
 
 #include <vector>
 #include <cstdlib>
@@ -471,10 +471,37 @@ static bool test_spare_preserved_when_excluded(onfi_interface &onfi_instance, bo
     return ok;
 }
 
-// Erase and verify first and last block boundaries
+// Erase and verify first and last usable blocks (skip factory-reserved bad blocks)
 static bool test_first_last_block_erase(onfi_interface &onfi_instance, bool verbose) {
-    unsigned int first_block = 0;
-    unsigned int last_block = onfi_instance.num_blocks ? (onfi_instance.num_blocks - 1) : 0;
+    if (onfi_instance.num_blocks == 0) {
+        if (verbose) cout << "Device reports zero blocks; skipping boundary erase test." << endl;
+        return true;
+    }
+
+    unsigned int first_good = 0;
+    bool found_first = false;
+    for (unsigned int block = 0; block < onfi_instance.num_blocks; ++block) {
+        if (!onfi_instance.is_bad_block(block)) {
+            first_good = block;
+            found_first = true;
+            break;
+        }
+    }
+
+    unsigned int last_good = 0;
+    bool found_last = false;
+    for (unsigned int block = onfi_instance.num_blocks; block-- > 0;) {
+        if (!onfi_instance.is_bad_block(block)) {
+            last_good = block;
+            found_last = true;
+            break;
+        }
+    }
+
+    if (!found_first || !found_last) {
+        if (verbose) cout << "No suitable good boundary blocks found (all factory-reserved?). Skipping test." << endl;
+        return true;
+    }
 
     onfi::OnfiController ctrl(onfi_instance);
     onfi::NandDevice dev(ctrl);
@@ -487,13 +514,13 @@ static bool test_first_last_block_erase(onfi_interface &onfi_instance, bool verb
     dev.interface_type = onfi_instance.interface_type;
     dev.chip = onfi_instance.flash_chip;
 
-    if (verbose) cout << "Erasing first block (0) and last block (" << last_block << ")" << endl;
+    if (verbose) cout << "Erasing first usable block (" << first_good << ") and last usable block (" << last_good << ")" << endl;
 
-    dev.erase_block(first_block);
-    bool ok = dev.verify_erase_block(first_block, /*complete_block*/false, slc_page_indices, 1, /*including_spare*/true, verbose);
+    dev.erase_block(first_good);
+    bool ok = dev.verify_erase_block(first_good, /*complete_block*/false, slc_page_indices, 1, /*including_spare*/true, verbose);
 
-    dev.erase_block(last_block);
-    ok = ok && dev.verify_erase_block(last_block, /*complete_block*/false, slc_page_indices, 1, /*including_spare*/true, verbose);
+    dev.erase_block(last_good);
+    ok = ok && dev.verify_erase_block(last_good, /*complete_block*/false, slc_page_indices, 1, /*including_spare*/true, verbose);
     return ok;
 }
 

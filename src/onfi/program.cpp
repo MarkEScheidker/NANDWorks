@@ -1,14 +1,14 @@
-#include "onfi_interface.h"
-#include "gpio.h"
-#include "timing.h"
+#include "onfi_interface.hpp"
+#include "gpio.hpp"
+#include "timing.hpp"
 #include <stdio.h>
 #include <stdlib.h>
 #include <cstring>
 #include <cstdint>
 #include <iomanip>
 #include <algorithm>
-#include "logging.h"
-#include "onfi/controller.h"
+#include "logging.hpp"
+#include "onfi/controller.hpp"
 
 bool onfi_interface::verify_program_page(unsigned int my_block_number, unsigned int my_page_number,
                                          uint8_t *data_to_program, bool verbose, int max_allowed_errors) {

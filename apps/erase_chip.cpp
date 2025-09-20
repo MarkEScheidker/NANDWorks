@@ -1,4 +1,4 @@
-#include "onfi_interface.h"
+#include "onfi_interface.hpp"
 #include <iostream>
 
 int main() {

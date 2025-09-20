@@ -1,15 +1,15 @@
-#include "onfi_interface.h"
-#include "gpio.h"
-#include "timing.h"
+#include "onfi_interface.hpp"
+#include "gpio.hpp"
+#include "timing.hpp"
 #include <stdio.h>
 #include <stdlib.h>
 #include <cstring>
 #include <cstdint>
 #include <iomanip>
 #include <algorithm>
-#include "logging.h"
-#include "onfi/controller.h"
-#include "onfi/address.h"
+#include "logging.hpp"
+#include "onfi/controller.hpp"
+#include "onfi/address.hpp"
 
 
 /**
@@ -159,7 +159,7 @@ void onfi_interface::convert_pagenumber_to_columnrow_address(unsigned int my_blo
 // .. the data will be available for read with a command sequence of ECh followed by an address of 40h
 // .. this function will read a random page and tries to verify if it was completely erased
 // .. for elaborate verifiying, please use a different function
-void onfi_interface::set_features(uint8_t address, uint8_t *data_to_send, uint8_t command) {
+void onfi_interface::set_features(uint8_t address, const uint8_t *data_to_send, uint8_t command) {
     onfi::OnfiController ctrl(*this);
     ctrl.set_features(address, data_to_send, command);
 }

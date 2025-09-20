@@ -1,14 +1,14 @@
-#include "onfi_interface.h"
-#include "gpio.h"
-#include "timing.h"
+#include "onfi_interface.hpp"
+#include "gpio.hpp"
+#include "timing.hpp"
 #include <stdio.h>
 #include <stdlib.h>
 #include <cstring>
 #include <cstdint>
 #include <iomanip>
 #include <algorithm>
-#include "logging.h"
-#include "onfi/controller.h"
+#include "logging.hpp"
+#include "onfi/controller.hpp"
 
 void onfi_interface::read_page(unsigned int my_block_number, unsigned int my_page_number, uint8_t address_length,
                                bool verbose) {
@@ -36,7 +36,7 @@ void onfi_interface::read_page(unsigned int my_block_number, unsigned int my_pag
 
 // this function opens a file named time_info_file.txt
 // .. this file will log all the duration from the timing operations as necessary
-void onfi_interface::change_read_column(uint8_t *col_address) {
+void onfi_interface::change_read_column(const uint8_t *col_address) {
     onfi::OnfiController ctrl(*this);
     ctrl.change_read_column(col_address);
 }

@@ -1,13 +1,13 @@
-#include "onfi_interface.h"
-#include "gpio.h"
-#include "timing.h"
+#include "onfi_interface.hpp"
+#include "gpio.hpp"
+#include "timing.hpp"
 #include <stdio.h>
 #include <stdlib.h>
 #include <cstring>
 #include <cstdint>
 #include <iomanip>
 #include <algorithm>
-#include "logging.h"
+#include "logging.hpp"
 
 void onfi_interface::get_started(param_type ONFI_OR_JEDEC) {
     bool bytewise = true;
@@ -32,7 +32,7 @@ void onfi_interface::get_started(param_type ONFI_OR_JEDEC) {
 
     /**
     now let test the NAND chip and print its properties as read from the chip memory itself
-    .. please make sure that the pin connections is appropriate as mentioned in hardware_locations.h
+    .. please make sure that the pin connections is appropriate as mentioned in hardware_locations.hpp
     .. this function call is also important to establish the parameters like:
     .. onfi_instance.num_bytes_in_page, onfi_instance.num_spare_bytes_in_page and num_pages_in_block
     */

@@ -2,7 +2,7 @@
 #define ONFI_PARAM_PAGE_H
 
 #include <stdint.h>
-#include "onfi/types.h"
+#include "onfi/types.hpp"
 
 namespace onfi {
 

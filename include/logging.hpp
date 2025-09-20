@@ -9,7 +9,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdint.h>
-#include "timing.h" // for get_timestamp_ns()
+#include "timing.hpp" // for get_timestamp_ns()
 
 // Levels: 0=NONE, 1=ERROR, 2=WARN, 3=INFO, 4=DEBUG, 5=TRACE
 #ifndef LOG_ONFI_LEVEL

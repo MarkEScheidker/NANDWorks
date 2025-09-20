@@ -3,11 +3,11 @@
 
 #include <stdint.h>
 #include <vector>
-#include "onfi/types.h"
-#include "onfi/controller.h"
-#include "onfi/data_sink.h"
-#include "onfi/address.h"
-#include "microprocessor_interface.h" // for enums
+#include "onfi/types.hpp"
+#include "onfi/controller.hpp"
+#include "onfi/data_sink.hpp"
+#include "onfi/address.hpp"
+#include "microprocessor_interface.hpp" // for enums
 
 namespace onfi {
 

@@ -1,14 +1,14 @@
-#include "onfi_interface.h"
-#include "gpio.h"
-#include "timing.h"
+#include "onfi_interface.hpp"
+#include "gpio.hpp"
+#include "timing.hpp"
 #include <stdio.h>
 #include <stdlib.h>
 #include <cstring>
 #include <cstdint>
 #include <iomanip>
 #include <algorithm>
-#include "logging.h"
-#include "onfi/param_page.h"
+#include "logging.hpp"
+#include "onfi/param_page.hpp"
 
 void onfi_interface::read_id() {
     uint8_t num_bytes;

@@ -1,6 +1,6 @@
-#include "onfi_interface.h"
-#include "onfi/controller.h"
-#include "onfi/device.h"
+#include "onfi_interface.hpp"
+#include "onfi/controller.hpp"
+#include "onfi/device.hpp"
 #include <vector>
 
 int main() {

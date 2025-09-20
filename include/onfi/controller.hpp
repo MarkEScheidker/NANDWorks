@@ -2,7 +2,7 @@
 #define ONFI_CONTROLLER_H
 
 #include <stdint.h>
-#include "onfi_interface.h" // relies on get_data/get_status; rehost later
+#include "onfi_interface.hpp" // relies on get_data/get_status; rehost later
 
 namespace onfi {
 

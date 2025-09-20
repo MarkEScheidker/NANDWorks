@@ -34,4 +34,7 @@ void gpio_clr_multi(uint32_t mask);
 // Useful for fast sampling of multiple input pins.
 uint32_t gpio_read_levels0();
 
+// Restore scheduler state and release bcm2835 resources when finished.
+void gpio_shutdown();
+
 #endif // GPIO_H

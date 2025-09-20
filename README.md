@@ -12,7 +12,7 @@ NANDWorks is a C++ toolkit that lets Raspberry Pi single-board computers exercis
 ## Hardware Overview
 - **Target platform:** Raspberry Pi 3 or 4 running 64-bit Raspberry Pi OS (or a comparable Debian derivative).
 - **NAND devices:** Any ONFI-compliant part; geometry is discovered at runtime through the ONFI parameter page.
-- **GPIO wiring:** Defaults live in `include/hardware_locations.h`. Update the table if your wiring differs.
+- **GPIO wiring:** Defaults live in `include/hardware_locations.hpp`. Update the table if your wiring differs.
 
 | Signal | BCM GPIO | Notes |
 | --- | --- | --- |
@@ -87,9 +87,9 @@ Generated artifacts:
 - `time_info_file.txt` – Created when binaries are built with `PROFILE_TIME=1`; records per-operation timing data.
 
 ## Library Architecture
-- **Hardware Abstraction Layer (HAL):** `include/microprocessor_interface.h` / `src/microprocessor_interface.cpp` manage GPIO modes, signal timing, and register access using `libbcm2835`.
-- **ONFI Protocol Layer:** `include/onfi_interface.h` and `src/onfi/*.cpp` implement reset, identification, feature access, block/page I/O, verification helpers, and higher-level utilities (controllers, data sinks, geometry helpers).
-- **Timing Utilities:** `include/timing.h` / `src/timing.cpp` expose cycle-accurate busy waits and timestamp helpers leveraged by benchmarking and profiling tools.
+- **Hardware Abstraction Layer (HAL):** `include/microprocessor_interface.hpp` / `src/microprocessor_interface.cpp` manage GPIO modes, signal timing, and register access using `libbcm2835`.
+- **ONFI Protocol Layer:** `include/onfi_interface.hpp` and `src/onfi/*.cpp` implement reset, identification, feature access, block/page I/O, verification helpers, and higher-level utilities (controllers, data sinks, geometry helpers).
+- **Timing Utilities:** `include/timing.hpp` / `src/timing.cpp` expose cycle-accurate busy waits and timestamp helpers leveraged by benchmarking and profiling tools.
 
 The Doxygen configuration under `docs/` parses these headers to produce browsable API documentation.
 

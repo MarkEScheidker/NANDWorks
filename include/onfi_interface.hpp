@@ -1,5 +1,5 @@
 /**
-File:			onfi_interface.h
+File:			onfi_interface.hpp
 Description:	This file contains the necessary functions that are defined by the ONFI protocol
 				.. for interfacing with a serial NAND memory.
 				The implementation here is tested on NAND memory from Micron.
@@ -11,7 +11,7 @@ Date: 			18 July 2020
 #define ONFI_INTERFACE_H
 
 // include our next header
-#include "microprocessor_interface.h"
+#include "microprocessor_interface.hpp"
 
 /**
  * @defgroup onfi_interface_api ONFI Interface Facade
@@ -182,7 +182,7 @@ public:
 	 * @brief Adjust the NAND read column pointer between cache fetches.
 	 * @param col_address Pointer to address bytes to send.
 	 */
-	void change_read_column(uint8_t* col_address);
+	void change_read_column(const uint8_t* col_address);
 
 	/**
 	 * @brief Issue a block erase operation.
@@ -267,7 +267,7 @@ public:
 	 * @param data_to_send Four-byte payload describing the feature configuration.
 	 * @param command Optional override for the command code.
 	 */
-	void set_features(uint8_t address, uint8_t* data_to_send, uint8_t command = 0xef);
+	void set_features(uint8_t address, const uint8_t* data_to_send, uint8_t command = 0xef);
 
 	/**
 	 * @brief Read ONFI feature parameters (EEh command).
