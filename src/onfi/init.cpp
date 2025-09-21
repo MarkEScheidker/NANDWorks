@@ -10,7 +10,7 @@
 #include "logging.hpp"
 
 void onfi_interface::get_started(param_type ONFI_OR_JEDEC) {
-    bool bytewise = true;
+    bool bytewise = false;
     initialize_onfi();
 
     /**now that the object is created
@@ -64,6 +64,8 @@ void onfi_interface::open_time_profile_file() {
 void onfi_interface::initialize_onfi(bool verbose) {
     if (verbose) LOG_ONFI_INFO("initialize_onfi() start");
     open_interface_debug_file();
+
+    erase_enabled_ = true;
 
     // No need for bridge_base_virtual or fd with pigpio
 

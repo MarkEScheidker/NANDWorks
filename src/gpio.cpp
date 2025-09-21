@@ -1,6 +1,10 @@
 #include "gpio.hpp"
 #include <bcm2835.h>
 #include <sched.h>
+#include <sys/mman.h>
+#include <cerrno>
+#include <cstdlib>
+#include <cstring>
 #include <iostream>
 #include <stdexcept>
 #include <utility>
@@ -10,6 +14,11 @@ namespace {
     bool g_scheduler_elevated = false;
     int g_prev_policy = SCHED_OTHER;
     struct sched_param g_prev_param = {};
+    bool g_memory_locked = false;
+    bool g_affinity_pinned = false;
+    cpu_set_t g_prev_affinity;
+    bool g_prev_affinity_valid = false;
+    int g_pinned_cpu = 0;
 }
 
 bool gpio_init() {
@@ -21,6 +30,14 @@ bool gpio_init() {
     if (!bcm2835_init()) {
         std::cerr << "bcm2835_init failed. Are you running as root?" << std::endl;
         return false;
+    }
+
+    if (!g_memory_locked) {
+        if (mlockall(MCL_CURRENT | MCL_FUTURE) != 0) {
+            std::cerr << "Warning: mlockall failed (" << std::strerror(errno) << ")" << std::endl;
+        } else {
+            g_memory_locked = true;
+        }
     }
 
     g_prev_policy = sched_getscheduler(0);
@@ -41,6 +58,36 @@ bool gpio_init() {
         std::cerr << "Failed to set real-time scheduler. Are you running as root?" << std::endl;
         bcm2835_close();
         return false;
+    }
+
+    if (!g_affinity_pinned) {
+        CPU_ZERO(&g_prev_affinity);
+        if (sched_getaffinity(0, sizeof(cpu_set_t), &g_prev_affinity) == 0) {
+            g_prev_affinity_valid = true;
+        } else {
+            std::cerr << "Warning: sched_getaffinity failed (" << std::strerror(errno) << ")" << std::endl;
+        }
+
+        const char* env_cpu = std::getenv("ONFI_PIN_CPU");
+        if (env_cpu) {
+            char* endptr = nullptr;
+            long parsed = std::strtol(env_cpu, &endptr, 10);
+            if (endptr && *endptr == '\0' && parsed >= 0 && parsed < CPU_SETSIZE) {
+                g_pinned_cpu = static_cast<int>(parsed);
+            } else {
+                std::cerr << "Warning: invalid ONFI_PIN_CPU value '" << env_cpu << "', defaulting to CPU 0" << std::endl;
+                g_pinned_cpu = 0;
+            }
+        }
+
+        cpu_set_t set;
+        CPU_ZERO(&set);
+        CPU_SET(static_cast<unsigned>(g_pinned_cpu), &set);
+        if (sched_setaffinity(0, sizeof(cpu_set_t), &set) != 0) {
+            std::cerr << "Warning: sched_setaffinity failed (" << std::strerror(errno) << ")" << std::endl;
+        } else {
+            g_affinity_pinned = true;
+        }
     }
 
     g_scheduler_elevated = true;
@@ -101,6 +148,14 @@ void gpio_shutdown() {
         }
     }
     g_scheduler_elevated = false;
+
+    if (g_affinity_pinned && g_prev_affinity_valid) {
+        if (sched_setaffinity(0, sizeof(cpu_set_t), &g_prev_affinity) != 0) {
+            std::cerr << "Warning: failed to restore CPU affinity (" << std::strerror(errno) << ")" << std::endl;
+        }
+    }
+    g_affinity_pinned = false;
+    g_prev_affinity_valid = false;
 
     bcm2835_close();
     g_prev_policy = SCHED_OTHER;

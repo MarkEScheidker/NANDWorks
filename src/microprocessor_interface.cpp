@@ -127,17 +127,30 @@ __attribute__((always_inline)) void interface::set_datalines_direction_input() c
     }
 }
 
+__attribute__((always_inline)) void interface::restore_control_pins(bool release_data_bus) const {
+    gpio_write(GPIO_CE, 1);
+    gpio_write(GPIO_WE, 1);
+    gpio_write(GPIO_RE, 1);
+    gpio_write(GPIO_ALE, 0);
+    gpio_write(GPIO_CLE, 0);
+
+    if (release_data_bus) {
+        set_datalines_direction_default();
+        gpio_set_direction(GPIO_DQS, false);
+        gpio_set_direction(GPIO_DQSC, false);
+    }
+}
+
 __attribute__((always_inline)) void interface::send_command(uint8_t command_to_send) const {
-    gpio_set_low(GPIO_WE);
     gpio_write(GPIO_CE, 0);
     gpio_write(GPIO_CLE, 1);
 
+    bcm2835_gpio_clr(GPIO_WE);
     set_dq_pins(command_to_send);
-
-    gpio_set_high(GPIO_WE);
+    bcm2835_gpio_set(GPIO_WE);
 
     gpio_write(GPIO_CLE, 0);
-    set_default_pin_values();
+    restore_control_pins(false);
 }
 
 __attribute__((always_inline)) void interface::send_addresses(const uint8_t *address_to_send, uint8_t num_address_bytes,
@@ -148,11 +161,12 @@ __attribute__((always_inline)) void interface::send_addresses(const uint8_t *add
     gpio_write(GPIO_ALE, 1);
 
     for (uint8_t i = 0; i < num_address_bytes; ++i) {
-        gpio_set_low(GPIO_WE);
+        bcm2835_gpio_clr(GPIO_WE);
         set_dq_pins(address_to_send[i]);
-        gpio_set_high(GPIO_WE);
+        bcm2835_gpio_set(GPIO_WE);
     }
-    set_default_pin_values();
+
+    restore_control_pins(false);
 
     (void)verbose;
 }
@@ -161,11 +175,11 @@ __attribute__((always_inline)) void interface::send_data(const uint8_t *data_to_
     if (interface_type == asynchronous) {
         gpio_write(GPIO_CE, 0);
         for (uint16_t i = 0; i < num_data; ++i) {
-            gpio_set_low(GPIO_WE);
+            bcm2835_gpio_clr(GPIO_WE);
             set_dq_pins(data_to_send[i]);
-            gpio_set_high(GPIO_WE);
+            bcm2835_gpio_set(GPIO_WE);
         }
-        set_default_pin_values();
+        restore_control_pins(false);
     } else {
         set_datalines_direction_default();
 
@@ -186,7 +200,7 @@ __attribute__((always_inline)) void interface::send_data(const uint8_t *data_to_
             gpio_write(GPIO_DQS, !gpio_read(GPIO_DQS)); // Toggle DQS
             busy_wait_ns(10);
         }
-        set_default_pin_values();
+        restore_control_pins(true);
     }
 }
 

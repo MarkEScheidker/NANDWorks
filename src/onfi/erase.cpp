@@ -12,21 +12,23 @@
 #include "onfi/types.hpp"
 
 void onfi_interface::disable_erase() {
-    // check to see if the device is busy
-    // .. wait if busy
+    if (!erase_enabled_) {
+        gpio_write(GPIO_WP, 0);
+        return;
+    }
     wait_ready_blocking();
-
-    // wp to low
     gpio_write(GPIO_WP, 0);
+    erase_enabled_ = false;
 }
 
 void onfi_interface::enable_erase() {
-    // check to see if the device is busy
-    // .. wait if busy
+    if (erase_enabled_) {
+        gpio_write(GPIO_WP, 1);
+        return;
+    }
     wait_ready_blocking();
-
-    // wp to high
     gpio_write(GPIO_WP, 1);
+    erase_enabled_ = true;
 }
 
 // following function erases the block address provided as the parameter to the function
@@ -147,7 +149,7 @@ bool onfi_interface::verify_block_erase(unsigned int my_block_number, bool compl
     uint16_t num_bytes_to_test = num_bytes_in_page;
 
     // let us create a local variable that will hold the data read from the pages
-    uint8_t *data_read_from_page = new uint8_t[num_bytes_to_test];
+    uint8_t *data_read_from_page = ensure_scratch(num_bytes_to_test);
     uint16_t idx = 0;
 
     //test to see if the user wants the complete block or just the selected pages
@@ -165,8 +167,6 @@ bool onfi_interface::verify_block_erase(unsigned int my_block_number, bool compl
             // let us grab the index from the array
             curr_page_index = page_indices[idx];
 
-            // let us first reset all the values in the local variables to 0x00
-            memset(data_read_from_page, 0x00, num_bytes_to_test);
             //first let us get the data from the page to the cache memory
             read_page(my_block_number, curr_page_index, 5);
             // now let us get the values from the cache memory to our local variable
@@ -199,8 +199,6 @@ bool onfi_interface::verify_block_erase(unsigned int my_block_number, bool compl
         // this means we are working on all the pages in the block
         // .. let us iterate through each pages in the block
         for (idx = 0; idx < num_pages_in_block; idx++) {
-            // let us first reset all the values in the local variables to 0x00
-            memset(data_read_from_page, 0x00, num_bytes_to_test);
             //first let us get the data from the page to the cache memory
             read_page(my_block_number, idx, 5);
             // now let us get the values from the cache memory to our local variable
@@ -230,7 +228,6 @@ bool onfi_interface::verify_block_erase(unsigned int my_block_number, bool compl
                             std::dec << fail_count << std::endl;
         }
     }
-    delete[] data_read_from_page;
     return return_value;
 }
 
@@ -242,5 +239,3 @@ bool onfi_interface::verify_block_erase(unsigned int my_block_number, bool compl
 // .. including_spare is to indicate if you want to program the spare section as well
 // .. .. if including spare  = 1, then length of data_to_program should be (num of bytes in pages + num of spare bytes)
 // .. verbose is for priting messages
-
-

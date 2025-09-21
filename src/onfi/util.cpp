@@ -1,8 +1,8 @@
 #include "onfi_interface.hpp"
 #include "gpio.hpp"
 #include "timing.hpp"
+#include <bcm2835.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <cstring>
 #include <cstdint>
 #include <iomanip>
@@ -18,6 +18,13 @@
 Following is the list of carefully chosen page indices in any block
 .. please read "Testing Latency on Shared Pages" in readme.md in "sources/Data" folder
 */
+uint8_t* onfi_interface::ensure_scratch(size_t size) {
+    if (scratch_buffer_.size() < size) {
+        scratch_buffer_.resize(size);
+    }
+    return scratch_buffer_.data();
+}
+
 namespace {
 constexpr std::array<uint16_t, 100> kDefaultPageSelection = {
     0, 2, 4, 6, 8, 10, 12, 14, 16, 18,
@@ -81,13 +88,13 @@ void onfi_interface::get_data(uint8_t *data_received, uint16_t num_data) const {
         uint16_t i;
         for (i = 0; i < num_data; i++) {
             // set the RE to low for next cycle
-            gpio_set_low(GPIO_RE);
+            bcm2835_gpio_clr(GPIO_RE);
 
             // read the data
             data_received[i] = read_dq_pins();
 
             // data is available at DQ pins on the rising edge of RE pin (RE is also input to NAND)
-            gpio_set_high(GPIO_RE);
+            bcm2835_gpio_set(GPIO_RE);
         }
 
         // set the pins as output
@@ -108,26 +115,30 @@ void onfi_interface::get_data(uint8_t *data_received, uint16_t num_data) const {
         busy_wait_ns(1000);
 
         // now take RE# to low
-        gpio_write(GPIO_RE, 0);
+        bcm2835_gpio_clr(GPIO_RE);
         // now take DQS to low
         // set DQS as output
-        gpio_write(GPIO_DQS, 1);
+        bcm2835_gpio_set(GPIO_DQS);
         gpio_set_direction(GPIO_DQS, true);
         gpio_set_direction(GPIO_DQSC, true);
-        gpio_write(GPIO_DQS, 0);
+        bcm2835_gpio_clr(GPIO_DQS);
         busy_wait_ns(1000);
-        gpio_set_high(GPIO_RE);
+        bcm2835_gpio_set(GPIO_RE);
         busy_wait_ns(1000);
         // now in a loop read the data
-        uint16_t i = 0;
-        for (i = 0; i < num_data; i += 1) {
-            // read the data
+        bool re_level = true;
+        bool dqs_level = false;
+        for (uint16_t i = 0; i < num_data; ++i) {
             data_received[i] = read_dq_pins();
 
-            gpio_write(GPIO_RE, !gpio_read(GPIO_RE)); // Toggle RE
-            gpio_write(GPIO_DQS, !gpio_read(GPIO_DQS)); // Toggle DQS
+            re_level = !re_level;
+            if (re_level) bcm2835_gpio_set(GPIO_RE);
+            else bcm2835_gpio_clr(GPIO_RE);
+            dqs_level = !dqs_level;
+            if (dqs_level) bcm2835_gpio_set(GPIO_DQS);
+            else bcm2835_gpio_clr(GPIO_DQS);
         }
-        gpio_write(GPIO_RE, 1);
+        bcm2835_gpio_set(GPIO_RE);
 
         // set the pins as output
         set_datalines_direction_default();
@@ -183,8 +194,11 @@ void onfi_interface::get_features(uint8_t address, uint8_t* data_received, onfi:
 // following function will convert a block from MLC mode to SLC mode
 // .. it uses set_features option to convert the block from SLC to MLC
 __attribute__((always_inline)) void onfi_interface::delay_function(uint32_t loop_count) {
-    for (; loop_count > 0; loop_count--)
-        busy_wait_ns(1000);
+    if (loop_count == 0) {
+        return;
+    }
+    const uint64_t total_wait_ns = static_cast<uint64_t>(loop_count) * 1000ULL;
+    busy_wait_ns(total_wait_ns);
 }
 
 void onfi_interface::profile_time() {

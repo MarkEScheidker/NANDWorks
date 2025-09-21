@@ -2,124 +2,104 @@
 #include "gpio.hpp"
 #include "timing.hpp"
 #include <stdio.h>
-#include <stdlib.h>
 #include <cstring>
 #include <cstdint>
 #include <iomanip>
 #include <algorithm>
+#include <array>
 #include "logging.hpp"
 #include "onfi/param_page.hpp"
 
 void onfi_interface::read_id() {
-    uint8_t num_bytes;
-    uint8_t address_to_read;
+    constexpr uint8_t kUniqueIdLength = 32;
+    uint8_t address_to_read = 0x00;
 
-    // let us read the unique ID programmed into the device
-    num_bytes = 32; // ONFI unique ID is 32 bytes
-    address_to_read = 0x0;
+    // Read the ONFI unique ID (32 bytes)
     send_command(0xED);
     send_addresses(&address_to_read);
-    uint8_t *my_unique_id = (uint8_t *) (malloc(num_bytes * sizeof(uint8_t)));
-    
-    //wait for RB# signal to be high
+    std::array<uint8_t, kUniqueIdLength> unique_bytes{};
+
     while (gpio_read(GPIO_RB) == 0);
-    
 
-    get_data(my_unique_id, num_bytes);
-    memcpy(unique_id, my_unique_id, num_bytes);
-    unique_id[num_bytes] = '\0'; // Null-terminate the string
-    free(my_unique_id);
+    get_data(unique_bytes.data(), unique_bytes.size());
+    memcpy(unique_id, unique_bytes.data(), unique_bytes.size());
+    unique_id[unique_bytes.size()] = '\0';
 
-    // let us read the ID at address 00
-    num_bytes = 8;
-    address_to_read = 0x0;
+    auto log_id_bytes = [](const char* label, const uint8_t* data, size_t len) {
+        LOG_ONFI_DEBUG("-------------------------------------------------");
+        LOG_ONFI_DEBUG("%s", label);
+        if (DEBUG_ONFI) {
+            printf("-------------------------------------------------\n");
+            printf("%s\n", label);
+        }
+        for (size_t idx = 0; idx < len; ++idx) {
+            if ((data[idx] >= 'a' && data[idx] <= 'z') || (data[idx] >= 'A' && data[idx] <= 'Z')) {
+                LOG_ONFI_DEBUG("%c ,", data[idx]);
+                if (DEBUG_ONFI) printf("%c ,", data[idx]);
+            } else {
+                LOG_ONFI_DEBUG("0x%x ,", data[idx]);
+                if (DEBUG_ONFI) printf("0x%x ,", data[idx]);
+            }
+        }
+        LOG_ONFI_DEBUG("");
+        LOG_ONFI_DEBUG("-------------------------------------------------");
+        if (DEBUG_ONFI) {
+            printf("\n-------------------------------------------------\n");
+        }
+    };
+
+    // Read standard ID data from address 0x00
+    std::array<uint8_t, 8> id00{};
     send_command(0x90);
     send_addresses(&address_to_read);
-    uint8_t *my_00_address = (uint8_t *) (malloc(num_bytes * sizeof(uint8_t)));
-    
-    get_data(my_00_address, num_bytes);
-    LOG_ONFI_DEBUG("-------------------------------------------------");
-    LOG_ONFI_DEBUG("The ID at 0x00 is: ");
-    for (uint8_t idx = 0; idx < num_bytes; idx++) {
-        if ((my_00_address[idx] >= 'a' && my_00_address[idx] <= 'z') || (
-                my_00_address[idx] >= 'A' && my_00_address[idx] <= 'Z'))
-            LOG_ONFI_DEBUG("%c ,", my_00_address[idx]);
-        else
-            LOG_ONFI_DEBUG("0x%x ,", my_00_address[idx]);
-    }
-    LOG_ONFI_DEBUG("");
-    LOG_ONFI_DEBUG("-------------------------------------------------");
+    get_data(id00.data(), id00.size());
+    log_id_bytes("The ID at 0x00 is: ", id00.data(), id00.size());
 
-    // let us read the ID at address 20
-    num_bytes = 4;
+    // Read optional data at 0x20 and 0x40
+    std::array<uint8_t, 4> id20{};
     address_to_read = 0x20;
     send_command(0x90);
     send_addresses(&address_to_read);
-    uint8_t *my_20_address = (uint8_t *) (malloc(num_bytes * sizeof(uint8_t)));
-    
-    get_data(my_20_address, num_bytes);
-    if(DEBUG_ONFI) printf("-------------------------------------------------\n");
-    LOG_ONFI_DEBUG("The ID at 0x20 is: ");
-    for (uint8_t idx = 0; idx < num_bytes; idx++) {
-        if ((my_20_address[idx] >= 'a' && my_20_address[idx] <= 'z') || (
-                my_20_address[idx] >= 'A' && my_20_address[idx] <= 'Z'))
-            LOG_ONFI_DEBUG("%c ,", my_20_address[idx]);
-        else
-            LOG_ONFI_DEBUG("0x%x ,", my_20_address[idx]);
-    }
-    LOG_ONFI_DEBUG("");
-    free(my_20_address);
-    LOG_ONFI_DEBUG("-------------------------------------------------");
+    get_data(id20.data(), id20.size());
+    log_id_bytes("The ID at 0x20 is: ", id20.data(), id20.size());
 
-    // let us read the ID at address 40
-    num_bytes = 6;
+    std::array<uint8_t, 6> id40{};
     address_to_read = 0x40;
     send_command(0x90);
     send_addresses(&address_to_read);
-    uint8_t *my_40_address = (uint8_t *) (malloc(num_bytes * sizeof(uint8_t)));
-    
-    get_data(my_40_address, num_bytes);
+    get_data(id40.data(), id40.size());
+    log_id_bytes("The ID at 0x40 is: ", id40.data(), id40.size());
+
     if(DEBUG_ONFI) printf("-------------------------------------------------\n");
-    LOG_ONFI_DEBUG("The ID at 0x40 is: ");
-    for (uint8_t idx = 0; idx < num_bytes; idx++) {
-        if ((my_40_address[idx] >= 'a' && my_40_address[idx] <= 'z') || (
-                my_40_address[idx] >= 'A' && my_40_address[idx] <= 'Z'))
-            LOG_ONFI_DEBUG("%c ,", my_40_address[idx]);
-        else
-            LOG_ONFI_DEBUG("0x%x ,", my_40_address[idx]);
-    }
-    LOG_ONFI_DEBUG("");
-    free(my_40_address);
-    LOG_ONFI_DEBUG("-------------------------------------------------");
 
     //this is where we determine if the default interface is asynchronous or toggle
     // .. ths is for TOSHIBA toggle chips
-    if (my_00_address[0] == 0x98) // this is for TOSHIBA chips
+    if (id00[0] == 0x98) // this is for TOSHIBA chips
     {
         LOG_ONFI_DEBUG("Detected TOSHIBA");
-        if ((my_00_address[5] & 0x80)) // this is for TOGGLE
+        if ((id00[5] & 0x80)) // this is for TOGGLE
         {
             LOG_ONFI_DEBUG(" TOGGLE");
             interface_type = toggle; // this will affect DIN and DOUT cycles
-            if (((my_00_address[2] >> 2) & 0x02) == 0x02) // this is for TLC
+            if (((id00[2] >> 2) & 0x02) == 0x02) // this is for TLC
             {
                 LOG_ONFI_DEBUG(" TLC");
                 flash_chip = toshiba_tlc_toggle; // this will affect how we program pages
             }
         }
         LOG_ONFI_DEBUG(" Chip.");
-    } else if (my_00_address[0] == 0x2c) // this is for Micron
+    } else if (id00[0] == 0x2c) // this is for Micron
     {
         LOG_ONFI_DEBUG("Detected MICRON");
-        if (((my_00_address[2] >> 2) & 0x02) == 0x02) // this is for TLC
+        if (((id00[2] >> 2) & 0x02) == 0x02) // this is for TLC
         {
             LOG_ONFI_DEBUG(" TLC");
             flash_chip = micron_tlc; // this will affect how we program pages
-        } else if (((my_00_address[2] >> 2) & 0x01) == 0x01) // this is for MLC
+        } else if (((id00[2] >> 2) & 0x01) == 0x01) // this is for MLC
         {
             LOG_ONFI_DEBUG(" MLC");
             flash_chip = micron_mlc; // this will affect how we program pages
-        } else if (((my_00_address[2] >> 2) & 0x02) == 0x00) // this is for SLC
+        } else if (((id00[2] >> 2) & 0x02) == 0x00) // this is for SLC
         {
             // flash chip will be default type
             LOG_ONFI_DEBUG(" SLC");
@@ -128,7 +108,6 @@ void onfi_interface::read_id() {
     } else {
         LOG_ONFI_DEBUG("Detected Asynchronous NAND Flash Chip.");
     }
-    free(my_00_address);
 }
 
 // parameter page_number is the global page number in the chip

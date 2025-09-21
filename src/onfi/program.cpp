@@ -2,11 +2,11 @@
 #include "gpio.hpp"
 #include "timing.hpp"
 #include <stdio.h>
-#include <stdlib.h>
 #include <cstring>
 #include <cstdint>
 #include <iomanip>
 #include <algorithm>
+#include <limits>
 #include "logging.hpp"
 #include "onfi/controller.hpp"
 
@@ -17,10 +17,7 @@ bool onfi_interface::verify_program_page(unsigned int my_block_number, unsigned 
     //uint16_t num_bytes_to_test = num_bytes_in_page+num_spare_bytes_in_page;
     uint16_t num_bytes_to_test = num_bytes_in_page;
 
-    uint8_t *data_read_from_page = (uint8_t *) malloc(sizeof(uint8_t) * (num_bytes_to_test));
-
-    // let us first reset all the values in the local variables to 0x00
-    memset(data_read_from_page, 0xff, num_bytes_to_test);
+    uint8_t *data_read_from_page = ensure_scratch(num_bytes_to_test);
     //first let us get the data from the page to the cache memory
     read_page(my_block_number, my_page_number, 5);
     // now let us get the values from the cache memory to our local variable
@@ -31,17 +28,10 @@ bool onfi_interface::verify_program_page(unsigned int my_block_number, unsigned 
     uint16_t byte_fail_count = 0;
     uint32_t bit_fail_count = 0;
     for (byte_id = 0; byte_id < (num_bytes_to_test); byte_id++) {
-        if (data_read_from_page[byte_id] != data_to_program[byte_id]) {
+        uint8_t diff = data_read_from_page[byte_id] ^ data_to_program[byte_id];
+        if (diff) {
             byte_fail_count++;
-
-
-            // Calculate bit differences
-            uint8_t diff = data_read_from_page[byte_id] ^ data_to_program[byte_id];
-            for (int i = 0; i < 8; ++i) {
-                if ((diff >> i) & 1) {
-                    bit_fail_count++;
-                }
-            }
+            bit_fail_count += static_cast<uint32_t>(__builtin_popcount(diff));
 
             if (verbose) {
 #if DEBUG_ONFI
@@ -66,7 +56,6 @@ bool onfi_interface::verify_program_page(unsigned int my_block_number, unsigned 
     }
 
     fflush(stdout);
-    free(data_read_from_page);
 
     return byte_fail_count <= max_allowed_errors;
 }
@@ -170,6 +159,7 @@ void onfi_interface::program_page_tlc_toshiba_subpage(unsigned int my_block_numb
 #else
 	if(verbose) fprintf(stdout,"Inside Program Fn: Address is: %02x,%02x,%02x,%02x,%02x.",page_address[0],page_address[1],page_address[2],page_address[3],page_address[4]);
 #endif
+
     // for first subpage
     send_command((uint8_t) my_subpage_number);
     send_command(0x80);
@@ -255,6 +245,18 @@ void onfi_interface::program_page_tlc_toshiba(unsigned int my_block_number, unsi
 #else
 	if(verbose) fprintf(stdout,"Inside Program Fn: Address is: %02x,%02x,%02x,%02x,%02x.",page_address[0],page_address[1],page_address[2],page_address[3],page_address[4]);
 #endif
+    const size_t total_payload = including_spare ? static_cast<size_t>(num_bytes_in_page) + num_spare_bytes_in_page
+                                                 : static_cast<size_t>(num_bytes_in_page);
+    const size_t slice_size = total_payload / 3;
+    const bool slice_payload = (total_payload % 3 == 0) && (slice_size <= std::numeric_limits<uint16_t>::max());
+    auto load_subpage_payload = [&](unsigned index, uint16_t &length) -> uint8_t* {
+        if (!slice_payload) {
+            length = static_cast<uint16_t>(total_payload);
+            return data_to_program;
+        }
+        length = static_cast<uint16_t>(slice_size);
+        return data_to_program + slice_size * index;
+    };
     // for first subpage
     send_command(0x01);
     send_command(0x80);
@@ -262,7 +264,9 @@ void onfi_interface::program_page_tlc_toshiba(unsigned int my_block_number, unsi
 
     
 
-    send_data(data_to_program, including_spare ? (num_bytes_in_page + num_spare_bytes_in_page) : (num_bytes_in_page));
+    uint16_t chunk_length = 0;
+    uint8_t* chunk_ptr = load_subpage_payload(0, chunk_length);
+    send_data(chunk_ptr, chunk_length);
 
 #if PROFILE_TIME
     time_info_file << "program page: ";
@@ -305,7 +309,8 @@ void onfi_interface::program_page_tlc_toshiba(unsigned int my_block_number, unsi
 
     
 
-    send_data(data_to_program, including_spare ? (num_bytes_in_page + num_spare_bytes_in_page) : (num_bytes_in_page));
+    chunk_ptr = load_subpage_payload(1, chunk_length);
+    send_data(chunk_ptr, chunk_length);
 
 #if PROFILE_TIME
     time_info_file << "program page of second subpage: ";
@@ -348,7 +353,8 @@ void onfi_interface::program_page_tlc_toshiba(unsigned int my_block_number, unsi
 
     
 
-    send_data(data_to_program, including_spare ? (num_bytes_in_page + num_spare_bytes_in_page) : (num_bytes_in_page));
+    chunk_ptr = load_subpage_payload(2, chunk_length);
+    send_data(chunk_ptr, chunk_length);
 
 #if PROFILE_TIME
     time_info_file << "program page of third subpage: ";

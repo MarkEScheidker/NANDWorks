@@ -14,6 +14,7 @@ Date: 			18 July 2020
 #include "microprocessor_interface.hpp"
 #include "onfi/types.hpp"
 #include "onfi/transport.hpp"
+#include <vector>
 
 
 /**
@@ -50,7 +51,11 @@ class onfi_interface: public interface, public onfi::Transport
 private:
     // private items go here
     std::fstream onfi_data_file;
-    std::fstream time_info_file;
+	std::fstream time_info_file;
+	mutable std::vector<uint8_t> scratch_buffer_;
+	bool erase_enabled_ = true;
+
+	uint8_t* ensure_scratch(size_t size);
 
 public:
 	// public items go here: this should be almost all the required functions

@@ -121,6 +121,12 @@ public:
     void set_datalines_direction_default() const;
 
     /**
+    Minimal helper to restore control pins to inactive levels.
+    When release_data_bus is true, also reset DQ/DQS to default state.
+    */
+    void restore_control_pins(bool release_data_bus = false) const;
+
+    /**
     function to initialize the data and command lines all in inactive state
     .. here the data lines are output for MCU and all other lines as well
     ... set data lines as input right before when needed
