@@ -1,0 +1,26 @@
+# Minimal Doxygen configuration
+PROJECT_NAME           = "MastersThesis NAND Interface"
+PROJECT_BRIEF          = "ONFI façade and supporting library for NAND flash characterization"
+OUTPUT_DIRECTORY       = docs
+GENERATE_HTML          = YES
+HTML_OUTPUT            = html
+GENERATE_LATEX         = NO
+INPUT                  = include src docs/api
+FILE_PATTERNS          = *.h *.hpp *.md
+EXCLUDE_PATTERNS       = */tests/* */apps/* */examples/*
+RECURSIVE              = YES
+EXTRACT_ALL            = YES
+EXTRACT_PRIVATE        = YES
+EXTRACT_STATIC         = YES
+QUIET                  = YES
+WARN_IF_UNDOCUMENTED   = NO
+WARN_IF_DOC_ERROR      = NO
+GENERATE_TREEVIEW      = YES
+FULL_PATH_NAMES        = NO
+STRIP_FROM_PATH        = .
+USE_MDFILE_AS_MAINPAGE = docs/api/overview.md
+HAVE_DOT               = YES
+DOT_IMAGE_FORMAT       = svg
+CALL_GRAPH             = YES
+CALLER_GRAPH           = YES
+DOT_GRAPH_MAX_NODES    = 200

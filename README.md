@@ -1,188 +1,130 @@
-# ONFI NAND Flash Interface for Raspberry Pi
+# NANDWorks
 
-This project provides a comprehensive C++ library and a suite of command-line tools for interfacing with ONFI-compliant NAND flash memory on a Raspberry Pi. The software is designed to run on the board's ARM processor under Linux, using memory-mapped I/O for high-performance, low-level control of the GPIO pins connected to the NAND flash.
+NANDWorks is a C++ toolkit that lets Raspberry Pi single-board computers exercise ONFI-compliant NAND flash directly from Linux user space. It combines a high-performance hardware abstraction layer, a full ONFI protocol stack, and a collection of command-line utilities, tests, and examples so you can characterize, program, and validate NAND parts without auxiliary firmware or FPGA bridges.
 
-This implementation has been validated with a Micron 3D NAND part (ONFI 4.0 compliant), but its modular design makes it adaptable for other similar NAND devices.
+## Highlights
+- **End-to-end toolchain** – A single `make` discovers every application, test, and example, emits binaries under `bin/`, and (optionally) refreshes Doxygen docs.
+- **Full ONFI coverage** – Handles bring-up, identification, parameter-page parsing, read/program/erase flows, bad-block checks, and verification routines validated against Micron ONFI 4.0 NAND.
+- **Deterministic GPIO control** – Uses memory-mapped GPIO via `libbcm2835` for cycle-level timing, including busy-wait helpers for margin experiments.
+- **Configurable instrumentation** – Compile-time knobs control logging verbosity and timing capture with zero overhead when disabled.
+- **Documentation driven** – Source-level comments feed Doxygen (`docs/html`) for browsing the public API.
 
-## Table of Contents
+## Hardware Overview
+- **Target platform:** Raspberry Pi 3 or 4 running 64-bit Raspberry Pi OS (or a comparable Debian derivative).
+- **NAND devices:** Any ONFI-compliant part; geometry is discovered at runtime through the ONFI parameter page.
+- **GPIO wiring:** Defaults live in `include/hardware_locations.hpp`. Update the table if your wiring differs.
 
-- [Features](#features)
-- [Hardware Setup](#hardware-setup)
-  - [Pin Connections](#pin-connections)
-  - [FPGA Bridge](#fpga-bridge)
-- [Software Architecture](#software-architecture)
-  - [Hardware Abstraction Layer (HAL)](#hardware-abstraction-layer-hal)
-  - [ONFI Protocol Layer](#onfi-protocol-layer)
-- [Building the Project](#building-the-project)
-- [Available Tools & Usage](#available-tools--usage)
-  - [`main`](#main)
-  - [`erase_chip`](#erase_chip)
-  - [`benchmark`](#benchmark)
-  - [`profiler`](#profiler)
-- [Public API Overview](#public-api-overview)
-  - [Initialization and Setup](#initialization-and-setup)
-  - [Device Information](#device-information)
-  - [Core Operations](#core-operations)
-  - [Verification](#verification)
-  - [Utilities](#utilities)
-- [Repository Structure](#repository-structure)
+| Signal | BCM GPIO | Notes |
+| --- | --- | --- |
+| `DQ0…DQ7` | 21, 20, 16, 12, 25, 24, 23, 18 | 8-bit bidirectional data bus |
+| `WP#` | 26 | Write Protect (active low) |
+| `WE#` | 19 | Write Enable (active low) |
+| `ALE` | 13 | Address Latch Enable |
+| `CLE` | 11 | Command Latch Enable |
+| `CE#` | 22 | Chip Enable (active low) |
+| `RE#` | 27 | Read Enable (active low) |
+| `R/B#` | 17 | Ready/Busy indicator from the NAND |
 
-## Features
+## Prerequisites
+- **Build toolchain:** `g++`, `make`, and standard libraries (install via `sudo apt install build-essential`).
+- **Optional:** `doxygen` if you want HTML API docs (`sudo apt install doxygen`).
+- **Permissions:** Anything that touches `/dev/mem` (all runtime tools) must run with root privileges (`sudo`).
+- **Vendor library:** The repository already includes `libbcm2835` in `lib/bcm2835_install`, so no additional installation is required on the Pi.
 
-*   **Low-Level NAND Control:** Direct interaction with the NAND flash for fundamental operations like Reset, Read ID, and Read Parameter Page.
-*   **Core Flash Operations:** Robust and well-tested functions for page programming, page reading, and block erasing.
-*   **Advanced Functionality:** Support for partial page programming/erasing, bad block detection, and SLC/MLC mode conversion.
-*   **Performance Utilities:** Includes tools to benchmark GPIO toggle speeds and profile the timing of various NAND operations.
-*   **Hardware Abstraction:** A dedicated hardware abstraction layer (HAL) for the DE1-SoC simplifies the interaction with GPIO pins, making the code more portable.
-*   **Detailed Documentation:** Doxygen-generated API documentation is available in the `docs/html` directory for easy browsing.
-
-## Hardware Setup
-
-The code is specifically designed for the Raspberry Pi. The following sections detail the required hardware connections.
-
-### Pin Connections
-
-The following table outlines the expected GPIO connections between the DE1-SoC and the NAND flash device. For a definitive reference, please consult `include/hardware_locations.h`.
-
-| Signal | GPIO Pin (BCM) | Description                               |
-| :--- | :--- | :---------------------------------------- |
-| `DQ0-DQ7` | 21, 20, 16, 12, 25, 24, 23, 18 | 8-bit bidirectional data bus.             |
-| `WP#` | 26 | Write Protect (Active Low).               |
-| `WE#` | 19 | Write Enable (Active Low).                |
-| `ALE` | 13 | Address Latch Enable (Active High).       |
-| `CLE` | 11 | Command Latch Enable (Active High).       |
-| `CE#` | 22 | Chip Enable (Active Low).                 |
-| `RE#` | 27 | Read Enable (Active Low).                 |
-| `R/B#` | 17 | Ready/Busy status (Output from NAND).     |
-
-## Software Architecture
-
-The project is divided into two main layers: the Hardware Abstraction Layer (HAL) and the ONFI Protocol Layer.
-
-### Hardware Abstraction Layer (HAL)
-
-The HAL, primarily defined in `include/microprocessor_interface.h` and implemented in `src/microprocessor_interface.cpp`, is responsible for all direct interaction with the hardware. Its key responsibilities include:
-
-*   **GPIO Control:** Setting pin directions (input/output), and driving pins high or low.
-*   **Memory Mapping:** Accessing the physical memory of the DE1-SoC to control GPIO pins.
-*   **Low-Level Data Transfer:** Providing primitive functions like `send_command`, `send_addresses`, and `send_data` that handle the raw signaling required to communicate with the NAND flash.
-
-### ONFI Protocol Layer
-
-Built on top of the HAL, the ONFI Protocol Layer, defined in `include/onfi_interface.h` and implemented in `src/onfi/`, implements the logic of the ONFI specification. This layer provides a user-friendly API for performing high-level NAND operations. Key functionalities include:
-
-*   **Device Initialization:** Handling the reset sequence and reading the ONFI parameter page to configure the driver.
-*   **Command Abstraction:** Translating high-level requests (e.g., "erase block 5") into the corresponding sequence of low-level ONFI commands.
-*   **Status Management:** Checking the device's status to ensure operations complete successfully.
-
-## Building the Project
-
-To build all the executables, navigate to the project's root directory and run the `make` command.
-
+## Quick Start
 ```bash
+# Build the static library, utilities, tests, examples, and docs
 make
+
+# Discover available binaries and categories
+make help
+
+# Run the GPIO benchmark (requires sudo on the Pi)
+sudo bin/apps/benchmark
 ```
 
-This will compile the source code and place the executables (`main`, `erase_chip`, `benchmark`, `profiler`) in the root directory.
-
-To clean the build artifacts, run:
+To clean generated artifacts under `build/`, `bin/`, and `docs/html`:
 ```bash
 make clean
 ```
 
-## Available Tools & Usage
+> **Note:** `make` invokes `make docs`, which only runs Doxygen if it is present. When missing, the build prints “Doxygen not found; skipping docs” and continues.
 
-The project builds four main executables. **Note:** All tools require root privileges to access `/dev/mem` for direct hardware control.
+## Build Configuration
+The top-level `Makefile` auto-discovers sources and produces a static core library plus per-target binaries:
+- Applications: `apps/*.cpp` → `bin/apps/<name>`
+- Tests: `tests/*.cpp` → `bin/tests/<name>`
+- Examples: `examples/*.cpp` → `bin/examples/<name>`
 
-### `main`
+Core knobs you can override on the command line (defaults shown):
+- `LOG_ONFI_LEVEL=0` – Verbosity for protocol-layer logs (0–5)
+- `LOG_HAL_LEVEL=0` – Verbosity for hardware abstraction logs (0–5)
+- `PROFILE_TIME=0` – Enable timing capture for select operations
 
-A general-purpose testing application that performs a basic set of sanity checks, including initialization, erase, program, and read operations. It's a great starting point to verify that your hardware is set up correctly and the library is functioning.
-
+Convenience targets layer on common setups:
 ```bash
-sudo ./main [-v]
-```
-*   `-v`: Enable verbose output for more detailed logging.
+make debug     # Adds -g -O2 and enables INFO-level ONFI/HAL logs plus profiling
+make trace     # Same as debug but raises ONFI/HAL to TRACE level
+make profile   # Keeps default logs but enables PROFILE_TIME
 
-### `erase_chip`
-
-A utility to perform a full erase of the connected NAND flash chip. **Use with extreme caution, as this will permanently delete all data on the device.**
-
-```bash
-sudo ./erase_chip
-```
-
-### `benchmark`
-
-A tool to measure the raw GPIO toggle frequency. This is useful for assessing the performance of the underlying hardware interface and ensuring that the timing requirements of the NAND flash can be met.
-
-```bash
-sudo ./benchmark
+# Manual override example
+make LOG_ONFI_LEVEL=3 LOG_HAL_LEVEL=4 PROFILE_TIME=1
 ```
 
-### `profiler`
+If you need to point at a different `libbcm2835`, adjust the include/library paths at the top of the Makefile.
 
-A utility to measure and profile the execution time of various NAND flash commands (e.g., program, erase, read). The results, including mean, median, and standard deviation, are printed to the console, providing valuable insights into the performance characteristics of the NAND device.
+## Runtime Tools
+| Binary | Location | Description |
+| --- | --- | --- |
+| `benchmark` | `bin/apps/benchmark` | Measures GPIO toggle rates for a range of busy-wait loop counts. |
+| `erase_chip` | `bin/apps/erase_chip` | Iterates through every block and issues a full-chip erase (destructive). |
+| `profiler` | `bin/apps/profiler` | Runs representative ONFI operations while streaming timing data when profiling is enabled. |
+| `gpio_test` | `bin/apps/gpio_test` | Interactive harness for verifying each GPIO line and observing state changes. |
+| `tester` | `bin/tests/tester` | Comprehensive regression covering erase/program/read/verify paths with randomized data. |
+| `example_*` | `bin/examples/…` | Minimal programs that demonstrate embedding the ONFI API in other applications. |
 
-```bash
-sudo ./profiler
-```
+Generated artifacts:
+- `time_info_file.txt` – Created when binaries are built with `PROFILE_TIME=1`; records per-operation timing data.
 
-## Public API Overview
+## Library Architecture
+- **Hardware Abstraction Layer (HAL):** `include/microprocessor_interface.hpp` / `src/microprocessor_interface.cpp` manage GPIO modes, signal timing, and register access using `libbcm2835`.
+- **ONFI Protocol Layer:** `include/onfi_interface.hpp` and `src/onfi/*.cpp` implement reset, identification, feature access, block/page I/O, verification helpers, and higher-level utilities (controllers, data sinks, geometry helpers).
+- **Timing Utilities:** `include/timing.hpp` / `src/timing.cpp` expose cycle-accurate busy waits and timestamp helpers leveraged by benchmarking and profiling tools.
 
-The primary entry point for using this library is the `onfi_interface` class. The following is a high-level overview of its most important functions. For complete details, please refer to the Doxygen documentation.
+The Doxygen configuration under `docs/` parses these headers to produce browsable API documentation.
 
-### Initialization and Setup
-
-*   `get_started()`: Initializes the entire ONFI interface, including the HAL and the NAND device itself.
-*   `device_initialization()`: Performs the initial power-on reset and handshake with the NAND flash.
-*   `reset_device()`: Issues a software reset to the NAND device.
-
-### Device Information
-
-*   `read_parameters()`: Reads the ONFI parameter page, which contains critical information about the device's geometry and capabilities.
-*   `read_id()`: Reads the manufacturer and device ID.
-*   `is_bad_block()`: Checks if a given block is marked as a bad block from the factory.
-
-### Core Operations
-
-*   `erase_block()`: Erases an entire block.
-*   `program_page()`: Programs a single page with the provided data.
-*   `read_page()`: Reads a single page into a buffer.
-
-### Verification
-
-*   `verify_block_erase()`: Verifies that a block has been successfully erased (i.e., all bits are 1).
-*   `verify_program_page()`: Verifies that a page has been programmed correctly by comparing its contents with the original data.
-
-### Utilities
-
-*   `set_features()` / `get_features()`: Low-level functions for setting and getting ONFI features.
-*   `convert_to_slc()` / `revert_to_mlc()`: Functions to switch a block between SLC and MLC modes.
-
-## Repository Structure
-
+## Repository Layout
 ```
 .
-├── Makefile              # Build script
-├── README.md             # This file
-├── build/                # Build artifacts (created by make)
-├── docs/                 # Doxygen documentation
-├── examples/             # Example code snippets
-├── include/              # Header files for the library
-│   ├── onfi_interface.h
-│   ├── microprocessor_interface.h
-│   └── hardware_locations.h
-├── lib/                  # Included libraries (bcm2835)
-└── src/                  # Source code for the library and tools
-    ├── main.cpp
-    ├── erase_chip.cpp
-    ├── benchmark.cpp
-    ├── profiler.cpp
-    └── onfi/
-        ├── erase.cpp
-        ├── identify.cpp
-        ├── init.cpp
-        ├── program.cpp
-        ├── read.cpp
-        └── util.cpp
+├── Makefile                # Auto-discovers sources and orchestrates builds/docs
+├── apps/                   # Command-line utilities (output in bin/apps)
+├── bin/                    # Generated binaries grouped by category
+├── build/                  # Object files and intermediate static libraries
+├── docs/                   # Doxygen config; HTML output lives in docs/html
+├── examples/               # Sample programs that show API usage patterns
+├── include/                # Public headers (HAL, ONFI API, logging, timing)
+├── lib/bcm2835_install/    # Vendored bcm2835 headers and static library
+├── src/                    # Core library implementation files
+├── tests/                  # Functional test entry points (bin/tests)
+└── README.md               # Project overview (this file)
 ```
+
+## Documentation
+Regenerate the HTML reference under `docs/html` with:
+```bash
+make docs
+# Then open docs/html/index.html in your browser
+```
+
+`docs/html/` is ignored by git, so you can generate and delete docs locally without affecting commits.
+
+## Contributing
+Contributions are welcome—file an issue or open a pull request:
+- Match the existing formatting style (brace layout, concise inline comments).
+- When changing behavior, add or extend tests under `tests/` where practical.
+- Leave generated artifacts (`build/`, `bin/`, `docs/html/`) out of commits; `.gitignore` already covers them.
+
+For hardware bring-up questions, feature requests (e.g., multi-die awareness, DMA-based transfers), or general discussion, start a thread in the issue tracker.
+
+---
+NANDWorks gives you full-stack control over ONFI NAND from Linux—automate lab workflows, run characterization experiments, or integrate the library into your own applications with confidence.

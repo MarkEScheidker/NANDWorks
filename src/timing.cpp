@@ -1,4 +1,4 @@
-#include "timing.h"
+#include "timing.hpp"
 #include <time.h>
 
 // Get a timestamp in nanoseconds.

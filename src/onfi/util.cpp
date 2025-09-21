@@ -1,12 +1,15 @@
-#include "onfi_interface.h"
-#include "gpio.h"
-#include "timing.h"
+#include "onfi_interface.hpp"
+#include "gpio.hpp"
+#include "timing.hpp"
 #include <stdio.h>
 #include <stdlib.h>
 #include <cstring>
 #include <cstdint>
 #include <iomanip>
 #include <algorithm>
+#include "logging.hpp"
+#include "onfi/controller.hpp"
+#include "onfi/address.hpp"
 
 
 /**
@@ -46,10 +49,7 @@ uint8_t onfi_interface::get_status() {
 void onfi_interface::print_status_on_fail() {
     uint8_t status = get_status();
     if (status & 0x01) {
-        if (onfi_debug_file)
-            onfi_debug_file << "I: Last Operation failed" << std::endl;
-        else
-            std::cout << "I: Last Operation failed" << std::endl;
+        LOG_ONFI_WARN("Last Operation failed");
     }
 }
 
@@ -139,38 +139,17 @@ void onfi_interface::get_data(uint8_t *data_received, uint16_t num_data) const {
 // .. R/B should be monotired again after issuing 0XFF command
 void onfi_interface::convert_pagenumber_to_columnrow_address(unsigned int my_block_number, unsigned int my_page_number,
                                                              uint8_t *my_test_block_address, bool verbose) {
-#if DEBUG_ONFI
-    if (onfi_debug_file)
-        onfi_debug_file << "I: Converting block: " << my_block_number << " and page: " << my_page_number <<
-                " to {col,col,row,row,row} format." << std::endl;
-    else
-        std::cout << "I: Converting block: " << my_block_number << " and page: " << my_page_number <<
-                " to {col,col,row,row,row} format." << std::endl;
-#else
-	if(verbose) std::cout<<"I: Converting block: "<<my_block_number<<" and page: "<<my_page_number<<" to {col,col,row,row,row} format." << std::endl;
-#endif
-
-    unsigned int page_number = (my_block_number * num_pages_in_block + my_page_number);
-
-    for (uint8_t i = 0; i < num_column_cycles; i++) {
-        my_test_block_address[i] = 0;
-    }
-    for (uint8_t i = num_column_cycles; i < (num_column_cycles + num_row_cycles); i++) {
-        my_test_block_address[i] = (page_number & 0xff);
-        page_number = page_number >> 8;
-    }
-#if DEBUG_ONFI
-    if (onfi_debug_file)
-        onfi_debug_file << "I: .. converted to " << (int) my_test_block_address[0] << "," << (int) my_test_block_address
-                [1] << "," << (int) my_test_block_address[2] << "," << (int) my_test_block_address[3] << "," << (int)
-                my_test_block_address[4] << std::endl;
-    else
-        std::cout << "I: .. converted to " << (int) my_test_block_address[0] << "," << (int) my_test_block_address[1] << ","
-                << (int) my_test_block_address[2] << "," << (int) my_test_block_address[3] << "," << (int)
-                my_test_block_address[4] << std::endl;
-#else
-	if(verbose) std::cout<<"I: .. converted to "<<(int)my_test_block_address[0]<<","<<(int)my_test_block_address[1]<<","<<(int)my_test_block_address[2]<<","<<(int)my_test_block_address[3]<<","<<(int)my_test_block_address[4]<<std::endl;
-#endif
+    LOG_ONFI_DEBUG_IF(verbose, "Converting block %u page %u to {col,col,row,row,row}", my_block_number, my_page_number);
+    onfi::to_col_row_address(
+        static_cast<uint32_t>(num_pages_in_block),
+        num_column_cycles,
+        num_row_cycles,
+        my_block_number,
+        my_page_number,
+        my_test_block_address);
+    LOG_ONFI_DEBUG_IF(verbose, ".. converted to %d,%d,%d,%d,%d",
+                      (int)my_test_block_address[0], (int)my_test_block_address[1], (int)my_test_block_address[2],
+                      (int)my_test_block_address[3], (int)my_test_block_address[4]);
 }
 
 // following function reads the ONFI parameter page
@@ -180,20 +159,9 @@ void onfi_interface::convert_pagenumber_to_columnrow_address(unsigned int my_blo
 // .. the data will be available for read with a command sequence of ECh followed by an address of 40h
 // .. this function will read a random page and tries to verify if it was completely erased
 // .. for elaborate verifiying, please use a different function
-void onfi_interface::set_features(uint8_t address, uint8_t *data_to_send, uint8_t command) {
-    // check if it is out of Busy cycle
-    while (gpio_read(GPIO_RB) == 0);
-
-    //send command
-    send_command(command);
-    //send the address
-    send_addresses(&address);
-
-    // now send the parameters
-    send_data(data_to_send, 4);
-
-    // check if it is out of Busy cycle
-    while (gpio_read(GPIO_RB) == 0);
+void onfi_interface::set_features(uint8_t address, const uint8_t *data_to_send, uint8_t command) {
+    onfi::OnfiController ctrl(*this);
+    ctrl.set_features(address, data_to_send, command);
 }
 
 //The GET FEATURES (EEh) command reads the subfeature parameters (P1-P4) from the
@@ -201,18 +169,8 @@ void onfi_interface::set_features(uint8_t address, uint8_t *data_to_send, uint8_
 // .. (LUNs) on the target are idle.
 // .. the parameters P1-P4 are in data_received argument
 void onfi_interface::get_features(uint8_t address, uint8_t* data_received, uint8_t command) const {
-    // check if it is out of Busy cycle
-    while (gpio_read(GPIO_RB) == 0);
-
-    //send command
-    send_command(command);
-    //send the address
-    send_addresses(&address);
-
-    // check if it is out of Busy cycle
-    while (gpio_read(GPIO_RB) == 0);
-
-    get_data(data_received, 4);
+    onfi::OnfiController ctrl(const_cast<onfi_interface&>(*this));
+    ctrl.get_features(address, data_received, command);
 }
 
 // following function will convert a block from MLC mode to SLC mode

@@ -1,12 +1,14 @@
-#include "onfi_interface.h"
-#include "gpio.h"
-#include "timing.h"
+#include "onfi_interface.hpp"
+#include "gpio.hpp"
+#include "timing.hpp"
 #include <stdio.h>
 #include <stdlib.h>
 #include <cstring>
 #include <cstdint>
 #include <iomanip>
 #include <algorithm>
+#include "logging.hpp"
+#include "onfi/controller.hpp"
 
 void onfi_interface::disable_erase() {
     // check to see if the device is busy
@@ -30,7 +32,7 @@ void onfi_interface::enable_erase() {
 // .. the address provided should be three 8-bit number array that corresponds to
 // .. .. R1,R2 and R3 for the block to be erased
 void onfi_interface::erase_block(unsigned int my_block_number, bool verbose) {
-    uint8_t my_test_block_address[5] = {0, 0, 0, 0, 0};
+    uint8_t my_test_block_address[8] = {0};
     // following function converts the my_page_number inside the my_block_number to {x,x,x,x,x} and saves to my_test_block_address
     convert_pagenumber_to_columnrow_address(my_block_number, 0, my_test_block_address, verbose);
     uint8_t *row_address = my_test_block_address + 2;
@@ -38,58 +40,32 @@ void onfi_interface::erase_block(unsigned int my_block_number, bool verbose) {
     enable_erase();
     gpio_set_direction(GPIO_RB, false);
 
-    // check if it is out of Busy cycle
+    onfi::OnfiController ctrl(*this);
+    // ensure ready then issue erase
     wait_ready_blocking();
-
-    send_command(0x60);
-    send_addresses(row_address, 3);
+    // Always perform erase; optionally time it
 #if PROFILE_TIME
     uint64_t start_time = get_timestamp_ns();
 #endif
-        send_command(0xd0);
-
-        // check if it is out of Busy cycle
-        wait_ready_blocking();
-
+    ctrl.erase_block(row_address);
 #if PROFILE_TIME
     uint64_t end_time = get_timestamp_ns();
     time_info_file << "  took " << (end_time - start_time) / 1000 << " microseconds\n";
 #endif
 
-#if DEBUG_ONFI
-    if (onfi_debug_file) {
-        char my_temp[100];
-        sprintf(my_temp, "Inside Erase Fn: Address is: %02x,%02x,%02x.", row_address[0], row_address[1],
-                row_address[2]);
-        onfi_debug_file << my_temp << std::endl;
-    } else
-        fprintf(stdout, "Inside Erase Fn: Address is: %02x,%02x,%02x.\n", row_address[0], row_address[1],
-                row_address[2]);
-#else
-	if(verbose) fprintf(stdout,"Inside Erase Fn: Address is: %02x,%02x,%02x.\n",row_address[0],row_address[1],row_address[2]);
-#endif
+    LOG_ONFI_INFO_IF(verbose, "Inside Erase Fn: Address is: %02x,%02x,%02x.", row_address[0], row_address[1], row_address[2]);
 
     // let us read the status register value
     uint8_t status = 0;
-    status = get_status();
+    status = ctrl.get_status();
     if (status & 0x20) {
         if (status & 0x01) {
             if(verbose) fprintf(stdout, "Failed Erase Operation\n");
         } else {
-#if DEBUG_ONFI
-            if (onfi_debug_file) onfi_debug_file << "Erase Operation Completed" << std::endl;
-            else fprintf(stdout, "Erase Operation Completed\n");
-#else
-	if(verbose) fprintf(stdout,"Erase Operation Completed\n");
-#endif
+            LOG_ONFI_INFO_IF(verbose, "Erase Operation Completed");
         }
     } else {
-#if DEBUG_ONFI
-        if (onfi_debug_file) onfi_debug_file << "Erase Operation, should not be here" << std::endl;
-        else fprintf(stdout, "Erase Operation, should not be here\n");
-#else
-	if(verbose) fprintf(stdout,"Erase Operation, should not be here\n");
-#endif
+        LOG_ONFI_WARN_IF(verbose, "Erase Operation, should not be here");
     }
 
     disable_erase();
@@ -133,18 +109,7 @@ void onfi_interface::partial_erase_block(unsigned int my_block_number, unsigned 
     // check if it is out of Busy cycle
     wait_ready_blocking();
 
-#if DEBUG_ONFI
-    if (onfi_debug_file) {
-        char my_temp[100];
-        sprintf(my_temp, "Inside Erase Fn: Address is: %02x,%02x,%02x.", row_address[0], row_address[1],
-                row_address[2]);
-        onfi_debug_file << my_temp << std::endl;
-    } else
-        fprintf(stdout, "Inside Erase Fn: Address is: %02x,%02x,%02x.\n", row_address[0], row_address[1],
-                row_address[2]);
-#else
-	if(verbose) fprintf(stdout,"Inside Erase Fn: Address is: %02x,%02x,%02x.\n",row_address[0],row_address[1],row_address[2]);
-#endif
+    LOG_ONFI_INFO_IF(verbose, "Inside Erase Fn: Address is: %02x,%02x,%02x.", row_address[0], row_address[1], row_address[2]);
 
     // let us read the status register value
     uint8_t status = 0;
@@ -153,20 +118,10 @@ void onfi_interface::partial_erase_block(unsigned int my_block_number, unsigned 
         if (status & 0x01) {
             fprintf(stdout, "Failed Erase Operation\n");
         } else {
-#if DEBUG_ONFI
-            if (onfi_debug_file) onfi_debug_file << "Erase Operation Completed" << std::endl;
-            else fprintf(stdout, "Erase Operation Completed\n");
-#else
-	if(verbose) fprintf(stdout,"Erase Operation Completed\n");
-#endif
+            LOG_ONFI_INFO_IF(verbose, "Erase Operation Completed");
         }
     } else {
-#if DEBUG_ONFI
-        if (onfi_debug_file) onfi_debug_file << "Erase Operation, should not be here" << std::endl;
-        else fprintf(stdout, "Erase Operation, should not be here\n");
-#else
-	if(verbose) fprintf(stdout,"Erase Operation, should not be here\n");
-#endif
+        LOG_ONFI_WARN_IF(verbose, "Erase Operation, should not be here");
     }
 
     disable_erase();
@@ -177,71 +132,6 @@ void onfi_interface::partial_erase_block(unsigned int my_block_number, unsigned 
 
 // .. this function will read a random page and tries to verify if it was completely erased
 // .. for elaborate verifiying, please use a different function
-bool onfi_interface::verify_block_erase_sample(unsigned int my_block_number, bool verbose) {
-    // let us initialize a random seed
-    srand(time(NULL));
-    //pick a random page index to test to see if erase works
-    uint16_t page_num_to_verify = rand() % num_pages_in_block;
-
-    uint8_t my_test_block_address[5] = {0, 0, 0, 0, 0};
-    // following function converts the my_page_number inside the my_block_number to {x,x,x,x,x} and saves to my_test_block_address
-    convert_pagenumber_to_columnrow_address(my_block_number, page_num_to_verify, my_test_block_address, verbose);
-    uint8_t *page_address = my_test_block_address;
-
-
-    // just a placeholder for return value
-    bool return_value = true;
-
-
-#if DEBUG_ONFI
-    if (onfi_debug_file) {
-        char my_temp[200];
-        sprintf(my_temp, "Verifying erase operation on page no: %d (%02x,%02x,%02x,%02x,%02x)", page_num_to_verify,
-                page_address[0], page_address[1], page_address[2], page_address[3], page_address[4]);
-        onfi_debug_file << my_temp << std::endl;
-    } else fprintf(stdout, "Verifying erase operation on page no: %d (%02x,%02x,%02x,%02x,%02x)\n", page_num_to_verify,
-                   page_address[0], page_address[1], page_address[2], page_address[3], page_address[4]);
-#else
-	if(verbose) fprintf(stdout,"Verifying erase operation on page no: %d (%02x,%02x,%02x,%02x,%02x)\n",page_num_to_verify,page_address[0],page_address[1],page_address[2],page_address[3],page_address[4]);
-#endif
-
-    // let us read from that page and compare each value read from the page to 0xff
-    uint8_t *data_read_from_page = new uint8_t[num_bytes_in_page + num_spare_bytes_in_page];
-
-    //let us initialize the array to 0x00
-    memset(data_read_from_page, 0x00, num_bytes_in_page + num_spare_bytes_in_page);
-
-    //let us read the page data to the cache memory of flash
-    read_page(my_block_number, page_num_to_verify, 5);
-    //let us acquire the data from the cache to the local variable
-    get_data(data_read_from_page, num_bytes_in_page + num_spare_bytes_in_page);
-
-    //now let us iterate through all the bytes and check
-    uint16_t byte_id = 0;
-    uint16_t fail_count = 0;
-    for (byte_id = 0; byte_id < (num_bytes_in_page + num_spare_bytes_in_page); byte_id++) {
-        if (data_read_from_page[byte_id] != 0xff) {
-            fail_count++;
-            return_value = false;
-            if (verbose) {
-#if DEBUG_ONFI
-                if (onfi_debug_file) {
-                    onfi_debug_file << "E:" << std::hex << byte_id << "," << std::hex << page_num_to_verify << "," <<
-                            std::hex << data_read_from_page[byte_id] << std::endl;
-                } else fprintf(stdout, "E:%x,%x,%x\n", byte_id, page_num_to_verify, data_read_from_page[byte_id]);
-#else
-					fprintf(stdout,"E:%x,%x,%x\n",byte_id,page_num_to_verify,data_read_from_page[byte_id]);
-#endif
-            }
-        }
-    }
-    if (fail_count) std::cout << "The number of bytes in page id " << page_num_to_verify <<
-                    " where erase operation failed is " << std::dec << fail_count << std::endl;
-    else std::cout << "Erase operation SUCCESS!!. Tested on page id " << page_num_to_verify << std::endl;
-
-    delete[] data_read_from_page;
-    return return_value;
-}
 
 
 // this is the function that can be used to elaborately verify the erase operation
@@ -346,70 +236,5 @@ bool onfi_interface::verify_block_erase(unsigned int my_block_number, bool compl
 // .. including_spare is to indicate if you want to program the spare section as well
 // .. .. if including spare  = 1, then length of data_to_program should be (num of bytes in pages + num of spare bytes)
 // .. verbose is for priting messages
-void onfi_interface::convert_to_slc_set_features(unsigned int my_block_number) {
-    uint8_t my_test_block_address[5] = {0, 0, 0, 0, 0};
-    // following function converts the my_page_number inside the my_block_number to {x,x,x,x,x} and saves to my_test_block_address
-    convert_pagenumber_to_columnrow_address(my_block_number, 0, my_test_block_address, false);
 
-    // to convert to SLC using set features, we have to first make sure
-    // .. at least half the pages are programmed
-    // .. let us just program all the pages in the block
-    program_pages_in_a_block(my_block_number, true, false, nullptr, 0, false);
 
-    // now that we have programmed the block,
-    // .. we will issue set_features command
-    uint8_t parameters[4] = {01, 01, 0, 0};
-    // let us send the command for feature
-    set_features(0x91, parameters);
-
-    // now we must erase the block to initialize in SLC mode
-    erase_block(my_block_number);
-
-    // now the block should be in SLC mode
-}
-
-void onfi_interface::revert_to_mlc_set_features() {
-    // .. we will issue set_features command
-    uint8_t parameters[4] = {02, 01, 0, 0};
-    // let us send the command for feature
-    set_features(0x91, parameters);
-}
-
-void onfi_interface::convert_to_slc(unsigned int my_block_number, bool first_time) {
-    uint8_t my_test_block_address[5] = {0, 0, 0, 0, 0};
-    // following function converts the my_page_number inside the my_block_number to {x,x,x,x,x} and saves to my_test_block_address
-    convert_pagenumber_to_columnrow_address(my_block_number, 0, my_test_block_address, false);
-
-    // to convert to SLC, we have to first make sure
-    // .. at least half the pages are programmed
-    // .. let us just program all the pages in the block
-    if (first_time) {
-        erase_block(my_block_number);
-        program_pages_in_a_block(my_block_number, true, false, nullptr, 0, false);
-    }
-
-    send_command(0xda);
-        
-    send_command(0x60);
-    send_addresses(my_test_block_address + 2);
-    send_command(0xd0);
-        
-    while (gpio_read(GPIO_RB) == 0);;
-
-    //perform erase operation to init
-    if (first_time) erase_block(my_block_number);
-}
-
-void onfi_interface::revert_to_mlc(unsigned int my_block_number) {
-    uint8_t my_test_block_address[5] = {0, 0, 0, 0, 0};
-    // following function converts the my_page_number inside the my_block_number to {x,x,x,x,x} and saves to my_test_block_address
-    convert_pagenumber_to_columnrow_address(my_block_number, 0, my_test_block_address, false);
-
-    send_command(0xdf);
-        
-    send_command(0x60);
-    send_addresses(my_test_block_address + 2);
-    send_command(0xd0);
-        
-    while (gpio_read(GPIO_RB) == 0);;
-}

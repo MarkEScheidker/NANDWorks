@@ -1,12 +1,14 @@
-#include "onfi_interface.h"
-#include "gpio.h"
-#include "timing.h"
+#include "onfi_interface.hpp"
+#include "gpio.hpp"
+#include "timing.hpp"
 #include <stdio.h>
 #include <stdlib.h>
 #include <cstring>
 #include <cstdint>
 #include <iomanip>
 #include <algorithm>
+#include "logging.hpp"
+#include "onfi/param_page.hpp"
 
 void onfi_interface::read_id() {
     uint8_t num_bytes;
@@ -36,17 +38,17 @@ void onfi_interface::read_id() {
     uint8_t *my_00_address = (uint8_t *) (malloc(num_bytes * sizeof(uint8_t)));
     
     get_data(my_00_address, num_bytes);
-    if(DEBUG_ONFI) printf("-------------------------------------------------\n");
-    if(DEBUG_ONFI) printf("The ID at 0x00 is: ");
+    LOG_ONFI_DEBUG("-------------------------------------------------");
+    LOG_ONFI_DEBUG("The ID at 0x00 is: ");
     for (uint8_t idx = 0; idx < num_bytes; idx++) {
         if ((my_00_address[idx] >= 'a' && my_00_address[idx] <= 'z') || (
                 my_00_address[idx] >= 'A' && my_00_address[idx] <= 'Z'))
-            if(DEBUG_ONFI) printf("%c ,", my_00_address[idx]);
+            LOG_ONFI_DEBUG("%c ,", my_00_address[idx]);
         else
-            if(DEBUG_ONFI) printf("0x%x ,", my_00_address[idx]);
+            LOG_ONFI_DEBUG("0x%x ,", my_00_address[idx]);
     }
-    if(DEBUG_ONFI) printf("\n");
-    if(DEBUG_ONFI) printf("-------------------------------------------------\n");
+    LOG_ONFI_DEBUG("");
+    LOG_ONFI_DEBUG("-------------------------------------------------");
 
     // let us read the ID at address 20
     num_bytes = 4;
@@ -57,17 +59,17 @@ void onfi_interface::read_id() {
     
     get_data(my_20_address, num_bytes);
     if(DEBUG_ONFI) printf("-------------------------------------------------\n");
-    if(DEBUG_ONFI) printf("The ID at 0x20 is: ");
+    LOG_ONFI_DEBUG("The ID at 0x20 is: ");
     for (uint8_t idx = 0; idx < num_bytes; idx++) {
         if ((my_20_address[idx] >= 'a' && my_20_address[idx] <= 'z') || (
                 my_20_address[idx] >= 'A' && my_20_address[idx] <= 'Z'))
-            if(DEBUG_ONFI) printf("%c ,", my_20_address[idx]);
+            LOG_ONFI_DEBUG("%c ,", my_20_address[idx]);
         else
-            if(DEBUG_ONFI) printf("0x%x ,", my_20_address[idx]);
+            LOG_ONFI_DEBUG("0x%x ,", my_20_address[idx]);
     }
-    if(DEBUG_ONFI) printf("\n");
+    LOG_ONFI_DEBUG("");
     free(my_20_address);
-    if(DEBUG_ONFI) printf("-------------------------------------------------\n");
+    LOG_ONFI_DEBUG("-------------------------------------------------");
 
     // let us read the ID at address 40
     num_bytes = 6;
@@ -78,53 +80,53 @@ void onfi_interface::read_id() {
     
     get_data(my_40_address, num_bytes);
     if(DEBUG_ONFI) printf("-------------------------------------------------\n");
-    if(DEBUG_ONFI) printf("The ID at 0x40 is: ");
+    LOG_ONFI_DEBUG("The ID at 0x40 is: ");
     for (uint8_t idx = 0; idx < num_bytes; idx++) {
         if ((my_40_address[idx] >= 'a' && my_40_address[idx] <= 'z') || (
                 my_40_address[idx] >= 'A' && my_40_address[idx] <= 'Z'))
-            if(DEBUG_ONFI) printf("%c ,", my_40_address[idx]);
+            LOG_ONFI_DEBUG("%c ,", my_40_address[idx]);
         else
-            if(DEBUG_ONFI) printf("0x%x ,", my_40_address[idx]);
+            LOG_ONFI_DEBUG("0x%x ,", my_40_address[idx]);
     }
-    if(DEBUG_ONFI) printf("\n");
+    LOG_ONFI_DEBUG("");
     free(my_40_address);
-    if(DEBUG_ONFI) printf("-------------------------------------------------\n");
+    LOG_ONFI_DEBUG("-------------------------------------------------");
 
     //this is where we determine if the default interface is asynchronous or toggle
     // .. ths is for TOSHIBA toggle chips
     if (my_00_address[0] == 0x98) // this is for TOSHIBA chips
     {
-        if(DEBUG_ONFI) printf("Detected TOSHIBA");
+        LOG_ONFI_DEBUG("Detected TOSHIBA");
         if ((my_00_address[5] & 0x80)) // this is for TOGGLE
         {
-            if(DEBUG_ONFI) printf(" TOGGLE");
+            LOG_ONFI_DEBUG(" TOGGLE");
             interface_type = toggle; // this will affect DIN and DOUT cycles
             if (((my_00_address[2] >> 2) & 0x02) == 0x02) // this is for TLC
             {
-                if(DEBUG_ONFI) printf(" TLC");
+                LOG_ONFI_DEBUG(" TLC");
                 flash_chip = toshiba_tlc_toggle; // this will affect how we program pages
             }
         }
-        if(DEBUG_ONFI) printf(" Chip\n.");
+        LOG_ONFI_DEBUG(" Chip.");
     } else if (my_00_address[0] == 0x2c) // this is for Micron
     {
-        if(DEBUG_ONFI) printf("Detected MICRON");
+        LOG_ONFI_DEBUG("Detected MICRON");
         if (((my_00_address[2] >> 2) & 0x02) == 0x02) // this is for TLC
         {
-            if(DEBUG_ONFI) printf(" TLC");
+            LOG_ONFI_DEBUG(" TLC");
             flash_chip = micron_tlc; // this will affect how we program pages
         } else if (((my_00_address[2] >> 2) & 0x01) == 0x01) // this is for MLC
         {
-            if(DEBUG_ONFI) printf(" MLC");
+            LOG_ONFI_DEBUG(" MLC");
             flash_chip = micron_mlc; // this will affect how we program pages
         } else if (((my_00_address[2] >> 2) & 0x02) == 0x00) // this is for SLC
         {
             // flash chip will be default type
-            if(DEBUG_ONFI) printf(" SLC");
+            LOG_ONFI_DEBUG(" SLC");
         }
-        if(DEBUG_ONFI) printf(" Chip \n");
+        LOG_ONFI_DEBUG(" Chip ");
     } else {
-        if(DEBUG_ONFI) printf("Detected Asynchronous NAND Flash Chip.\n");
+        LOG_ONFI_DEBUG("Detected Asynchronous NAND Flash Chip.");
     }
     free(my_00_address);
 }
@@ -142,38 +144,17 @@ void onfi_interface::read_parameters(param_type ONFI_OR_JEDEC, bool bytewise, bo
         type_parameter = "JEDEC";
     }
 
-#if DEBUG_ONFI
-    if (onfi_debug_file)
-        onfi_debug_file << "I: Reading " << type_parameter << " parameters" << std::endl;
-    else
-        std::cout << "I: Reading " << type_parameter << " parameters" << std::endl;
-#else
-	if(verbose) std::cout<<"I: Reading "<<type_parameter<<" parameters"<<std::endl;
-#endif
+    LOG_ONFI_INFO_IF(verbose, "Reading %s parameters", type_parameter.c_str());
 
     // make sure none of the LUNs are busy
     while (gpio_read(GPIO_RB) == 0);
 
-#if DEBUG_ONFI
-    if (onfi_debug_file)
-        onfi_debug_file << "I: .. sending command" << std::endl;
-    else
-        std::cout << "I: .. sending command" << std::endl;
-#else
-	if(verbose) std::cout<<"I: .. sending command"<<std::endl;
-#endif
+    LOG_ONFI_DEBUG_IF(verbose, ".. sending command");
     // read ID command
     send_command(0xEC);
     // send address 00
 
-#if DEBUG_ONFI
-    if (onfi_debug_file)
-        onfi_debug_file << "I: .. sending address" << std::endl;
-    else
-        std::cout << "I: .. sending address" << std::endl;
-#else
-	if(verbose) std::cout<<"I: .. sending address"<<std::endl;
-#endif
+    LOG_ONFI_DEBUG_IF(verbose, ".. sending address");
     send_addresses(&address_to_send);
 
     //have some delay here and wait for busy signal again before reading the paramters
@@ -181,14 +162,7 @@ void onfi_interface::read_parameters(param_type ONFI_OR_JEDEC, bool bytewise, bo
     // make sure none of the LUNs are busy
     while (gpio_read(GPIO_RB) == 0);
 
-#if DEBUG_ONFI
-    if (onfi_debug_file)
-        onfi_debug_file << "I: .. acquiring " << type_parameter << " parameters" << std::endl;
-    else
-        std::cout << "I: .. acquiring " << type_parameter << " parameters" << std::endl;
-#else
-	if(verbose) std::cout<<"I: .. acquiring "<<type_parameter<<" parameters"<<std::endl;
-#endif
+    LOG_ONFI_DEBUG_IF(verbose, ".. acquiring %s parameters", type_parameter.c_str());
     // now read the 256-bytes of data
     uint16_t num_bytes_in_parameters = 256;
     uint8_t ONFI_parameters[num_bytes_in_parameters];
@@ -218,14 +192,7 @@ void onfi_interface::read_parameters(param_type ONFI_OR_JEDEC, bool bytewise, bo
     if(DEBUG_ONFI) printf("\n");
     if(DEBUG_ONFI) printf("-------------------------------------------------\n");
 
-#if DEBUG_ONFI
-    if (onfi_debug_file)
-        onfi_debug_file << "I: .. acquired " << type_parameter << " parameters" << std::endl;
-    else
-        std::cout << "I: .. acquired " << type_parameter << " parameters" << std::endl;
-#else
-	if(verbose) std::cout<<"I: .. acquired "<<type_parameter<<" parameters"<<std::endl;
-#endif
+    LOG_ONFI_DEBUG_IF(verbose, ".. acquired %s parameters", type_parameter.c_str());
 
     uint8_t ret_whole, ret_decimal;
 
@@ -233,13 +200,15 @@ void onfi_interface::read_parameters(param_type ONFI_OR_JEDEC, bool bytewise, bo
     decode_ONFI_version(ONFI_parameters[4], ONFI_parameters[5], &ret_whole, &ret_decimal);
     snprintf(onfi_version, sizeof(onfi_version), "%c.%c", ret_whole, ret_decimal);
 
-    set_page_size(ONFI_parameters[83], ONFI_parameters[82], ONFI_parameters[81], ONFI_parameters[80]);
-    set_page_size_spare(ONFI_parameters[85], ONFI_parameters[84]);
-    set_block_size(ONFI_parameters[95], ONFI_parameters[94], ONFI_parameters[93], ONFI_parameters[92]);
-    set_lun_size(ONFI_parameters[99], ONFI_parameters[98], ONFI_parameters[97], ONFI_parameters[96]);
-
-    num_column_cycles = (ONFI_parameters[101] & 0xf0) >> 4;
-    num_row_cycles = (ONFI_parameters[101] & 0x0f);
+    // Use parser helpers to fill geometry fields
+    onfi::Geometry g{};
+    onfi::parse_geometry_from_parameters(ONFI_parameters, g);
+    num_bytes_in_page = static_cast<uint16_t>(g.page_size_bytes);
+    num_spare_bytes_in_page = static_cast<uint16_t>(g.spare_size_bytes);
+    num_pages_in_block = static_cast<uint16_t>(g.pages_per_block);
+    num_blocks = static_cast<uint16_t>(g.blocks_per_lun);
+    num_column_cycles = g.column_cycles;
+    num_row_cycles = g.row_cycles;
 
     // Extract manufacturer information (Bytes 32-43)
     memcpy(manufacturer_id, &ONFI_parameters[32], 12);
@@ -424,33 +393,21 @@ void onfi_interface::decode_ONFI_version(uint8_t byte_4, uint8_t byte_5, uint8_t
 
 // following function will set the size of page based on value read
 void onfi_interface::set_page_size(uint8_t byte_83, uint8_t byte_82, uint8_t byte_81, uint8_t byte_80) {
-    num_bytes_in_page = (((byte_83 * 256 + byte_82) * 256 + byte_81) * 256 + byte_80);
-    // for error condition
-    if ((byte_83 == 0xff && byte_82 == 0xff && byte_81 == 0xff && byte_80 == 0xff) || (
-            byte_83 == 0x0 && byte_82 == 0x0 && byte_81 == 0x0 && byte_80 == 0x0))
-        num_bytes_in_page = 2048;
+    num_bytes_in_page = static_cast<uint16_t>(onfi::parse_page_size(byte_83, byte_82, byte_81, byte_80));
 }
 
 // following function will set the size of spare bytes in a page based on value read
 void onfi_interface::set_page_size_spare(uint8_t byte_85, uint8_t byte_84) {
-    num_spare_bytes_in_page = (byte_85 * 256 + byte_84);
-    if ((byte_85 == 0xff && byte_84 == 0xff) || (byte_84 == 0x0 && byte_85 == 0x0))
-        num_spare_bytes_in_page = 128;
+    num_spare_bytes_in_page = static_cast<uint16_t>(onfi::parse_spare_size(byte_85, byte_84));
 }
 
 // following function will set the number of pages in a block
 void onfi_interface::set_block_size(uint8_t byte_95, uint8_t byte_94, uint8_t byte_93, uint8_t byte_92) {
-    num_pages_in_block = ((byte_95 * 256 + byte_94) * 256 + byte_93) * 256 + byte_92;
-    if ((byte_95 == 0xff && byte_94 == 0xff && byte_93 == 0xff && byte_92 == 0xff) || (
-            byte_95 == 0x0 && byte_94 == 0x0 && byte_93 == 0x0 && byte_92 == 0x0))
-        num_pages_in_block = 64;
+    num_pages_in_block = static_cast<uint16_t>(onfi::parse_pages_per_block(byte_95, byte_94, byte_93, byte_92));
 }
 
 void onfi_interface::set_lun_size(uint8_t byte_99, uint8_t byte_98, uint8_t byte_97, uint8_t byte_96) {
-    num_blocks = ((byte_99 * 256 + byte_98) * 256 + byte_97) * 256 + byte_96;
-    if ((byte_96 == 0xff && byte_97 == 0xff && byte_98 == 0xff && byte_99 == 0xff) || (
-            byte_96 == 0x0 && byte_97 == 0x0 && byte_98 == 0x0 && byte_99 == 0x0))
-        num_blocks = 64;
+    num_blocks = static_cast<uint16_t>(onfi::parse_blocks_per_lun(byte_99, byte_98, byte_97, byte_96));
 }
 
 // following function tests if the block address sent was a bad block or not

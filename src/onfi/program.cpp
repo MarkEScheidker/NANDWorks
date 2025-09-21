@@ -1,12 +1,14 @@
-#include "onfi_interface.h"
-#include "gpio.h"
-#include "timing.h"
+#include "onfi_interface.hpp"
+#include "gpio.hpp"
+#include "timing.hpp"
 #include <stdio.h>
 #include <stdlib.h>
 #include <cstring>
 #include <cstdint>
 #include <iomanip>
 #include <algorithm>
+#include "logging.hpp"
+#include "onfi/controller.hpp"
 
 bool onfi_interface::verify_program_page(unsigned int my_block_number, unsigned int my_page_number,
                                          uint8_t *data_to_program, bool verbose, int max_allowed_errors) {
@@ -78,7 +80,7 @@ bool onfi_interface::verify_program_page(unsigned int my_block_number, unsigned 
 // .. verbose is for priting messages
 void onfi_interface::program_page(unsigned int my_block_number, unsigned int my_page_number, uint8_t *data_to_program,
                                   bool including_spare, bool verbose) {
-    uint8_t page_address[5] = {0, 0, 0, 0, 0};
+    uint8_t page_address[8] = {0};
     // following function converts the my_page_number inside the my_block_number to {x,x,x,x,x} and saves to my_test_block_address
     convert_pagenumber_to_columnrow_address(my_block_number, my_page_number, page_address, verbose);
 
@@ -97,29 +99,21 @@ void onfi_interface::program_page(unsigned int my_block_number, unsigned int my_
 	if(verbose) fprintf(stdout,"Inside Program Fn: Address is: %02x,%02x,%02x,%02x,%02x.",page_address[0],page_address[1],page_address[2],page_address[3],page_address[4]);
 #endif
 
-    send_command(0x80);
-    send_addresses(page_address, 5);
-
-    
-
-    send_data(data_to_program, including_spare ? (num_bytes_in_page + num_spare_bytes_in_page) : (num_bytes_in_page));
+    onfi::OnfiController ctrl(*this);
+    ctrl.program_page(page_address, data_to_program, including_spare ? (num_bytes_in_page + num_spare_bytes_in_page) : (num_bytes_in_page));
 
 #if PROFILE_TIME
     time_info_file << "program page: ";
     uint64_t start_time = get_timestamp_ns();
 #endif
-        send_command(0x10);
-
-        
-        // check if it is out of Busy cycle
-        wait_ready_blocking();
+        /* busy handled by controller */
 #if PROFILE_TIME
     uint64_t end_time = get_timestamp_ns();
     time_info_file << "  took " << (end_time - start_time) / 1000 << " microseconds\n";
 #endif
 
     uint8_t status = 0;
-    status = get_status();
+    status = ctrl.get_status();
     // .. use  the commended code for multi-plane die
     // read_status_enhanced(&status_value,(address+2));
     if (status & 0x20) {
@@ -293,12 +287,7 @@ void onfi_interface::program_page_tlc_toshiba(unsigned int my_block_number, unsi
             fprintf(stdout, "Failed Program Operation of first subpage: %d,%d,%d\n", page_address[2], page_address[3],
                     page_address[4]);
         } else {
-#if DEBUG_ONFI
-            if (onfi_debug_file) onfi_debug_file << "Program Operation Completed of first subpage" << std::endl;
-            else fprintf(stdout, "Program Operation Completed of first subpage\n");
-#else
-	if(verbose) fprintf(stdout,"Program Operation Completed of first subpage\n");
-#endif
+            LOG_ONFI_INFO_IF(verbose, "Program Operation Completed of first subpage");
         }
     } else {
 #if DEBUG_ONFI
@@ -341,12 +330,7 @@ void onfi_interface::program_page_tlc_toshiba(unsigned int my_block_number, unsi
                     page_address[4]);
         }
         else {
-#if DEBUG_ONFI
-            if (onfi_debug_file) onfi_debug_file << "Program Operation Completed of second subpage" << std::endl;
-            else fprintf(stdout, "Program Operation Completed of second subpage\n");
-#else
-	if(verbose) fprintf(stdout,"Program Operation Completed of second subpage\n");
-#endif
+            LOG_ONFI_INFO_IF(verbose, "Program Operation Completed of second subpage");
         }
     } else {
 #if DEBUG_ONFI
@@ -388,12 +372,7 @@ void onfi_interface::program_page_tlc_toshiba(unsigned int my_block_number, unsi
             fprintf(stdout, "Failed Program Operation of third subpage: %d,%d,%d\n", page_address[2], page_address[3],
                     page_address[4]);
         } else {
-#if DEBUG_ONFI
-            if (onfi_debug_file) onfi_debug_file << "Program Operation Completed of third subpage" << std::endl;
-            else fprintf(stdout, "Program Operation Completed of third subpage\n");
-#else
-	if(verbose) fprintf(stdout,"Program Operation Completed of third subpage\n");
-#endif
+            LOG_ONFI_INFO_IF(verbose, "Program Operation Completed of third subpage");
         }
     } else {
 #if DEBUG_ONFI
@@ -487,42 +466,13 @@ void onfi_interface::partial_program_page(unsigned int my_block_number, unsigned
 // .. my_test_block_address is the address of the block (starting address)
 // .. num_pages is the number of pages in the page_indices array
 // .. verbose is for printing
-void onfi_interface::program_pages_in_a_block_slc(unsigned int my_block_number, uint16_t num_pages, bool verbose) {
-    uint8_t *data_to_program = (uint8_t *) malloc(sizeof(uint8_t) * (num_bytes_in_page + num_spare_bytes_in_page));
-    memset(data_to_program, 0x00, num_bytes_in_page + num_spare_bytes_in_page);
-
-    // let us program all the pages in the block
-    uint16_t page_idx = 0;
-    for (page_idx = 0; page_idx < num_pages; page_idx++) {
-        // (uint8_t* page_address,uint8_t* data_to_program,bool including_spare,bool verbose)
-        program_page(my_block_number, page_idx, data_to_program, true, verbose);
-    }
-    free(data_to_program);
-}
+ 
 
 // this function will program the pages in a block with an array provided by user
 // .. if the user wants to give an array
 // .. .. it is indicated through bool array_provided
 // .. .. the actual array is supposed to be in uint8_t* provided_array (lenght should be total number of bytes in a page)
-void onfi_interface::program_n_pages_in_a_block(unsigned int my_block_number, uint16_t num_pages, bool array_provided,
-                                                uint8_t *provided_array, bool verbose) {
-    uint8_t *data_to_program;
-    if (array_provided) {
-        data_to_program = provided_array;
-    } else {
-        data_to_program = (uint8_t *) malloc(sizeof(uint8_t) * (num_bytes_in_page + num_spare_bytes_in_page));
-        memset(data_to_program, 0x00, num_bytes_in_page + num_spare_bytes_in_page);
-    }
-
-    // let us program all the pages in the block
-    uint16_t page_idx = 0;
-    for (page_idx = 0; page_idx < num_pages; page_idx++) {
-        // (uint8_t* page_address,uint8_t* data_to_program,bool including_spare,bool verbose)
-        program_page(my_block_number, page_idx, data_to_program, true, verbose);
-    }
-    if (!array_provided)
-        free(data_to_program);
-}
+ 
 
 // let us program pages in the block with all uint8_t* provided_data
 // the paramters are:
@@ -531,96 +481,9 @@ void onfi_interface::program_n_pages_in_a_block(unsigned int my_block_number, ui
 // .. page_indices is an array of indices inside the block that we want to program
 // .. num_pages is the number of pages in the page_indices array
 // .. verbose is for printing
-void onfi_interface::program_pages_in_a_block(unsigned int my_block_number, bool complete_block, bool data_random,
-                                              uint16_t *page_indices, uint16_t num_pages, bool verbose) {
-    uint8_t *data_to_program = (uint8_t *) malloc(sizeof(uint8_t) * (num_bytes_in_page + num_spare_bytes_in_page));
-    srand(time(0));
-    if (data_random) {
-        for (uint32_t b_idx = 0; b_idx < (num_bytes_in_page + num_spare_bytes_in_page); b_idx++) {
-            data_to_program[b_idx] = (uint8_t) (rand() % 255);
-        }
-    } else {
-        memset(data_to_program, 0x00, num_bytes_in_page + num_spare_bytes_in_page);
-    }
-    // Ensure the first byte of the spare area is not 0x00 to avoid marking as bad block
-    data_to_program[num_bytes_in_page] = 0xFF;
-    // memset(data_to_program+1000,0x00,sizeof(uint8_t)*1000);
-    std::fstream input_data_file;
-    input_data_file.open("raw_data_file.txt", std::fstream::out);
-    for (int idx = 0; idx < num_bytes_in_page + num_spare_bytes_in_page; idx++) {
-        input_data_file << data_to_program[idx];
-    }
-    input_data_file.close();
+ 
 
-    if (complete_block) {
-        // let us program all the pages in the block
-        uint16_t page_idx = 0;
-        for (page_idx = 0; page_idx < num_pages_in_block; page_idx++) {
-            // (uint8_t* page_address,uint8_t* data_to_program,bool including_spare,bool verbose)
-            program_page(my_block_number, page_idx, data_to_program, true, verbose);
-        }
-    } else {
-        uint16_t curr_page_index = 0;
-
-        // let us sort the page indices here
-        uint16_t *page_indices_sorted = new uint16_t[num_pages];
-        uint16_t idx = 0;
-        for (idx = 0; idx < num_pages; idx++)
-            page_indices_sorted[idx] = page_indices[idx];
-
-        std::sort(page_indices_sorted, page_indices_sorted + num_pages);
-
-        for (idx = 0; idx < num_pages; idx++) {
-            // let us grab the index from the array
-            // curr_page_index = page_indices[idx];
-            curr_page_index = page_indices_sorted[idx];
-
-            // (uint8_t* page_address,uint8_t* data_to_program,bool including_spare,bool verbose)
-            program_page(my_block_number, curr_page_index, data_to_program, true, verbose);
-        }
-
-        delete[] page_indices_sorted;
-    }
-
-    free(data_to_program);
-}
-
-void onfi_interface::partial_program_pages_in_a_block(unsigned int my_block_number, uint32_t loop_count,
-                                                      bool complete_block, uint16_t *page_indices, uint16_t num_pages,
-                                                      bool verbose) {
-    uint8_t *data_to_program = (uint8_t *) malloc(sizeof(uint8_t) * (num_bytes_in_page + num_spare_bytes_in_page));
-    memset(data_to_program, 0x00, num_bytes_in_page + num_spare_bytes_in_page);
-
-    if (complete_block) {
-        // let us program all the pages in the block
-        uint16_t page_idx = 0;
-        for (page_idx = 0; page_idx < num_pages_in_block; page_idx++) {
-            // (uint8_t* page_address,uint8_t* data_to_program,bool including_spare,bool verbose)
-            partial_program_page(my_block_number, page_idx, loop_count, data_to_program, true, verbose);
-        }
-    } else {
-        uint16_t curr_page_index = 0;
-
-        // let us sort the page indices here
-        uint16_t *page_indices_sorted = new uint16_t[num_pages];
-        uint16_t idx = 0;
-        for (idx = 0; idx < num_pages; idx++)
-            page_indices_sorted[idx] = page_indices[idx];
-
-        std::sort(page_indices_sorted, page_indices_sorted + num_pages);
-
-        for (idx = 0; idx < num_pages; idx++) {
-            // let us grab the index from the array
-            // curr_page_index = page_indices[idx];
-            curr_page_index = page_indices_sorted[idx];
-
-            partial_program_page(my_block_number, curr_page_index, loop_count, data_to_program, true, verbose);
-        }
-        delete[] page_indices_sorted;
-    }
-
-    free(data_to_program);
-}
+ 
 
 // let us verify program pages in the block
 // the paramters are:
@@ -629,62 +492,11 @@ void onfi_interface::partial_program_pages_in_a_block(unsigned int my_block_numb
 // .. page_indices is an array of indices inside the block that we want to verify
 // .. num_pages is the number of pages in the page_indices array
 // .. verbose is for printing
-bool onfi_interface::verify_program_pages_in_a_block(unsigned int my_block_number, bool complete_block,
-                                                     uint16_t *page_indices, uint16_t num_pages, bool verbose, int max_allowed_errors) {
-    bool return_value = true;
-    //uint16_t num_bytes_to_test = num_bytes_in_page+num_spare_bytes_in_page;
-    uint16_t num_bytes_to_test = num_bytes_in_page;
-
-    uint8_t *data_to_program = (uint8_t *) malloc(sizeof(uint8_t) * (num_bytes_to_test));
-    memset(data_to_program, 0x00, num_bytes_to_test);
-
-    if (complete_block) {
-        // let us program all the pages in the block
-        uint16_t page_idx = 0;
-        for (page_idx = 0; page_idx < num_pages_in_block; page_idx++) {
-            // verify_program_page(uint8_t* page_address,uint8_t* data_to_program,bool verbose)
-            if (!verify_program_page(my_block_number, page_idx, data_to_program, verbose, max_allowed_errors))
-            return_value = false;
-        }
-    } else {
-        uint16_t curr_page_index = 0;
-        uint16_t idx = 0;
-        std::cout << "Verifying program operation on " << std::dec << num_pages << " pages" << std::endl;
-        for (idx = 0; idx < num_pages; idx++) {
-            // let us grab the index from the array
-            curr_page_index = page_indices[idx];
-
-            // verify_program_page(uint8_t* page_address,uint8_t* data_to_program,bool verbose)
-            if (!verify_program_page(my_block_number, curr_page_index, data_to_program, verbose, max_allowed_errors))
-                return_value = false;
-        }
-
-        // delete[] page_indices_sorted;
-    }
-
-    free(data_to_program);
-    return return_value;
-}
+ 
 
 // this function goes through the block and verifies program values in all of
 // .. 512 pages in a block
-bool onfi_interface::verify_program_pages_in_a_block_slc(unsigned int my_block_number, bool verbose, int max_allowed_errors) {
-    bool return_value = true;
-
-    uint8_t *data_to_program = (uint8_t *) malloc(sizeof(uint8_t) * (num_bytes_in_page + num_spare_bytes_in_page));
-    memset(data_to_program, 0x00, num_bytes_in_page + num_spare_bytes_in_page);
-
-    // let us program all the pages in the block
-    uint16_t page_idx = 0;
-    for (page_idx = 0; page_idx < (num_pages_in_block / 2); page_idx++) {
-        // verify_program_page(uint8_t* page_address,uint8_t* data_to_program,bool verbose)
-        if (!verify_program_page(my_block_number, page_idx, data_to_program, verbose, max_allowed_errors))
-            return_value = false;
-    }
-
-    free(data_to_program);
-    return return_value;
-}
+ 
 
 // this function reads the single page address provided
 // each value is hex while the sequence is terminated by newline character
