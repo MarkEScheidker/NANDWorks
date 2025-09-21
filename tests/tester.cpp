@@ -11,6 +11,7 @@ Description: This source file is to test the basic functionality of the interfac
 #include "onfi/device.hpp"
 #include "onfi/controller.hpp"
 #include "onfi/data_sink.hpp"
+#include "onfi/types.hpp"
 
 #include <vector>
 #include <cstdlib>
@@ -76,7 +77,13 @@ static bool test_block_erase(onfi_interface &onfi_instance, bool verbose) {
     dev.chip = onfi_instance.flash_chip;
 
     dev.erase_block(block);
-    return dev.verify_erase_block(block, true, nullptr, 0, /*including_spare*/false, verbose);
+
+    const auto selection = onfi::default_page_selection();
+    bool sampled_ok = dev.verify_erase_block(block, false, selection.indices, selection.count,
+                                             /*including_spare*/false, verbose);
+    bool full_ok = dev.verify_erase_block(block, true, nullptr, 0,
+                                          /*including_spare*/false, verbose);
+    return sampled_ok && full_ok;
 }
 
 static bool test_single_page_program(onfi_interface &onfi_instance, bool verbose) {

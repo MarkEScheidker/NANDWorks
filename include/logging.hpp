@@ -21,16 +21,22 @@
 #endif
 
 // Optional: allow redirecting output to a file at runtime when enabled
+static inline FILE*& logger_output_slot()
+{
+    static FILE* out = stderr;
+    return out;
+}
+
 static inline FILE* logger_output()
 {
-    static FILE* out = NULL;
-    if (!out) out = stderr; // default to stderr
-    return out;
+    return logger_output_slot();
 }
 
 static inline void logger_set_output_file(FILE* f)
 {
-    if (f) fflush(logger_output());
+    FILE*& out = logger_output_slot();
+    fflush(out);
+    out = f ? f : stderr;
     // deliberately no fclose here; caller owns FILE*
 }
 

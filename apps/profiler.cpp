@@ -13,6 +13,8 @@
 #include <random>
 #include <string>
 #include <vector>
+#include <exception>
+#include <stdexcept>
 
 struct BenchmarkResult {
     std::string name;
@@ -51,19 +53,19 @@ BenchmarkResult benchmark_gpio_init() {
     std::vector<uint64_t> timings;
     timings.reserve(100);
 
-    // Drop refcount so each iteration measures a full init.
+    // Ensure we start from a clean slate before benchmarking.
     gpio_shutdown();
     for (int i = 0; i < 100; ++i) {
         const uint64_t start = get_timestamp_ns();
-        if (!gpio_init()) {
+        GpioSession session(/*throw_on_failure=*/false);
+        if (!session.ok()) {
             timings.push_back(0);
         } else {
             const uint64_t end = get_timestamp_ns();
             timings.push_back(end - start);
         }
-        gpio_shutdown();
+        // session goes out of scope here and calls gpio_shutdown()
     }
-    gpio_init(); // Ensure GPIO is available for subsequent benchmarks
 
     return {"gpio_init", calculate_mean(timings), calculate_median(timings), calculate_stddev(timings)};
 }
@@ -259,19 +261,26 @@ void print_chip_info(const onfi_interface& onfi) {
 
 int main() {
     try {
-        onfi_interface onfi;
         std::vector<BenchmarkResult> results;
 
         std::cout << "--- Function Profiler ---" << std::endl;
         std::cout << "This tool measures the execution time of various functions." << std::endl;
         std::cout << std::endl;
 
+        results.push_back(benchmark_gpio_init());
+
+        GpioSession gpio_guard;
+        if (!gpio_guard.ok()) {
+            throw std::runtime_error("gpio_init failed");
+        }
+
+        onfi_interface onfi;
+
         // Seed RNG for randomized ONFI access benchmarks.
         const unsigned seed = static_cast<unsigned>(
             std::chrono::system_clock::now().time_since_epoch().count());
         std::default_random_engine rng(seed);
 
-        results.push_back(benchmark_gpio_init());
         results.push_back(benchmark_gpio_set_direction());
         results.push_back(benchmark_gpio_set_high());
         results.push_back(benchmark_gpio_set_low());

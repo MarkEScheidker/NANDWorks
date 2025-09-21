@@ -9,6 +9,7 @@
 #include <algorithm>
 #include "logging.hpp"
 #include "onfi/controller.hpp"
+#include "onfi/types.hpp"
 
 void onfi_interface::disable_erase() {
     // check to see if the device is busy
@@ -137,8 +138,8 @@ void onfi_interface::partial_erase_block(unsigned int my_block_number, unsigned 
 // this is the function that can be used to elaborately verify the erase operation
 // .. the first argument is the address of the block
 // .. the second argument defines if the complete block is to be verified
-// .. .. if the second argument is false, then the pages from page_indices_selected are taken
-bool onfi_interface::verify_block_erase(unsigned int my_block_number, bool complete_block, uint16_t *page_indices,
+// .. .. if the second argument is false, the helper default_page_selection() provides the indices
+bool onfi_interface::verify_block_erase(unsigned int my_block_number, bool complete_block, const uint16_t *page_indices,
                                         uint16_t num_pages, bool verbose) {
     // just a placeholder for return value
     bool return_value = true;
@@ -151,6 +152,11 @@ bool onfi_interface::verify_block_erase(unsigned int my_block_number, bool compl
 
     //test to see if the user wants the complete block or just the selected pages
     if (!complete_block) {
+        if (!page_indices || num_pages == 0) {
+            const auto defaults = onfi::default_page_selection();
+            page_indices = defaults.indices;
+            num_pages = defaults.count;
+        }
         // this means we are operating only on selected pages in the block
         // this means we are working on all the pages in the block
         // .. let us iterate through each pages in the block

@@ -1,6 +1,7 @@
 #include "gpio.hpp"
 #include "timing.hpp"
 #include <iostream>
+#include <exception>
 #include <bcm2835.h>
 
 #define BENCHMARK_PIN RPI_V2_GPIO_P1_07 // GPIO 4
@@ -8,13 +9,16 @@
 #define TARGET_HALF_PERIOD_NS 50 // Target 10 MHz
 
 int main() {
-    if (!gpio_init()) {
-        return 1;
-    }
+    try {
+        GpioSession gpio_session;
+        if (!gpio_session.ok()) {
+            std::cerr << "GPIO initialisation failed" << std::endl;
+            return 1;
+        }
 
-    gpio_set_direction(BENCHMARK_PIN, true);
+        gpio_set_direction(BENCHMARK_PIN, true);
 
-    std::cout << "--- GPIO Benchmark (Variable Delay) ---" << std::endl;
+        std::cout << "--- GPIO Benchmark (Variable Delay) ---" << std::endl;
     std::cout << "This benchmark measures the actual GPIO toggle frequency for various software delay settings." << std::endl;
     std::cout << "'Half-Period Cycles' refers to the number of CPU cycles used in a busy-wait loop for each half of the toggle period." << std::endl;
     std::cout << "A value of 0 for 'Half-Period Cycles' represents the maximum achievable frequency with minimal software overhead." << std::endl;
@@ -37,6 +41,11 @@ int main() {
         double actual_freq = NUM_CYCLES / elapsed_s;
 
         std::cout << "Half-Period Cycles: " << half_period_cycles << ", Actual Frequency: " << actual_freq / 1e6 << " MHz" << std::endl;
+    }
+
+    } catch (const std::exception& ex) {
+        std::cerr << "Benchmark failed: " << ex.what() << std::endl;
+        return 1;
     }
 
     return 0;

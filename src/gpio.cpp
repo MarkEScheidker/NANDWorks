@@ -2,6 +2,8 @@
 #include <bcm2835.h>
 #include <sched.h>
 #include <iostream>
+#include <stdexcept>
+#include <utility>
 
 namespace {
     unsigned int g_init_refcount = 0;
@@ -103,4 +105,38 @@ void gpio_shutdown() {
     bcm2835_close();
     g_prev_policy = SCHED_OTHER;
     g_prev_param = {};
+}
+
+
+GpioSession::GpioSession(bool throw_on_failure)
+    : active_(gpio_init())
+{
+    if (!active_ && throw_on_failure) {
+        throw std::runtime_error("gpio_init failed");
+    }
+}
+
+GpioSession::GpioSession(GpioSession&& other) noexcept
+    : active_(other.active_)
+{
+    other.active_ = false;
+}
+
+GpioSession& GpioSession::operator=(GpioSession&& other) noexcept
+{
+    if (this != &other) {
+        if (active_) {
+            gpio_shutdown();
+        }
+        active_ = other.active_;
+        other.active_ = false;
+    }
+    return *this;
+}
+
+GpioSession::~GpioSession()
+{
+    if (active_) {
+        gpio_shutdown();
+    }
 }

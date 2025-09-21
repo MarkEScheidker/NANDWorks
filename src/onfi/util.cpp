@@ -7,34 +7,41 @@
 #include <cstdint>
 #include <iomanip>
 #include <algorithm>
+#include <array>
 #include "logging.hpp"
 #include "onfi/controller.hpp"
 #include "onfi/address.hpp"
+#include "onfi/types.hpp"
 
 
 /**
-Following is the list of carefull chosen page indices in any block
+Following is the list of carefully chosen page indices in any block
 .. please read "Testing Latency on Shared Pages" in readme.md in "sources/Data" folder
 */
-uint16_t num_pages_selected = 100;
-uint16_t page_indices_selected[] = {
-    0, 2, 4, 6, 8, 10, 12, 14, 16, 18, //these are the pages at the beginning of the block (they are not shared)
-
-    32, 34, 36, 38, 40, 42, 44, 46, 48, 50, // these are the pages at the beginning of shared location
-    64, 68, 72, 76, 80, 84, 88, 92, 96, 100, // .. these are MSB pages to the pages above
-
+namespace {
+constexpr std::array<uint16_t, 100> kDefaultPageSelection = {
+    0, 2, 4, 6, 8, 10, 12, 14, 16, 18,
+    32, 34, 36, 38, 40, 42, 44, 46, 48, 50,
+    64, 68, 72, 76, 80, 84, 88, 92, 96, 100,
     105, 113, 121, 129, 137, 145, 153, 161, 169, 177,
-    // these are the pages that follow different relation for LSB and MSB pages
-    168, 176, 184, 192, 200, 208, 216, 224, 232, 240, // .. these are MSB for above LSB pages
-
-    601, 609, 617, 625, 633, 641, 649, 657, 665, 673, // these pages are somewhere in the middle of the block
-    664, 672, 680, 688, 696, 704, 712, 720, 728, 736, // .. these pages are MSB to above LSB pages
-
-    941, 943, 945, 947, 949, 951, 953, 955, 957, 959, // .. these are at the tail of shared pages
-    1004, 1006, 1008, 1010, 1012, 1014, 1016, 1018, 1020, 1022, // .. these are MSB to above LSB pages
-
+    168, 176, 184, 192, 200, 208, 216, 224, 232, 240,
+    601, 609, 617, 625, 633, 641, 649, 657, 665, 673,
+    664, 672, 680, 688, 696, 704, 712, 720, 728, 736,
+    941, 943, 945, 947, 949, 951, 953, 955, 957, 959,
+    1004, 1006, 1008, 1010, 1012, 1014, 1016, 1018, 1020, 1022,
     1003, 1005, 1009, 1011, 1013, 1015, 1017, 1019, 1021, 1023
-}; // .. these are unshared pages at the tail of the block
+};
+} // namespace
+
+namespace onfi {
+
+PageSelectionView default_page_selection()
+{
+    return {kDefaultPageSelection.data(), static_cast<uint16_t>(kDefaultPageSelection.size())};
+}
+
+} // namespace onfi
+
 
 
 
@@ -159,7 +166,7 @@ void onfi_interface::convert_pagenumber_to_columnrow_address(unsigned int my_blo
 // .. the data will be available for read with a command sequence of ECh followed by an address of 40h
 // .. this function will read a random page and tries to verify if it was completely erased
 // .. for elaborate verifiying, please use a different function
-void onfi_interface::set_features(uint8_t address, const uint8_t *data_to_send, uint8_t command) {
+void onfi_interface::set_features(uint8_t address, const uint8_t *data_to_send, onfi::FeatureCommand command) {
     onfi::OnfiController ctrl(*this);
     ctrl.set_features(address, data_to_send, command);
 }
@@ -168,7 +175,7 @@ void onfi_interface::set_features(uint8_t address, const uint8_t *data_to_send, 
 // .. specified feature address. This command is accepted by the target only when all die
 // .. (LUNs) on the target are idle.
 // .. the parameters P1-P4 are in data_received argument
-void onfi_interface::get_features(uint8_t address, uint8_t* data_received, uint8_t command) const {
+void onfi_interface::get_features(uint8_t address, uint8_t* data_received, onfi::FeatureCommand command) const {
     onfi::OnfiController ctrl(const_cast<onfi_interface&>(*this));
     ctrl.get_features(address, data_received, command);
 }

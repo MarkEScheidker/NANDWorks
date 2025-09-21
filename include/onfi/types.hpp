@@ -6,6 +6,19 @@
 
 namespace onfi {
 
+// Feature command opcodes used with SET/GET FEATURES
+enum class FeatureCommand : uint8_t {
+    Set = 0xEF,
+    Get = 0xEE,
+};
+
+struct PageSelectionView {
+    const uint16_t* indices = nullptr;
+    uint16_t count = 0;
+};
+
+PageSelectionView default_page_selection();
+
 // Describes the NAND array organization
 struct Geometry {
     uint32_t page_size_bytes = 0;        // main area

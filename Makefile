@@ -1,4 +1,4 @@
-CXX = g++
+CXX ?= g++
 
 # -------------------------
 # Logging / profiling flags
@@ -6,20 +6,31 @@ LOG_ONFI_LEVEL ?= 0
 LOG_HAL_LEVEL  ?= 0
 PROFILE_TIME   ?= 0
 
+THIRD_PARTY_DIR := lib/bcm2835_install
+
 # Layout
 OBJ_DIR = build
 LIB_DIR = $(OBJ_DIR)/lib
 BIN_DIR = bin
 
-# Base compile flags
-CXXFLAGS = -Wall -O3 -s -lrt -std=c++0x -Iinclude -I$(OBJ_DIR)/../lib/bcm2835_install/include -L$(OBJ_DIR)/../lib/bcm2835_install/lib \
-           -DLOG_ONFI_LEVEL=$(LOG_ONFI_LEVEL) -DLOG_HAL_LEVEL=$(LOG_HAL_LEVEL) -DPROFILE_TIME=$(PROFILE_TIME)
-LIBS = -lbcm2835
+CPPFLAGS ?=
+CPPFLAGS += -Iinclude -I$(THIRD_PARTY_DIR)/include \
+            -DLOG_ONFI_LEVEL=$(LOG_ONFI_LEVEL) \
+            -DLOG_HAL_LEVEL=$(LOG_HAL_LEVEL) \
+            -DPROFILE_TIME=$(PROFILE_TIME)
 
-APP_LIBS     = $(LIBS)
-TEST_LIBS    = $(LIBS)
+CXXFLAGS ?= -std=c++17 -Wall -Wextra -O3
+
+LDFLAGS ?=
+LDFLAGS += -L$(THIRD_PARTY_DIR)/lib
+
+LDLIBS ?=
+LDLIBS += -lbcm2835 -lrt
+
 EXTRA_EXAMPLE_LIBS ?= -lpigpio
-EXAMPLE_LIBS = $(LIBS) $(EXTRA_EXAMPLE_LIBS)
+APP_LDLIBS     = $(LDLIBS)
+TEST_LDLIBS    = $(LDLIBS)
+EXAMPLE_LDLIBS = $(LDLIBS) $(EXTRA_EXAMPLE_LIBS)
 
 # Program-specific extra libraries
 # Core/library sources (no app/test code)
@@ -63,10 +74,10 @@ all: $(TARGETS) docs
 .PHONY: debug trace profile help docs clean
 
 debug:
-	$(MAKE) all LOG_ONFI_LEVEL=4 LOG_HAL_LEVEL=4 PROFILE_TIME=1 CXXFLAGS="$(CXXFLAGS) -g -O2"
+	$(MAKE) all LOG_ONFI_LEVEL=4 LOG_HAL_LEVEL=4 PROFILE_TIME=1 CXXFLAGS="$(CXXFLAGS) -g -O0"
 
 trace:
-	$(MAKE) all LOG_ONFI_LEVEL=5 LOG_HAL_LEVEL=5 PROFILE_TIME=1 CXXFLAGS="$(CXXFLAGS) -g -O2"
+	$(MAKE) all LOG_ONFI_LEVEL=5 LOG_HAL_LEVEL=5 PROFILE_TIME=1 CXXFLAGS="$(CXXFLAGS) -g -O0"
 
 profile:
 	$(MAKE) all PROFILE_TIME=1
@@ -100,22 +111,22 @@ $(BIN_DIR):
 # Core object rule
 $(OBJ_DIR)/src/%.o: src/%.cpp | $(OBJ_DIR)
 	mkdir -p $(dir $@)
-	$(CXX) -c $< $(CXXFLAGS) -o $@
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
 
 # App object rule
 $(OBJ_DIR)/apps/%.o: $(APP_SOURCE_DIR)/%.cpp | $(OBJ_DIR)
 	mkdir -p $(dir $@)
-	$(CXX) -c $< $(CXXFLAGS) -o $@
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
 
 # Test object rule
 $(OBJ_DIR)/tests/%.o: $(TEST_SOURCE_DIR)/%.cpp | $(OBJ_DIR)
 	mkdir -p $(dir $@)
-	$(CXX) -c $< $(CXXFLAGS) -o $@
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
 
 # Example object rule
 $(OBJ_DIR)/examples/%.o: $(EXAMPLE_SOURCE_DIR)/%.cpp | $(OBJ_DIR)
 	mkdir -p $(dir $@)
-	$(CXX) -c $< $(CXXFLAGS) -o $@
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
 
 # Convenience targets for direct invocation (e.g. `make tester`)
 $(APP_PROGRAMS): %: $(APP_BIN_DIR)/%
@@ -125,15 +136,15 @@ $(EXAMPLE_PROGRAMS): %: $(EXAMPLE_BIN_DIR)/%
 # Link rules per program type
 $(APP_BIN_DIR)/%: $(LIB_DIR)/libonfi.a $(OBJ_DIR)/apps/%.o
 	mkdir -p $(dir $@)
-	$(CXX) $(OBJ_DIR)/apps/$*.o $(CXXFLAGS) $(LIB_DIR)/libonfi.a $(APP_LIBS) -o $@
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJ_DIR)/apps/$*.o $(LIB_DIR)/libonfi.a -o $@ $(APP_LDLIBS)
 
 $(TEST_BIN_DIR)/%: $(LIB_DIR)/libonfi.a $(OBJ_DIR)/tests/%.o
 	mkdir -p $(dir $@)
-	$(CXX) $(OBJ_DIR)/tests/$*.o $(CXXFLAGS) $(LIB_DIR)/libonfi.a $(TEST_LIBS) -o $@
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJ_DIR)/tests/$*.o $(LIB_DIR)/libonfi.a -o $@ $(TEST_LDLIBS)
 
 $(EXAMPLE_BIN_DIR)/%: $(LIB_DIR)/libonfi.a $(OBJ_DIR)/examples/%.o
 	mkdir -p $(dir $@)
-	$(CXX) $(OBJ_DIR)/examples/$*.o $(CXXFLAGS) $(LIB_DIR)/libonfi.a $(EXAMPLE_LIBS) -o $@
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJ_DIR)/examples/$*.o $(LIB_DIR)/libonfi.a -o $@ $(EXAMPLE_LDLIBS)
 
 clean:
 	rm -rf $(OBJ_DIR) $(BIN_DIR) docs/html main benchmark profiler erase_chip tester

@@ -10,6 +10,7 @@
 namespace {
     static uint32_t dq_all_mask = 0;
     static uint32_t dq_set_mask[256];
+    static uint32_t dq_clear_mask[256];
     static bool dq_lut_inited = false;
 
     constexpr uint8_t kDqPins[] = {
@@ -40,6 +41,7 @@ namespace {
             if (v & 0x40) mask |= bit(GPIO_DQ6);
             if (v & 0x80) mask |= bit(GPIO_DQ7);
             dq_set_mask[v] = mask;
+            dq_clear_mask[v] = dq_all_mask & ~mask;
         }
         dq_lut_inited = true;
     }
@@ -48,7 +50,7 @@ namespace {
 // Helper to set DQ pins using LUT for speed
 void interface::set_dq_pins(uint8_t data) const {
     if (!dq_lut_inited) init_dq_lut();
-    gpio_clr_multi(dq_all_mask);
+    gpio_clr_multi(dq_clear_mask[data]);
     gpio_set_multi(dq_set_mask[data]);
 }
 

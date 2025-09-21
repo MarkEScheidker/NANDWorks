@@ -420,29 +420,19 @@ bool onfi_interface::is_bad_block(unsigned int my_block_number) {
     read_page(my_block_number, 0, 5);
 
     //let us change the read column point to the first byte of spare region
-    uint8_t new_col[2] = {(uint8_t) (num_bytes_in_page & 0xff), (uint8_t) ((num_bytes_in_page >> 8) & 0xff)};
-    change_read_column(new_col);
+    uint8_t spare_col[2] = {
+        static_cast<uint8_t>(num_bytes_in_page & 0xff),
+        static_cast<uint8_t>((num_bytes_in_page >> 8) & 0xff)
+    };
+    change_read_column(spare_col);
 
-    uint8_t is_valid_data = 0x55;
-    get_data(&is_valid_data, 1);
+    uint8_t spare_byte = 0xFF;
+    get_data(&spare_byte, 1);
 
-    //if the value read is 0x00, then it is a bad block
-    if (is_valid_data == 0xff) {
-        //this is perfect
-        // .. so not a bad block
-        return false;
-    } else if (is_valid_data == 0x00) {
-        //this is a bad block
-        return true;
-    } else {
-        // may still not be a bad block
-        return false;
-    }
+    uint8_t reset_col[2] = {0x00, 0x00};
+    change_read_column(reset_col);
 
-    // resinstate the read column address to the 0th byte in the page
-    new_col[0] = 0x0;
-    new_col[1] = 0x0;
-    change_read_column(new_col);
+    return spare_byte == 0x00;
 }
 
 // write a function to perform an read operation from NAND flash to cache register

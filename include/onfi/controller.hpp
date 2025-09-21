@@ -2,16 +2,16 @@
 #define ONFI_CONTROLLER_H
 
 #include <stdint.h>
-#include "onfi_interface.hpp" // relies on get_data/get_status; rehost later
+#include "onfi/types.hpp"
+#include "onfi/transport.hpp"
 
 namespace onfi {
-
 // Thin wrapper around low-level ONFI command sequences.
 // Delegates transport to the provided onfi_interface (HAL + data I/O).
 class OnfiController {
-    onfi_interface& hal_;
+    Transport& transport_;
 public:
-    explicit OnfiController(onfi_interface& hal) : hal_(hal) {}
+    explicit OnfiController(Transport& transport) : transport_(transport) {}
 
     void reset();
 
@@ -24,11 +24,13 @@ public:
     void erase_block(const uint8_t* row3);
     void partial_erase_block(const uint8_t* row3, uint32_t loop_count);
 
-    void set_features(uint8_t address, const uint8_t data[4], uint8_t command = 0xEF);
-    void get_features(uint8_t address, uint8_t out[4], uint8_t command = 0xEE) const;
+    void set_features(uint8_t address, const uint8_t data[4],
+                      FeatureCommand command = FeatureCommand::Set);
+    void get_features(uint8_t address, uint8_t out[4],
+                      FeatureCommand command = FeatureCommand::Get) const;
 
     void read_data(uint8_t* dst, uint16_t n) const;
-    uint8_t get_status() const;
+    uint8_t get_status();
 };
 
 } // namespace onfi

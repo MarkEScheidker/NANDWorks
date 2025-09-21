@@ -12,6 +12,9 @@ Date: 			18 July 2020
 
 // include our next header
 #include "microprocessor_interface.hpp"
+#include "onfi/types.hpp"
+#include "onfi/transport.hpp"
+
 
 /**
  * @defgroup onfi_interface_api ONFI Interface Facade
@@ -31,9 +34,6 @@ enum param_type
 #define DEBUG_ONFI false
 #define PROFILE_DELAY_TIME true
 
-extern uint16_t num_pages_selected;
-extern uint16_t page_indices_selected[];
-
 /**
  * @class onfi_interface
  * @brief High-level façade for interacting with ONFI-compliant NAND devices.
@@ -45,7 +45,7 @@ extern uint16_t page_indices_selected[];
  *          duplicating protocol logic.
  * @ingroup onfi_interface_api
  */
-class onfi_interface: public interface
+class onfi_interface: public interface, public onfi::Transport
 {
 private:
     // private items go here
@@ -64,6 +64,18 @@ public:
 	{
 		deinitialize_onfi();
 	}
+
+	using interface::send_command;
+	using interface::send_addresses;
+	using interface::send_data;
+	using interface::wait_ready_blocking;
+
+	void send_command(uint8_t command) const override { interface::send_command(command); }
+	void send_addresses(const uint8_t* address_to_send, uint8_t num_address_bytes = 1, bool verbose = false) const override {
+		interface::send_addresses(address_to_send, num_address_bytes, verbose);
+	}
+	void send_data(const uint8_t* data_to_send, uint16_t num_data) const override { interface::send_data(data_to_send, num_data); }
+	void wait_ready_blocking() const override { interface::wait_ready_blocking(); }
 
 	// let us make these paramters public
 	uint16_t num_bytes_in_page;
@@ -103,13 +115,13 @@ public:
 	 * @param data_received Destination buffer.
 	 * @param num_data Number of bytes to read.
 	 */
-	void get_data(uint8_t* data_received,uint16_t num_data) const;
+	void get_data(uint8_t* data_received,uint16_t num_data) const override;
 
 /**
 	 * @brief Read the NAND status register corresponding to the last command.
 	 * @return Raw ONFI status byte.
 	 */
-	uint8_t get_status();
+	uint8_t get_status() override;
 
 /**
 	 * @brief Print a human-readable failure interpretation of the status register.
@@ -214,7 +226,8 @@ public:
 	 * @param verbose Emit per-page statistics.
 	 * @return true when the block verifies successfully.
 	 */
-	bool verify_block_erase(unsigned int my_block_number, bool complete_block = false,uint16_t* page_indices = page_indices_selected,uint16_t num_pages = num_pages_selected, bool verbose = false);
+	bool verify_block_erase(unsigned int my_block_number, bool complete_block = false,
+		const uint16_t* page_indices = nullptr, uint16_t num_pages = 0, bool verbose = false);
 
 	/** @brief Assert the hardware write-protect to block program/erase operations. */
 	void disable_erase();
@@ -267,7 +280,8 @@ public:
 	 * @param data_to_send Four-byte payload describing the feature configuration.
 	 * @param command Optional override for the command code.
 	 */
-	void set_features(uint8_t address, const uint8_t* data_to_send, uint8_t command = 0xef);
+	void set_features(uint8_t address, const uint8_t* data_to_send,
+		onfi::FeatureCommand command = onfi::FeatureCommand::Set);
 
 	/**
 	 * @brief Read ONFI feature parameters (EEh command).
@@ -275,13 +289,14 @@ public:
 	 * @param data_received Buffer to receive four bytes of feature data.
 	 * @param command Optional override for the command code.
 	 */
-	void get_features(uint8_t address, uint8_t* data_received, uint8_t command = 0xee) const;
+	void get_features(uint8_t address, uint8_t* data_received,
+		onfi::FeatureCommand command = onfi::FeatureCommand::Get) const;
 
 	/**
 	 * @brief Busy-wait delay used by profiling and margining routines.
 	 * @param loop_count Iterations of the internal delay loop.
 	 */
-	void delay_function(uint32_t loop_count);
+	void delay_function(uint32_t loop_count) override;
 	/** @brief Capture timing data for the most recent operation. */
 	void profile_time();
 

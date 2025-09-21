@@ -37,4 +37,20 @@ uint32_t gpio_read_levels0();
 // Restore scheduler state and release bcm2835 resources when finished.
 void gpio_shutdown();
 
+
+class GpioSession {
+public:
+    explicit GpioSession(bool throw_on_failure = true);
+    GpioSession(const GpioSession&) = delete;
+    GpioSession& operator=(const GpioSession&) = delete;
+    GpioSession(GpioSession&& other) noexcept;
+    GpioSession& operator=(GpioSession&& other) noexcept;
+    ~GpioSession();
+
+    bool ok() const { return active_; }
+
+private:
+    bool active_ = false;
+};
+
 #endif // GPIO_H
