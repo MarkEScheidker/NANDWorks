@@ -168,6 +168,7 @@ void onfi_interface::convert_pagenumber_to_columnrow_address(unsigned int my_blo
     LOG_ONFI_DEBUG_IF(verbose, ".. converted to %d,%d,%d,%d,%d",
                       (int)my_test_block_address[0], (int)my_test_block_address[1], (int)my_test_block_address[2],
                       (int)my_test_block_address[3], (int)my_test_block_address[4]);
+    (void)verbose;
 }
 
 // following function reads the ONFI parameter page
@@ -193,7 +194,7 @@ void onfi_interface::get_features(uint8_t address, uint8_t* data_received, onfi:
 
 // following function will convert a block from MLC mode to SLC mode
 // .. it uses set_features option to convert the block from SLC to MLC
-__attribute__((always_inline)) void onfi_interface::delay_function(uint32_t loop_count) {
+void onfi_interface::delay_function(uint32_t loop_count) {
     if (loop_count == 0) {
         return;
     }

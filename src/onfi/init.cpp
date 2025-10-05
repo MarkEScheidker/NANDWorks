@@ -73,6 +73,7 @@ void onfi_interface::initialize_onfi(bool verbose) {
 }
 
 void onfi_interface::deinitialize_onfi(bool verbose) {
+    (void)verbose;
 #if DEBUG_ONFI
     if (onfi_debug_file.is_open()) {
         onfi_debug_file.close();
@@ -133,6 +134,7 @@ void onfi_interface::device_initialization(bool verbose) {
 // .. .. command to be sent is 0xFF
 // .. .. check for R/B signal to be high after certain duration (should go low(busy) and go high (ready))
 void onfi_interface::reset_device(bool verbose) {
+    (void)verbose;
     // oxff is reset command
     send_command(0xff);
     // No fixed delay; just wait for ready with a timeout

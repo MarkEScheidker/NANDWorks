@@ -75,7 +75,7 @@ void interface::close_interface_debug_file(bool verbose) {
     if (verbose) LOG_HAL_INFO("Closing interface debug");
 }
 
-__attribute__((always_inline)) void interface::set_pin_direction_inactive() const {
+void interface::set_pin_direction_inactive() const {
     // Set all control pins to output and inactive state
     gpio_set_direction(GPIO_WP, true); gpio_write(GPIO_WP, 1);
     gpio_set_direction(GPIO_CLE, true); gpio_write(GPIO_CLE, 0);
@@ -96,11 +96,11 @@ __attribute__((always_inline)) void interface::set_pin_direction_inactive() cons
     gpio_set_direction(GPIO_DQSC, true); gpio_write(GPIO_DQSC, 0);
 }
 
-__attribute__((always_inline)) void interface::set_ce_low() const {
+void interface::set_ce_low() const {
     gpio_write(GPIO_CE, 0);
 }
 
-__attribute__((always_inline)) void interface::set_default_pin_values() const {
+void interface::set_default_pin_values() const {
     gpio_write(GPIO_CE, 1);
     gpio_write(GPIO_RE, 1);
     gpio_write(GPIO_WE, 1);
@@ -114,20 +114,20 @@ __attribute__((always_inline)) void interface::set_default_pin_values() const {
     gpio_set_direction(GPIO_DQSC, false);
 }
 
-__attribute__((always_inline)) void interface::set_datalines_direction_default() const {
+void interface::set_datalines_direction_default() const {
     for (uint8_t pin : kDqPins) {
         gpio_set_direction(pin, true);
     }
     set_dq_pins(0x00); // Reset DQ pins to low
 }
 
-__attribute__((always_inline)) void interface::set_datalines_direction_input() const {
+void interface::set_datalines_direction_input() const {
     for (uint8_t pin : kDqPins) {
         gpio_set_direction(pin, false);
     }
 }
 
-__attribute__((always_inline)) void interface::restore_control_pins(bool release_data_bus) const {
+void interface::restore_control_pins(bool release_data_bus) const {
     gpio_write(GPIO_CE, 1);
     gpio_write(GPIO_WE, 1);
     gpio_write(GPIO_RE, 1);
@@ -141,7 +141,7 @@ __attribute__((always_inline)) void interface::restore_control_pins(bool release
     }
 }
 
-__attribute__((always_inline)) void interface::send_command(uint8_t command_to_send) const {
+void interface::send_command(uint8_t command_to_send) const {
     gpio_write(GPIO_CE, 0);
     gpio_write(GPIO_CLE, 1);
 
@@ -153,7 +153,7 @@ __attribute__((always_inline)) void interface::send_command(uint8_t command_to_s
     restore_control_pins(false);
 }
 
-__attribute__((always_inline)) void interface::send_addresses(const uint8_t *address_to_send, uint8_t num_address_bytes,
+void interface::send_addresses(const uint8_t *address_to_send, uint8_t num_address_bytes,
                                                               bool verbose) const {
     LOG_HAL_DEBUG_IF(verbose, "Sending %u address bytes", static_cast<unsigned>(num_address_bytes));
 
@@ -171,7 +171,7 @@ __attribute__((always_inline)) void interface::send_addresses(const uint8_t *add
     (void)verbose;
 }
 
-__attribute__((always_inline)) void interface::send_data(const uint8_t *data_to_send, uint16_t num_data) const {
+void interface::send_data(const uint8_t *data_to_send, uint16_t num_data) const {
     if (interface_type == asynchronous) {
         gpio_write(GPIO_CE, 0);
         for (uint16_t i = 0; i < num_data; ++i) {
@@ -228,6 +228,7 @@ void interface::test_leds_increment(bool verbose) {
     }
 
     LOG_HAL_INFO_IF(verbose, ".. Testing LEDs completed");
+    (void)verbose;
 }
 
 bool interface::wait_ready(uint64_t timeout_ns) const {

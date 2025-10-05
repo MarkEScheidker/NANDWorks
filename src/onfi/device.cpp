@@ -160,6 +160,7 @@ bool NandDevice::verify_program_page(unsigned int block, unsigned int page,
                                      int max_allowed_errors,
                                      uint32_t* out_byte_errors,
                                      uint32_t* out_bit_errors) const {
+    (void)verbose;
     const uint32_t total = geometry.page_size_bytes + (including_spare ? geometry.spare_size_bytes : 0);
     std::vector<uint8_t> got;
     read_page(block, page, including_spare, /*bytewise*/false, got);
@@ -185,6 +186,7 @@ bool NandDevice::verify_program_block(unsigned int block,
                                       bool including_spare,
                                       bool verbose,
                                       int max_allowed_errors) const {
+    (void)verbose;
     const uint32_t total = geometry.page_size_bytes + (including_spare ? geometry.spare_size_bytes : 0);
     std::vector<uint8_t> default_buf;
     const uint8_t* exp = expected;
@@ -209,6 +211,7 @@ bool NandDevice::verify_erase_block(unsigned int block,
                                     uint16_t num_pages,
                                     bool including_spare,
                                     bool verbose) const {
+    (void)verbose;
     const uint32_t total = geometry.page_size_bytes + (including_spare ? geometry.spare_size_bytes : 0);
     std::vector<uint8_t> got;
     bool ok = true;

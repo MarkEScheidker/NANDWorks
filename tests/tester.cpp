@@ -138,6 +138,7 @@ static bool test_multi_page_program(onfi_interface &onfi_instance, bool verbose)
 }
 
 static bool test_page_reads(onfi_interface &onfi_instance, bool verbose) {
+    (void)verbose;
     unsigned int block = pick_good_block(onfi_instance);
     onfi::OnfiController ctrl(onfi_instance);
     onfi::NandDevice dev(ctrl);
@@ -443,12 +444,11 @@ static bool test_verify_mismatch_detection(onfi_interface &onfi_instance, bool v
 
 // Test that programming with including_spare=false does not alter spare area
 static bool test_spare_preserved_when_excluded(onfi_interface &onfi_instance, bool verbose) {
+    (void)verbose;
     unsigned int block = pick_good_block(onfi_instance);
     unsigned int page = 0;
 
     size_t main_size = onfi_instance.num_bytes_in_page;
-    size_t spare_size = onfi_instance.num_spare_bytes_in_page;
-    size_t total = main_size + spare_size;
     uint8_t *main_only_pattern = new uint8_t[main_size];
     for (size_t i = 0; i < main_size; ++i)
         main_only_pattern[i] = static_cast<uint8_t>((i * 7) & 0xFF);
@@ -533,6 +533,7 @@ static bool test_first_last_block_erase(onfi_interface &onfi_instance, bool verb
 
 // Compare bulk vs bytewise read paths return identical data
 static bool test_bulk_vs_bytewise_read_consistency(onfi_interface &onfi_instance, bool verbose) {
+    (void)verbose;
     unsigned int block = pick_good_block(onfi_instance);
     unsigned int page = 0;
 
@@ -564,6 +565,7 @@ static bool test_bulk_vs_bytewise_read_consistency(onfi_interface &onfi_instance
 
 // Program a whole block with a provided pattern and verify
 static bool test_block_program_subset_verify(onfi_interface &onfi_instance, bool verbose) {
+    (void)verbose;
     unsigned int block = pick_good_block(onfi_instance);
 
     size_t total = onfi_instance.num_bytes_in_page + onfi_instance.num_spare_bytes_in_page;
@@ -716,6 +718,7 @@ static bool test_tlc_subpages_if_supported(onfi_interface &onfi_instance, bool v
 
 // Exercise NandDevice::read_block via a sink on a small subset
 static bool test_read_block_with_sink(onfi_interface &onfi_instance, bool verbose) {
+    (void)verbose;
     unsigned int block = pick_good_block(onfi_instance);
     uint16_t subset[2] = {0, 1};
 
