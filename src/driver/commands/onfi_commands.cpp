@@ -5,6 +5,7 @@
 #include "gpio.hpp"
 #include "onfi/controller.hpp"
 #include "onfi/device.hpp"
+#include "onfi/timed_commands.hpp"
 #include "onfi_interface.hpp"
 #include <algorithm>
 #include <array>
@@ -183,6 +184,47 @@ void print_byte_table(std::ostream& out, const std::vector<uint8_t>& data) {
         out << "|\n";
     }
     out << std::dec << std::setfill(' ');
+}
+
+void print_timing_summary(std::ostream& out,
+                          std::string_view label,
+                          const onfi::timed::OperationTiming& timing) {
+    out << label << " busy interval: ";
+    if (!timing.busy_detected) {
+        out << "not observed" << "\n";
+        return;
+    }
+
+    const double micros = static_cast<double>(timing.duration_ns) / 1000.0;
+    out << std::fixed << std::setprecision(3) << micros
+        << " us (" << timing.duration_ns << " ns)\n";
+    out.unsetf(std::ios::floatfield);
+    out << "  status: 0x" << std::hex << std::setw(2) << std::setfill('0')
+        << static_cast<int>(timing.status) << std::dec << std::setfill(' ') << "\n";
+    out << "  ready:  " << (timing.ready ? "yes" : "no") << "\n";
+    out << "  pass:   " << (timing.pass ? "yes" : "no") << "\n";
+    if (timing.timed_out) {
+        out << "  note:  busy interval exceeded timeout threshold" << "\n";
+    }
+}
+
+void report_timing_status(std::ostream& err,
+                          std::string_view label,
+                          const onfi::timed::OperationTiming& timing) {
+    if (timing.succeeded()) return;
+
+    err << label << ' ';
+    if (!timing.busy_detected) {
+        err << "never asserted busy";
+    } else if (!timing.ready) {
+        err << "did not report ready completion";
+    } else if (!timing.pass) {
+        err << "reported failure status";
+    } else if (timing.timed_out) {
+        err << "exceeded busy timeout";
+    }
+    err << " (status=0x" << std::hex << std::setw(2) << std::setfill('0')
+        << static_cast<int>(timing.status) << std::dec << std::setfill(' ') << ")\n";
 }
 
 bool write_file(const std::string& path, const std::vector<uint8_t>& data) {
@@ -547,6 +589,99 @@ int program_block_command(const CommandContext& context) {
 
     context.out << "Program block successful." << "\n";
     return 0;
+}
+
+int measure_erase_command(const CommandContext& context) {
+    auto& onfi = context.driver.require_onfi_started();
+    const int64_t block = context.arguments.require_int("block");
+    ensure_block_in_range(onfi, block);
+
+    const auto timing = onfi::timed::erase_block(
+        onfi,
+        static_cast<unsigned int>(block),
+        context.verbose);
+
+    print_timing_summary(context.out, "Erase", timing);
+    report_timing_status(context.err, "Erase", timing);
+    return timing.succeeded() ? 0 : 1;
+}
+
+int measure_program_command(const CommandContext& context) {
+    auto& onfi = context.driver.require_onfi_started();
+    const int64_t block = context.arguments.require_int("block");
+    ensure_block_in_range(onfi, block);
+    const int64_t page = context.arguments.require_int("page");
+    ensure_page_in_range(onfi, page);
+
+    const bool include_spare = context.arguments.has("include-spare");
+    const bool pad = context.arguments.has("pad");
+    const auto input_path = context.arguments.value("input");
+
+    const std::size_t expected = static_cast<std::size_t>(onfi.num_bytes_in_page) +
+                                 (include_spare ? onfi.num_spare_bytes_in_page : 0U);
+    std::vector<uint8_t> payload(expected, 0xFF);
+    if (input_path) {
+        payload = read_file(*input_path);
+        if (payload.size() < expected) {
+            if (!pad) {
+                throw std::runtime_error("Input shorter than expected page length; use --pad to fill remaining bytes");
+            }
+            payload.resize(expected, 0xFF);
+        } else if (payload.size() > expected) {
+            throw std::runtime_error("Input larger than expected page length");
+        }
+    }
+
+    const auto timing = onfi::timed::program_page(
+        onfi,
+        static_cast<unsigned int>(block),
+        static_cast<unsigned int>(page),
+        payload.data(),
+        static_cast<uint32_t>(payload.size()),
+        include_spare,
+        context.verbose);
+
+    context.out << "Payload length: " << payload.size() << " bytes\n";
+    print_timing_summary(context.out, "Program", timing);
+    report_timing_status(context.err, "Program", timing);
+    return timing.succeeded() ? 0 : 1;
+}
+
+int measure_read_command(const CommandContext& context) {
+    auto& onfi = context.driver.require_onfi_started();
+    const int64_t block = context.arguments.require_int("block");
+    ensure_block_in_range(onfi, block);
+    const int64_t page = context.arguments.require_int("page");
+    ensure_page_in_range(onfi, page);
+
+    const bool include_spare = context.arguments.has("include-spare");
+    const auto output_path = context.arguments.value("output");
+
+    const std::size_t expected = static_cast<std::size_t>(onfi.num_bytes_in_page) +
+                                 (include_spare ? onfi.num_spare_bytes_in_page : 0U);
+    std::vector<uint8_t> buffer(expected, 0x00);
+
+    const auto timing = onfi::timed::read_page(
+        onfi,
+        static_cast<unsigned int>(block),
+        static_cast<unsigned int>(page),
+        buffer.data(),
+        static_cast<uint32_t>(buffer.size()),
+        include_spare,
+        context.verbose);
+
+    context.out << "Captured " << buffer.size() << " bytes\n";
+    print_timing_summary(context.out, "Read", timing);
+    if (output_path) {
+        if (!write_file(*output_path, buffer)) {
+            throw std::runtime_error("Failed to write output file: " + *output_path);
+        }
+        context.out << "Wrote page data to '" << *output_path << "'\n";
+    } else {
+        print_byte_table(context.out, buffer);
+    }
+    report_timing_status(context.err, "Read", timing);
+    return timing.succeeded() ? 0 : 1;
 }
 
 int verify_page_command(const CommandContext& context) {
@@ -1245,6 +1380,64 @@ void register_onfi_commands(CommandRegistry& registry) {
     });
 
     registry.register_command({
+        .name = "measure-erase",
+        .aliases = {"timed-erase"},
+        .summary = "Erase a block and report busy time.",
+        .description = "Issues a block erase and reports the busy interval measured from R/B#.",
+        .usage = "nandworks measure-erase --block <index> --force",
+        .options = {
+            OptionSpec{"block", 'b', true, true, false, "index", "Block index (0-based)."}
+        },
+        .min_positionals = 0,
+        .max_positionals = 0,
+        .safety = CommandSafety::RequiresForce,
+        .requires_session = true,
+        .requires_root = true,
+        .handler = measure_erase_command,
+    });
+
+    registry.register_command({
+        .name = "measure-program",
+        .aliases = {"timed-program"},
+        .summary = "Program a page and report busy time.",
+        .description = "Programs a page and reports the busy interval observed via R/B#.",
+        .usage = "nandworks measure-program --block <index> --page <index> --force",
+        .options = {
+            OptionSpec{"block", 'b', true, true, false, "index", "Block index (0-based)."},
+            OptionSpec{"page", 'p', true, true, false, "index", "Page index within the block."},
+            OptionSpec{"include-spare", '\0', false, false, false, "", "Include spare bytes in the transfer."},
+            OptionSpec{"input", 'i', false, true, false, "file", "Binary payload to program (defaults to 0xFF fill)."},
+            OptionSpec{"pad", '\0', false, false, false, "", "Pad shorter input with 0xFF."}
+        },
+        .min_positionals = 0,
+        .max_positionals = 0,
+        .safety = CommandSafety::RequiresForce,
+        .requires_session = true,
+        .requires_root = true,
+        .handler = measure_program_command,
+    });
+
+    registry.register_command({
+        .name = "measure-read",
+        .aliases = {"timed-read"},
+        .summary = "Read a page and report busy time.",
+        .description = "Reads a page, streams it to stdout unless --output is provided, and reports the busy interval.",
+        .usage = "nandworks measure-read --block <index> --page <index> [--output <path>]",
+        .options = {
+            OptionSpec{"block", 'b', true, true, false, "index", "Block index (0-based)."},
+            OptionSpec{"page", 'p', true, true, false, "index", "Page index within the block."},
+            OptionSpec{"include-spare", '\0', false, false, false, "", "Include spare bytes in the transfer."},
+            OptionSpec{"output", 'o', true, false, false, "file", "Write captured data to a file."}
+        },
+        .min_positionals = 0,
+        .max_positionals = 0,
+        .safety = CommandSafety::Safe,
+        .requires_session = true,
+        .requires_root = true,
+        .handler = measure_read_command,
+    });
+
+    registry.register_command({
         .name = "erase-block",
         .aliases = {"erase"},
         .summary = "Erase a NAND block.",
@@ -1292,6 +1485,9 @@ set_flags("raw-address", true, true);
 set_flags("raw-send-data", true, true);
 set_flags("raw-read-data", true, true);
 set_flags("raw-change-column", true, true);
+set_flags("measure-erase", true, true);
+set_flags("measure-program", true, true);
+set_flags("measure-read", true, true);
 set_flags("erase-block", true, true);
 
 

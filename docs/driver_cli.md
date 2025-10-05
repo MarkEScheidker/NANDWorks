@@ -58,6 +58,14 @@ The registry exposes the following functional groups. Every command automaticall
 | `raw-address` (`--bytes`) | Sends one or more address cycles. | `sudo bin/nandworks raw-address --bytes 0x00,0x00,0x00 --force` |
 | `raw-send-data` (`--bytes`) | Drives data bytes onto the bus. | `sudo bin/nandworks raw-send-data --bytes 0xAA,0x55 --force` |
 
+### Timing metrics
+
+| Command | Description | Example |
+| --- | --- | --- |
+| `measure-erase` (`--block`, `--force`) | Issues a block erase and reports the busy interval observed on R/B#. | `sudo bin/nandworks measure-erase --block 10 --force` |
+| `measure-program` (`--block`, `--page`, `--include-spare`, `--input`, `--pad`, `--force`) | Programs a page (default 0xFF fill) and reports how long the device remained busy. | `sudo bin/nandworks measure-program --block 10 --page 4 --force` |
+| `measure-read` (`--block`, `--page`, `--include-spare`, `--output <file>`) | Reads a page, printing it to stdout unless an output path is provided, and reports the array-to-cache transfer time. | `sudo bin/nandworks measure-read --block 10 --page 4 --output read.bin` |
+
 ### Verification & maintenance
 
 | Command | Description | Example |
@@ -95,4 +103,3 @@ To add a new command:
 4. Add parser/unit coverage under `tests/` to lock in the new behaviour.
 
 With these patterns, the CLI remains the single, authoritative interface for both manual operation and scripted automation.
-

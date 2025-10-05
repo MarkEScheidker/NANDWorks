@@ -143,6 +143,13 @@ If you need to point at a different `libbcm2835`, adjust the include/library pat
 Generated artifacts:
 - `time_info_file.txt` – Created when binaries are built with `PROFILE_TIME=1`; records per-operation timing data.
 
+### Timing-focused CLI commands
+The main driver also exposes timing-specific variants that reuse the new low-level helpers to measure the exact busy interval reported on R/B#:
+
+- `measure-erase --block <index> --force` – Issues a block erase and prints the nanosecond/microsecond busy duration along with the resulting status byte.
+- `measure-program --block <index> --page <index> --force [--input file] [--include-spare] [--pad]` – Programs a single page (defaulting to an 0xFF fill) and reports how long the device remained busy.
+- `measure-read --block <index> --page <index> [--include-spare] [--output <path>]` – Reads a page, printing it to stdout by default or writing to a file when `--output` is provided, and reports the array-to-cache transfer time.
+
 ## Library Architecture
 - **Hardware Abstraction Layer (HAL):** `include/microprocessor_interface.hpp` / `src/microprocessor_interface.cpp` manage GPIO modes, signal timing, and register access using `libbcm2835`.
 - **ONFI Protocol Layer:** `include/onfi_interface.hpp` and `src/onfi/*.cpp` implement reset, identification, feature access, block/page I/O, verification helpers, and higher-level utilities (controllers, data sinks, geometry helpers).
