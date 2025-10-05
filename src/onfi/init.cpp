@@ -9,15 +9,15 @@
 #include <algorithm>
 #include "logging.hpp"
 
-void onfi_interface::get_started(param_type ONFI_OR_JEDEC) {
+void onfi_interface::get_started(param_type ONFI_OR_JEDEC, bool verbose) {
     bool bytewise = false;
-    initialize_onfi();
+    initialize_onfi(verbose);
 
     /**now that the object is created
     .. the object should go and initialize itself by looking at the addresses and map to them
     .. let us test if the LEDs test will succeed
     */
-    test_onfi_leds();
+    test_onfi_leds(verbose);
 
 #if PROFILE_TIME
     open_time_profile_file();
@@ -27,7 +27,7 @@ void onfi_interface::get_started(param_type ONFI_OR_JEDEC) {
     .. this should follow a pattern of power cycle as mentioned in the datasheet
     .. then we will do a reset operation
     */
-    device_initialization();
+    device_initialization(verbose);
     read_id();
 
     /**
@@ -41,7 +41,7 @@ void onfi_interface::get_started(param_type ONFI_OR_JEDEC) {
         bytewise = false;
     }
 
-    read_parameters(ONFI_OR_JEDEC, bytewise, true);
+    read_parameters(ONFI_OR_JEDEC, bytewise, verbose);
 
     // Set timing mode to 4 (25ns tRC/tWC)
     uint8_t timing_mode_data[4] = {0x04, 0x00, 0x00, 0x00};

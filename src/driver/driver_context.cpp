@@ -22,7 +22,7 @@ onfi_interface& DriverContext::require_onfi_started(param_type type) {
     onfi_interface& controller = require_onfi();
     if (!started_) {
         try {
-            controller.get_started(type);
+            controller.get_started(type, verbose_);
             started_ = true;
             start_type_ = type;
         } catch (...) {

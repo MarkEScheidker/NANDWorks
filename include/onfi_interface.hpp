@@ -99,8 +99,9 @@ public:
 	/**
 	 * @brief Initialize the ONFI stack and underlying HAL resources.
 	 * @param ONFI_OR_JEDEC Select ONFI (default) or JEDEC parameter parsing.
+	 * @param verbose Emit initialization details and parameter summaries when true.
 	 */
-	void get_started(param_type ONFI_OR_JEDEC=ONFI);
+	void get_started(param_type ONFI_OR_JEDEC=ONFI, bool verbose = false);
 
 /**
 	 * @brief Bring up the hardware bridge, map registers, and perform power-on checks.
