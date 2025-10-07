@@ -36,11 +36,11 @@ NANDWorks is a C++ toolkit that lets Raspberry Pi single-board computers exercis
 # Build the static library, utilities, tests, examples, and docs
 make
 
-# Discover available binaries and categories
-make help
+# Inspect the unified driver and available commands
+bin/nandworks --help
 
-# Run the GPIO benchmark (requires sudo on the Pi)
-sudo bin/apps/benchmark
+# Probe the attached NAND (requires sudo on the Pi)
+sudo bin/nandworks probe
 ```
 
 To clean generated artifacts under `build/`, `bin/`, and `docs/html`:
@@ -49,6 +49,62 @@ make clean
 ```
 
 > **Note:** `make` invokes `make docs`, which only runs Doxygen if it is present. When missing, the build prints “Doxygen not found; skipping docs” and continues.
+
+
+## Unified CLI Driver
+The `bin/nandworks` binary is now the primary front-end for NANDWorks. It consolidates device bring-up, data-path operations, verification helpers, and raw transport primitives:
+
+- `bin/nandworks --help` lists every registered command with a short summary.
+- `bin/nandworks help <command>` prints command-specific syntax, options, and safety notes.
+- Commands that touch the hardware must be run with `sudo`; destructive flows (`program-*`, `erase-*`, raw command/address/data helpers) also require `--force` before they will execute.
+
+### Identification & maintenance
+| Command | Capability |
+| --- | --- |
+| `probe` | Initialise the ONFI stack, parse the parameter page, and print manufacturer/model/geometry details. |
+| `read-id` | Execute READ-ID/UNIQUE-ID and emit the identifier in ASCII and hex form. |
+| `status` (`--raw`) | Issue `0x70` and report ready/pass/write-protect bits (optionally the raw bitmap). |
+| `parameters` (`--jedec`, `--bytewise`, `--raw`, `--output`) | Refresh the ONFI/Jedec parameter page, update cached geometry, and optionally dump the 256-byte payload. |
+| `scan-bad-blocks` (`--block`) | Report factory bad blocks across the device or for a single block. |
+| `reset-device`, `device-init`, `wait-ready` | Expose the HAL maintenance helpers for scripted workflows. |
+
+### Read / inspect
+| Command | Capability |
+| --- | --- |
+| `read-page` (`--include-spare`, `--bytewise`, `--output`) | Capture a single page to stdout or a file. |
+| `read-block` (`--pages`, `--include-spare`, `--bytewise`, `--output`) | Stream a full block or page subset to a file or printable hexdump. |
+| `raw-change-column` (`--column`), `raw-read-data` (`--count`) | Adjust the read pointer and pull arbitrary bytes from the bus. |
+
+### Program & erase (require `--force`)
+| Command | Capability |
+| --- | --- |
+| `program-page` (`--input`, `--include-spare`, `--pad`, `--verify`) | Program a single page from a buffer and optionally verify it. |
+| `program-block` (`--pages`, `--input`, `--random`, `--verify`) | Program a block or list of pages using supplied or random data. |
+| `erase-block`, `erase-chip` | Erase individual blocks or contiguous ranges. |
+| `set-feature`, `raw-command`, `raw-address`, `raw-send-data` | Drive ONFI command/address/data cycles directly. |
+
+### Verification & diagnostics
+| Command | Capability |
+| --- | --- |
+| `verify-page`, `verify-block` | Compare flash contents against reference data and report byte/bit error counts. |
+| `test-leds` | Pulse the indicator LEDs to confirm GPIO wiring. |
+
+Example flows:
+```bash
+# Identify the attached device
+sudo bin/nandworks probe
+
+# Dump a page (including spare bytes) to disk
+sudo bin/nandworks read-page --block 10 --page 4 --include-spare --output page10_4.bin
+
+# Program and verify a page (explicit opt-in)
+sudo bin/nandworks program-page --block 10 --page 4 --input payload.bin --verify --force
+
+# Scan for factory-marked bad blocks
+sudo bin/nandworks scan-bad-blocks
+```
+
+Legacy helper binaries under `bin/apps/` remain available for transitional workflows, but new automation should target `bin/nandworks` so behaviour stays centralised.
 
 ## Build Configuration
 The top-level `Makefile` auto-discovers sources and produces a static core library plus per-target binaries:
@@ -76,6 +132,7 @@ If you need to point at a different `libbcm2835`, adjust the include/library pat
 ## Runtime Tools
 | Binary | Location | Description |
 | --- | --- | --- |
+| `nandworks` | `bin/nandworks` | Unified CLI covering identification, read/program/erase flows, feature access, and raw transport helpers. |
 | `benchmark` | `bin/apps/benchmark` | Measures GPIO toggle rates for a range of busy-wait loop counts. |
 | `erase_chip` | `bin/apps/erase_chip` | Iterates through every block and issues a full-chip erase (destructive). |
 | `profiler` | `bin/apps/profiler` | Runs representative ONFI operations while streaming timing data when profiling is enabled. |
@@ -85,6 +142,13 @@ If you need to point at a different `libbcm2835`, adjust the include/library pat
 
 Generated artifacts:
 - `time_info_file.txt` – Created when binaries are built with `PROFILE_TIME=1`; records per-operation timing data.
+
+### Timing-focused CLI commands
+The main driver also exposes timing-specific variants that reuse the new low-level helpers to measure the exact busy interval reported on R/B#:
+
+- `measure-erase --block <index> --force` – Issues a block erase and prints the nanosecond/microsecond busy duration along with the resulting status byte.
+- `measure-program --block <index> --page <index> --force [--input file] [--include-spare] [--pad]` – Programs a single page (defaulting to an 0xFF fill) and reports how long the device remained busy.
+- `measure-read --block <index> --page <index> [--include-spare] [--output <path>]` – Reads a page, printing it to stdout by default or writing to a file when `--output` is provided, and reports the array-to-cache transfer time.
 
 ## Library Architecture
 - **Hardware Abstraction Layer (HAL):** `include/microprocessor_interface.hpp` / `src/microprocessor_interface.cpp` manage GPIO modes, signal timing, and register access using `libbcm2835`.
@@ -110,6 +174,8 @@ The Doxygen configuration under `docs/` parses these headers to produce browsabl
 ```
 
 ## Documentation
+- `docs/driver_cli.md` – Narrative guide to the unified `nandworks` CLI, its safety rails, and example workflows.
+
 Regenerate the HTML reference under `docs/html` with:
 ```bash
 make docs

@@ -31,12 +31,18 @@ EXTRA_EXAMPLE_LIBS ?= -lpigpio
 APP_LDLIBS     = $(LDLIBS)
 TEST_LDLIBS    = $(LDLIBS)
 EXAMPLE_LDLIBS = $(LDLIBS) $(EXTRA_EXAMPLE_LIBS)
+MAIN_SOURCE = nandworks
+MAIN_OBJ     = $(OBJ_DIR)/$(MAIN_SOURCE).o
+MAIN_TARGET  = $(BIN_DIR)/nandworks
+
 
 # Program-specific extra libraries
 # Core/library sources (no app/test code)
 CORE_SOURCES = microprocessor_interface timing gpio \
-               onfi/init onfi/identify onfi/read onfi/program onfi/erase onfi/util \
-               onfi/address onfi/param_page onfi/controller onfi/device onfi/data_sink
+               onfi/init onfi/identify onfi/read onfi/program onfi/erase onfi/util onfi/timed_commands \
+               onfi/address onfi/param_page onfi/controller onfi/device onfi/data_sink \
+               driver/command_registry driver/driver_context driver/command_arguments driver/cli_parser \
+               driver/commands/onfi_commands
 
 # Program source layout
 APP_SOURCE_DIR     = apps
@@ -67,11 +73,11 @@ EXAMPLE_BIN_DIR = $(BIN_DIR)/examples
 APP_TARGETS     = $(addprefix $(APP_BIN_DIR)/,$(APP_PROGRAMS))
 TEST_TARGETS    = $(addprefix $(TEST_BIN_DIR)/,$(TEST_PROGRAMS))
 EXAMPLE_TARGETS = $(addprefix $(EXAMPLE_BIN_DIR)/,$(EXAMPLE_PROGRAMS))
-TARGETS         = $(APP_TARGETS) $(TEST_TARGETS) $(EXAMPLE_TARGETS)
+TARGETS         = $(MAIN_TARGET) $(APP_TARGETS) $(TEST_TARGETS) $(EXAMPLE_TARGETS)
 
 all: $(TARGETS) docs
 
-.PHONY: debug trace profile help docs clean
+.PHONY: debug trace profile help docs clean nandworks
 
 debug:
 	$(MAKE) all LOG_ONFI_LEVEL=4 LOG_HAL_LEVEL=4 PROFILE_TIME=1 CXXFLAGS="$(CXXFLAGS) -g -O0"
@@ -127,6 +133,14 @@ $(OBJ_DIR)/tests/%.o: $(TEST_SOURCE_DIR)/%.cpp | $(OBJ_DIR)
 $(OBJ_DIR)/examples/%.o: $(EXAMPLE_SOURCE_DIR)/%.cpp | $(OBJ_DIR)
 	mkdir -p $(dir $@)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
+$(MAIN_OBJ): $(MAIN_SOURCE).cpp | $(OBJ_DIR)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
+
+$(MAIN_TARGET): $(LIB_DIR)/libonfi.a $(MAIN_OBJ)
+	mkdir -p $(dir $@)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(MAIN_OBJ) $(LIB_DIR)/libonfi.a -o $@ $(APP_LDLIBS)
+	rm $(MAIN_OBJ)
+
 
 # Convenience targets for direct invocation (e.g. `make tester`)
 $(APP_PROGRAMS): %: $(APP_BIN_DIR)/%
@@ -137,6 +151,9 @@ $(EXAMPLE_PROGRAMS): %: $(EXAMPLE_BIN_DIR)/%
 $(APP_BIN_DIR)/%: $(LIB_DIR)/libonfi.a $(OBJ_DIR)/apps/%.o
 	mkdir -p $(dir $@)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJ_DIR)/apps/$*.o $(LIB_DIR)/libonfi.a -o $@ $(APP_LDLIBS)
+nandworks: $(MAIN_TARGET)
+	@:
+
 
 $(TEST_BIN_DIR)/%: $(LIB_DIR)/libonfi.a $(OBJ_DIR)/tests/%.o
 	mkdir -p $(dir $@)
