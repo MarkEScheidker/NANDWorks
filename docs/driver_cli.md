@@ -76,6 +76,12 @@ The registry exposes the following functional groups. Every command automaticall
 | `device-init` | Runs the power-on initialisation helper (`device_initialization`). | `sudo bin/nandworks device-init` |
 | `wait-ready` | Exposes the HAL wait loop as a first-class command. | `sudo bin/nandworks wait-ready` |
 
+### Automation
+
+| Command | Description | Example |
+| --- | --- | --- |
+| `script` (`--allow-unsafe`) | Executes a LuaJIT script. Commands are invoked through `exec(...)`, and additional args after `--` arrive in Lua's `arg` table. | `sudo bin/nandworks script workflows/probe.lua -- device0` |
+
 
 ## Patterns & tips
 
@@ -83,6 +89,7 @@ The registry exposes the following functional groups. Every command automaticall
 - **Force guard** – Destructive commands throw an argument error when `--force` is omitted. This keeps exploratory work safe, especially when running scripts.
 - **Uniform parsing** – Options accept both long (`--block`) and short (`-b`) forms. Values can be specified inline (`--value=0x90`) or as separate tokens. Lists (`--pages 0,4,9-12`) accept comma and dash notation.
 - **Help everywhere** – Use `--help` or `-h` after any command to print its usage, option descriptions, and the force requirement if applicable.
+- **Embedded scripting** – `nandworks script` embeds LuaJIT. Scripts call back into the CLI via `exec("command", "--flag")` and can control the session through `driver.start_session()`/`driver.shutdown()`. Pass `--allow-unsafe` to expose Lua's `os`/`io` libraries when filesystem access is required.
 - **Legacy tools** – The original apps (`bin/apps/*`) are still built for compatibility, but they reuse the same underlying library. New automation should favour the CLI so behaviour stays consistent and scriptable.
 
 ## Troubleshooting

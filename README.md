@@ -30,6 +30,7 @@ NANDWorks is a C++ toolkit that lets Raspberry Pi single-board computers exercis
 - **Optional:** `doxygen` if you want HTML API docs (`sudo apt install doxygen`).
 - **Permissions:** Anything that touches `/dev/mem` (all runtime tools) must run with root privileges (`sudo`).
 - **Vendor library:** The repository already includes `libbcm2835` in `lib/bcm2835_install`, so no additional installation is required on the Pi.
+- **Submodules:** LuaJIT is tracked as a submodule; after cloning run `git submodule update --init --recursive` (or clone with `--recurse-submodules`).
 
 ## Quick Start
 ```bash
@@ -49,6 +50,81 @@ make clean
 ```
 
 > **Note:** `make` invokes `make docs`, which only runs Doxygen if it is present. When missing, the build prints “Doxygen not found; skipping docs” and continues.
+
+## LuaJIT Submodule
+LuaJIT lives under `lib/LuaJIT` and is tracked as a Git submodule. Common tasks:
+
+```bash
+# Populate submodules after cloning (if you skipped --recurse-submodules)
+git submodule update --init --recursive
+
+# Pull the main repo and refresh submodules to the recorded commits
+git pull --rebase
+git submodule update --init --recursive
+
+# Move LuaJIT to the latest upstream commit on its default branch
+git submodule update --remote lib/LuaJIT
+
+# Inspect or pin a specific LuaJIT release tag
+git -C lib/LuaJIT checkout v2.1-20230410
+```
+
+After changing the LuaJIT revision, commit both the `lib/LuaJIT` submodule pointer and `.gitmodules` (if it changed) so collaborators stay aligned.
+
+## Lua Scripting
+LuaJIT integration is enabled by default. Build normally with `make`, or disable it when toolchain support is unavailable:
+
+```bash
+# Standard build (LuaJIT on)
+make
+
+# Opt out of Lua support
+make WITH_LUAJIT=0
+```
+
+Run scripts with the new `script` command:
+
+```bash
+sudo bin/nandworks script examples/scripts/probe.lua
+
+# Forward arguments to the Lua script
+sudo bin/nandworks script automate.lua -- my-block 42
+```
+
+Within Lua you now get a `nandworks` helper module (the legacy globals remain for compatibility):
+- `nandworks.commands.<name>(opts)` (alias `commands.<name>`) mirrors every CLI command; hyphenated names map to underscores (`cmd.read_page{ block = 0, page = 0 }`). Boolean fields add flags, arrays feed repeatable options, and failures raise Lua errors unless you set `meta = { allow_failure = true }`.
+- `nandworks.with_session(function(cmd, nw) ... end [, "onfi" | "jedec"])` ensures the driver is started before your code runs and shuts it down afterwards. The callback receives the commands table and the module context, so you can still reach `nw.driver` if you need advanced control.
+- `nandworks.exec(...)` (alias `exec`) invokes a command manually and returns its status code.
+- `nandworks.driver` (alias `driver`) exposes the lower-level `start_session`, `shutdown`, and `is_active` helpers.
+- CLI arguments remain in the global `arg` table (`arg[0]` is the script path).
+
+Typical automation script:
+
+```lua
+nandworks.with_session(function(cmd)
+    cmd.probe()
+    cmd.parameters({ bytewise = true })
+    cmd.read_page({
+        block = 0,
+        page = 0,
+        include_spare = true,
+        output = "page0.bin",
+    })
+end)
+```
+
+By default only safe standard libraries are exposed. Pass `--allow-unsafe` to enable the Lua `os` and `io` libraries when you need filesystem access:
+
+```bash
+sudo bin/nandworks script --allow-unsafe tools/dump.lua
+```
+
+See `examples/scripts/probe.lua`, `examples/scripts/read_page.lua`, and `examples/scripts/program_page.lua` for walkthroughs. Additional automation smoke tests live under `tests/scripts/`, including `smoke.lua`, `bad_block_scan.lua`, and `random_cycle.lua`.
+
+More sample workflows:
+- `examples/scripts/dump_parameters.lua` – save the ONFI or JEDEC parameter page to disk.
+- `examples/scripts/scan_bad_blocks.lua` – list factory-marked bad blocks (optionally targeting a single block).
+- `examples/scripts/status_watch.lua` – poll the ONFI status register a few times to inspect ready/busy transitions.
 
 
 ## Unified CLI Driver
@@ -89,6 +165,11 @@ The `bin/nandworks` binary is now the primary front-end for NANDWorks. It consol
 | `verify-page`, `verify-block` | Compare flash contents against reference data and report byte/bit error counts. |
 | `test-leds` | Pulse the indicator LEDs to confirm GPIO wiring. |
 
+### Automation
+| Command | Capability |
+| --- | --- |
+| `script` (`--allow-unsafe`) | Execute a Lua script with access to `exec()` for CLI commands and driver helpers; pass extra args after `--`. |
+
 Example flows:
 ```bash
 # Identify the attached device
@@ -116,6 +197,7 @@ Core knobs you can override on the command line (defaults shown):
 - `LOG_ONFI_LEVEL=0` – Verbosity for protocol-layer logs (0–5)
 - `LOG_HAL_LEVEL=0` – Verbosity for hardware abstraction logs (0–5)
 - `PROFILE_TIME=0` – Enable timing capture for select operations
+- `WITH_LUAJIT=1` – Build and link the embedded LuaJIT runtime (set to 0 to disable)
 
 Convenience targets layer on common setups:
 ```bash
@@ -166,10 +248,14 @@ The Doxygen configuration under `docs/` parses these headers to produce browsabl
 ├── build/                  # Object files and intermediate static libraries
 ├── docs/                   # Doxygen config; HTML output lives in docs/html
 ├── examples/               # Sample programs that show API usage patterns
+│   └── scripts/            # Lua automation examples
 ├── include/                # Public headers (HAL, ONFI API, logging, timing)
-├── lib/bcm2835_install/    # Vendored bcm2835 headers and static library
+├── lib/                    # Vendored dependencies
+│   ├── bcm2835_install/    # Vendored bcm2835 headers and static library
+│   └── LuaJIT/             # LuaJIT runtime tracked as a submodule
 ├── src/                    # Core library implementation files
 ├── tests/                  # Functional test entry points (bin/tests)
+│   └── scripts/            # Lua automation smoke tests
 └── README.md               # Project overview (this file)
 ```
 

@@ -2,6 +2,7 @@
 #include "nandworks/command_context.hpp"
 #include "nandworks/command_registry.hpp"
 #include "nandworks/commands/onfi.hpp"
+#include "nandworks/commands/script.hpp"
 #include "nandworks/driver_context.hpp"
 
 #include <exception>
@@ -134,6 +135,7 @@ int main(int argc, char** argv) {
 
     nandworks::CommandRegistry registry;
     register_builtin_commands(registry);
+    nandworks::commands::register_script_commands(registry);
     nandworks::commands::register_onfi_commands(registry);
 
     if ((global_help || list_commands) && command_name.empty()) {

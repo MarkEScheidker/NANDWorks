@@ -1,3 +1,4 @@
+CC ?= gcc
 CXX ?= g++
 
 # -------------------------
@@ -5,6 +6,12 @@ CXX ?= g++
 LOG_ONFI_LEVEL ?= 0
 LOG_HAL_LEVEL  ?= 0
 PROFILE_TIME   ?= 0
+
+WITH_LUAJIT ?= 1
+
+LUAJIT_DIR := lib/LuaJIT
+LUAJIT_LIB := $(LUAJIT_DIR)/src/libluajit.a
+LUAJIT_INC := $(LUAJIT_DIR)/src
 
 THIRD_PARTY_DIR := lib/bcm2835_install
 
@@ -19,6 +26,14 @@ CPPFLAGS += -Iinclude -I$(THIRD_PARTY_DIR)/include \
             -DLOG_HAL_LEVEL=$(LOG_HAL_LEVEL) \
             -DPROFILE_TIME=$(PROFILE_TIME)
 
+ifeq ($(WITH_LUAJIT),1)
+CPPFLAGS += -DNANDWORKS_WITH_LUAJIT=1 -I$(LUAJIT_INC)
+LUAJIT_EXTRA_LIBS := $(LUAJIT_LIB)
+else
+CPPFLAGS += -DNANDWORKS_WITH_LUAJIT=0
+LUAJIT_EXTRA_LIBS :=
+endif
+
 CXXFLAGS ?= -std=c++17 -Wall -Wextra -O3
 
 LDFLAGS ?=
@@ -28,9 +43,9 @@ LDLIBS ?=
 LDLIBS += -lbcm2835 -lrt
 
 EXTRA_EXAMPLE_LIBS ?= -lpigpio
-APP_LDLIBS     = $(LDLIBS)
-TEST_LDLIBS    = $(LDLIBS)
-EXAMPLE_LDLIBS = $(LDLIBS) $(EXTRA_EXAMPLE_LIBS)
+APP_LDLIBS     = $(LDLIBS) $(LUAJIT_EXTRA_LIBS)
+TEST_LDLIBS    = $(LDLIBS) $(LUAJIT_EXTRA_LIBS)
+EXAMPLE_LDLIBS = $(LDLIBS) $(EXTRA_EXAMPLE_LIBS) $(LUAJIT_EXTRA_LIBS)
 MAIN_SOURCE = nandworks
 MAIN_OBJ     = $(OBJ_DIR)/$(MAIN_SOURCE).o
 MAIN_TARGET  = $(BIN_DIR)/nandworks
@@ -42,7 +57,8 @@ CORE_SOURCES = microprocessor_interface timing gpio \
                onfi/init onfi/identify onfi/read onfi/program onfi/erase onfi/util onfi/timed_commands \
                onfi/address onfi/param_page onfi/controller onfi/device onfi/data_sink \
                driver/command_registry driver/driver_context driver/command_arguments driver/cli_parser \
-               driver/commands/onfi_commands
+               driver/commands/onfi_commands driver/commands/script_command \
+               scripting/lua_engine
 
 # Program source layout
 APP_SOURCE_DIR     = apps
@@ -133,10 +149,19 @@ $(OBJ_DIR)/tests/%.o: $(TEST_SOURCE_DIR)/%.cpp | $(OBJ_DIR)
 $(OBJ_DIR)/examples/%.o: $(EXAMPLE_SOURCE_DIR)/%.cpp | $(OBJ_DIR)
 	mkdir -p $(dir $@)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
+
+ifeq ($(WITH_LUAJIT),1)
+$(LUAJIT_LIB):
+	$(MAKE) -C $(LUAJIT_DIR) BUILDMODE=static CC="$(CC)"
+
+$(OBJ_DIR)/src/scripting/%.o: | $(LUAJIT_LIB)
+$(OBJ_DIR)/src/driver/commands/script_command.o: | $(LUAJIT_LIB)
+endif
+
 $(MAIN_OBJ): $(MAIN_SOURCE).cpp | $(OBJ_DIR)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
 
-$(MAIN_TARGET): $(LIB_DIR)/libonfi.a $(MAIN_OBJ)
+$(MAIN_TARGET): $(LIB_DIR)/libonfi.a $(MAIN_OBJ) $(LUAJIT_EXTRA_LIBS)
 	mkdir -p $(dir $@)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(MAIN_OBJ) $(LIB_DIR)/libonfi.a -o $@ $(APP_LDLIBS)
 	rm $(MAIN_OBJ)
@@ -148,20 +173,23 @@ $(TEST_PROGRAMS): %: $(TEST_BIN_DIR)/%
 $(EXAMPLE_PROGRAMS): %: $(EXAMPLE_BIN_DIR)/%
 
 # Link rules per program type
-$(APP_BIN_DIR)/%: $(LIB_DIR)/libonfi.a $(OBJ_DIR)/apps/%.o
+$(APP_BIN_DIR)/%: $(LIB_DIR)/libonfi.a $(OBJ_DIR)/apps/%.o $(LUAJIT_EXTRA_LIBS)
 	mkdir -p $(dir $@)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJ_DIR)/apps/$*.o $(LIB_DIR)/libonfi.a -o $@ $(APP_LDLIBS)
 nandworks: $(MAIN_TARGET)
 	@:
 
 
-$(TEST_BIN_DIR)/%: $(LIB_DIR)/libonfi.a $(OBJ_DIR)/tests/%.o
+$(TEST_BIN_DIR)/%: $(LIB_DIR)/libonfi.a $(OBJ_DIR)/tests/%.o $(LUAJIT_EXTRA_LIBS)
 	mkdir -p $(dir $@)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJ_DIR)/tests/$*.o $(LIB_DIR)/libonfi.a -o $@ $(TEST_LDLIBS)
 
-$(EXAMPLE_BIN_DIR)/%: $(LIB_DIR)/libonfi.a $(OBJ_DIR)/examples/%.o
+$(EXAMPLE_BIN_DIR)/%: $(LIB_DIR)/libonfi.a $(OBJ_DIR)/examples/%.o $(LUAJIT_EXTRA_LIBS)
 	mkdir -p $(dir $@)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJ_DIR)/examples/$*.o $(LIB_DIR)/libonfi.a -o $@ $(EXAMPLE_LDLIBS)
 
 clean:
 	rm -rf $(OBJ_DIR) $(BIN_DIR) docs/html main benchmark profiler erase_chip tester
+ifeq ($(WITH_LUAJIT),1)
+	$(MAKE) -C $(LUAJIT_DIR) clean
+endif
