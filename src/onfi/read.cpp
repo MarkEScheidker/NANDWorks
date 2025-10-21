@@ -12,8 +12,12 @@
 
 void onfi_interface::read_page(unsigned int my_block_number, unsigned int my_page_number, uint8_t address_length,
                                bool verbose) {
-    if (address_length != num_column_cycles + num_row_cycles) {
-        fprintf(stdout, "E: Address Length Mismatch.");
+    const uint8_t expected_length = static_cast<uint8_t>(num_column_cycles + num_row_cycles);
+    if (address_length != expected_length) {
+        LOG_ONFI_WARN("Address length mismatch (requested %u, expected %u); using expected length",
+                      static_cast<unsigned int>(address_length),
+                      static_cast<unsigned int>(expected_length));
+        address_length = expected_length;
     }
     uint8_t address[8] = {0};
     convert_pagenumber_to_columnrow_address(my_block_number, my_page_number, address, verbose);

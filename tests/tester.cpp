@@ -12,6 +12,7 @@ Description: This source file is to test the basic functionality of the interfac
 #include "onfi/controller.hpp"
 #include "onfi/data_sink.hpp"
 #include "onfi/types.hpp"
+#include "onfi/block_mode.hpp"
 
 #include <vector>
 #include <cstdlib>
@@ -716,6 +717,59 @@ static bool test_tlc_subpages_if_supported(onfi_interface &onfi_instance, bool v
     return page_read.size() == total && not_all_ff;
 }
 
+static bool test_micron_block_mode(onfi_interface& onfi_instance, bool verbose) {
+    if (!onfi_instance.supports_block_mode_toggle()) {
+        if (verbose) cout << "Skipping Micron block-mode test (device does not advertise support)" << endl;
+        return true;
+    }
+
+    unsigned int block = pick_good_block(onfi_instance);
+    try {
+        auto original_mode = onfi_instance.get_block_mode(block, /*refresh*/true);
+        if (verbose) {
+            cout << "Micron block-mode test selecting block " << block
+                 << " (initial mode: " << onfi::to_string(original_mode) << ")" << endl;
+        }
+
+        onfi_instance.set_block_mode(block, onfi::BlockMode::Slc, /*force_erase*/true, /*verify*/true, verbose);
+        auto slc_mode = onfi_instance.get_block_mode(block, /*refresh*/true);
+        if (verbose) {
+            cout << "  After SLC request: " << onfi::to_string(slc_mode) << endl;
+        }
+        if (slc_mode != onfi::BlockMode::Slc) {
+            if (verbose) cout << "Expected SLC mode after conversion, observed " << onfi::to_string(slc_mode) << endl;
+            return false;
+        }
+
+        onfi_instance.set_block_mode(block, onfi::BlockMode::Mlc, /*force_erase*/true, /*verify*/true, verbose);
+        auto mlc_mode = onfi_instance.get_block_mode(block, /*refresh*/true);
+        if (verbose) {
+            cout << "  After MLC request: " << onfi::to_string(mlc_mode) << endl;
+        }
+        if (mlc_mode != onfi::BlockMode::Mlc) {
+            if (verbose) cout << "Expected MLC mode after conversion, observed " << onfi::to_string(mlc_mode) << endl;
+            return false;
+        }
+
+        if (original_mode == onfi::BlockMode::Slc) {
+            onfi_instance.set_block_mode(block, onfi::BlockMode::Slc, /*force_erase*/true, /*verify*/true, verbose);
+            if (verbose) {
+                auto restored = onfi_instance.get_block_mode(block, /*refresh*/true);
+                cout << "  Restored original SLC mode for block " << block
+                     << " -> " << onfi::to_string(restored) << endl;
+            }
+        } else if (verbose) {
+            cout << "  Leaving block " << block
+                 << " in MLC mode (initial was " << onfi::to_string(original_mode) << ")" << endl;
+        }
+
+        return true;
+    } catch (const std::exception& ex) {
+        if (verbose) cout << "Micron block-mode test encountered an error: " << ex.what() << endl;
+        return false;
+    }
+}
+
 // Exercise NandDevice::read_block via a sink on a small subset
 static bool test_read_block_with_sink(onfi_interface &onfi_instance, bool verbose) {
     (void)verbose;
@@ -976,6 +1030,12 @@ int main(int argc, char **argv) {
 
     cout << "\n--- Running TLC Subpages Test (if supported) ---" << endl;
     if (run_test("TLC Subpages Test (if supported)", test_tlc_subpages_if_supported, onfi_instance, verbose))
+        ++pass;
+    else
+        ++fail;
+
+    cout << "\n--- Running Micron Block Mode Test (if supported) ---" << endl;
+    if (run_test("Micron Block Mode Test (if supported)", test_micron_block_mode, onfi_instance, verbose))
         ++pass;
     else
         ++fail;

@@ -7,6 +7,7 @@
 #include <iomanip>
 #include <algorithm>
 #include <array>
+#include <mutex>
 #include "logging.hpp"
 #include "onfi/param_page.hpp"
 
@@ -77,6 +78,7 @@ void onfi_interface::read_id() {
     if (id00[0] == 0x98) // this is for TOSHIBA chips
     {
         LOG_ONFI_DEBUG("Detected TOSHIBA");
+        update_block_mode_support(false);
         if ((id00[5] & 0x80)) // this is for TOGGLE
         {
             LOG_ONFI_DEBUG(" TOGGLE");
@@ -95,18 +97,22 @@ void onfi_interface::read_id() {
         {
             LOG_ONFI_DEBUG(" TLC");
             flash_chip = micron_tlc; // this will affect how we program pages
+            update_block_mode_support(true);
         } else if (((id00[2] >> 2) & 0x01) == 0x01) // this is for MLC
         {
             LOG_ONFI_DEBUG(" MLC");
             flash_chip = micron_mlc; // this will affect how we program pages
+            update_block_mode_support(true);
         } else if (((id00[2] >> 2) & 0x02) == 0x00) // this is for SLC
         {
             // flash chip will be default type
             LOG_ONFI_DEBUG(" SLC");
+            update_block_mode_support(false);
         }
         LOG_ONFI_DEBUG(" Chip ");
     } else {
         LOG_ONFI_DEBUG("Detected Asynchronous NAND Flash Chip.");
+        update_block_mode_support(false);
     }
 }
 
@@ -188,6 +194,10 @@ void onfi_interface::read_parameters(param_type ONFI_OR_JEDEC, bool bytewise, bo
     num_blocks = static_cast<uint16_t>(g.blocks_per_lun);
     num_column_cycles = g.column_cycles;
     num_row_cycles = g.row_cycles;
+    {
+        std::lock_guard<std::mutex> lock(block_mode_mutex_);
+        ensure_block_mode_cache();
+    }
 
     // Extract manufacturer information (Bytes 32-43)
     memcpy(manufacturer_id, &ONFI_parameters[32], 12);

@@ -54,6 +54,7 @@ The registry exposes the following functional groups. Every command automaticall
 | `erase-block` (`--block`) | Erases a single block and waits for completion. | `sudo bin/nandworks erase-block --block 10 --force` |
 | `erase-chip` (`--start`, `--count`) | Performs sequential block erases across the device (dangerous). | `sudo bin/nandworks erase-chip --start 0 --count 2048 --force` |
 | `set-feature` (`--address`, `--data`) | Issues SET FEATURES with four byte payload. | `sudo bin/nandworks set-feature --address 0x01 --data 0x04,0x00,0x00,0x00 --force` |
+| `block-mode` (`--block`, `--mode`, `--force`, `--no-verify`, `--list`, `--refresh`) | Toggle Micron blocks between SLC and MLC or report current state. | `sudo bin/nandworks block-mode --block 42 --mode slc --force` |
 | `raw-command` (`--value`) | Sends an arbitrary command byte. | `sudo bin/nandworks raw-command --value 0x90 --force` |
 | `raw-address` (`--bytes`) | Sends one or more address cycles. | `sudo bin/nandworks raw-address --bytes 0x00,0x00,0x00 --force` |
 | `raw-send-data` (`--bytes`) | Drives data bytes onto the bus. | `sudo bin/nandworks raw-send-data --bytes 0xAA,0x55 --force` |

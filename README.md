@@ -5,6 +5,7 @@ NANDWorks is a C++ toolkit that lets Raspberry Pi single-board computers exercis
 ## Highlights
 - **End-to-end toolchain** – A single `make` discovers every application, test, and example, emits binaries under `bin/`, and (optionally) refreshes Doxygen docs.
 - **Full ONFI coverage** – Handles bring-up, identification, parameter-page parsing, read/program/erase flows, bad-block checks, and verification routines validated against Micron ONFI 4.0 NAND.
+- **Micron block-mode tooling** – Toggle supported Micron blocks between SLC and MLC, cache state, and automate workflows via CLI and Lua bindings.
 - **Deterministic GPIO control** – Uses memory-mapped GPIO via `libbcm2835` for cycle-level timing, including busy-wait helpers for margin experiments.
 - **Configurable instrumentation** – Compile-time knobs control logging verbosity and timing capture with zero overhead when disabled.
 - **Documentation driven** – Source-level comments feed Doxygen (`docs/html`) for browsing the public API.
