@@ -179,14 +179,6 @@ void onfi_interface::convert_pagenumber_to_columnrow_address(unsigned int my_blo
 // .. this function will read a random page and tries to verify if it was completely erased
 // .. for elaborate verifiying, please use a different function
 void onfi_interface::set_features(uint8_t address, const uint8_t *data_to_send, onfi::FeatureCommand command) {
-    if (feature_write_hook_) {
-        std::array<uint8_t, 4> payload{0, 0, 0, 0};
-        if (data_to_send) {
-            std::copy_n(data_to_send, payload.size(), payload.begin());
-        }
-        feature_write_hook_(address, payload, command);
-        return;
-    }
     onfi::OnfiController ctrl(*this);
     ctrl.set_features(address, data_to_send, command);
 }
@@ -196,20 +188,10 @@ void onfi_interface::set_features(uint8_t address, const uint8_t *data_to_send, 
 // .. (LUNs) on the target are idle.
 // .. the parameters P1-P4 are in data_received argument
 void onfi_interface::get_features(uint8_t address, uint8_t* data_received, onfi::FeatureCommand command) const {
-    if (feature_read_hook_) {
-        std::array<uint8_t, 4> payload{0, 0, 0, 0};
-        feature_read_hook_(address, payload, command);
-        if (data_received) {
-            std::copy(payload.begin(), payload.end(), data_received);
-        }
-        return;
-    }
     onfi::OnfiController ctrl(const_cast<onfi_interface&>(*this));
     ctrl.get_features(address, data_received, command);
 }
 
-// following function will convert a block from MLC mode to SLC mode
-// .. it uses set_features option to convert the block from SLC to MLC
 void onfi_interface::delay_function(uint32_t loop_count) {
     if (loop_count == 0) {
         return;

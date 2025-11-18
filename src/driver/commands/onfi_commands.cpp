@@ -3,7 +3,6 @@
 #include "nandworks/command_context.hpp"
 #include "nandworks/driver_context.hpp"
 #include "gpio.hpp"
-#include "onfi/block_mode.hpp"
 #include "onfi/controller.hpp"
 #include "onfi/device.hpp"
 #include "onfi/timed_commands.hpp"
@@ -859,67 +858,6 @@ int get_feature_command(const CommandContext& context) {
     return 0;
 }
 
-int block_mode_command(const CommandContext& context) {
-    auto& onfi = context.driver.require_onfi_started();
-    if (!onfi.supports_block_mode_toggle()) {
-        context.err << "Active device does not expose Micron block-mode features.\n";
-        return 1;
-    }
-
-    const bool refresh = context.arguments.has("refresh");
-
-    if (context.arguments.has("list")) {
-        if (context.arguments.has("block")) {
-            const int64_t block = context.arguments.require_int("block");
-            ensure_block_in_range(onfi, block);
-            auto mode = onfi.get_block_mode(static_cast<unsigned int>(block), refresh);
-            context.out << "Block " << block << ": " << onfi::to_string(mode) << "\n";
-            return 0;
-        }
-
-        std::size_t slc = 0, mlc = 0, unknown = 0;
-        for (uint32_t block = 0; block < onfi.num_blocks; ++block) {
-            auto mode = onfi.get_block_mode(block, refresh);
-            switch (mode) {
-            case onfi::BlockMode::Slc: ++slc; break;
-            case onfi::BlockMode::Mlc: ++mlc; break;
-            case onfi::BlockMode::Unknown: default: ++unknown; break;
-            }
-        }
-        context.out << "Block mode summary:\n";
-        context.out << "  SLC: " << slc << "\n";
-        context.out << "  MLC: " << mlc << "\n";
-        context.out << "  Unknown: " << unknown << "\n";
-        return (unknown == 0) ? 0 : 1;
-    }
-
-    const bool has_block = context.arguments.has("block");
-    const bool has_mode = context.arguments.has("mode");
-    if (!has_block || !has_mode) {
-        throw std::invalid_argument("block-mode requires both --block and --mode when not listing");
-    }
-
-    const int64_t block = context.arguments.require_int("block");
-    ensure_block_in_range(onfi, block);
-    auto mode_opt = context.arguments.value("mode");
-    if (!mode_opt) {
-        throw std::invalid_argument("Missing required option '--mode'");
-    }
-    onfi::BlockMode mode = onfi::parse_block_mode(*mode_opt);
-    if (mode == onfi::BlockMode::Unknown) {
-        throw std::invalid_argument("Mode must be 'slc' or 'mlc'");
-    }
-
-    const bool force_erase = context.arguments.has("force");
-    const bool verify = !context.arguments.has("no-verify");
-    const bool verbose = context.verbose || context.arguments.has("verbose");
-
-    onfi.set_block_mode(static_cast<unsigned int>(block), mode, force_erase, verify, verbose);
-    auto confirmed = onfi.get_block_mode(static_cast<unsigned int>(block), verify);
-    context.out << "Block " << block << " set to " << onfi::to_string(confirmed) << "\n";
-    return (confirmed == mode) ? 0 : 1;
-}
-
 int reset_command(const CommandContext& context) {
     auto& onfi = context.driver.require_onfi_started();
     onfi.reset_device(context.verbose);
@@ -1277,30 +1215,6 @@ void register_onfi_commands(CommandRegistry& registry) {
     });
 
     registry.register_command({
-        .name = "block-mode",
-        .aliases = {"micron-mode"},
-        .summary = "Inspect or change Micron block SLC/MLC state.",
-        .description = "Uses Micron SET/GET FEATURES commands to manage logical block SLC/MLC allocation.",
-        .usage = "nandworks block-mode --block <index> --mode <slc|mlc> [--force] [--no-verify] [--verbose]\n"
-                 "nandworks block-mode --list [--block <index>] [--refresh]",
-        .options = {
-            OptionSpec{"block", 'b', true, false, false, "index", "Target block index (0-based)."},
-            OptionSpec{"mode", 'm', true, false, false, "slc|mlc", "Desired mode when updating a block."},
-            OptionSpec{"force", 'f', false, false, false, "", "Skip implicit erase prior to issuing the change."},
-            OptionSpec{"no-verify", '\0', false, false, false, "", "Do not issue a readback verification step."},
-            OptionSpec{"list", 'l', false, false, false, "", "List current block mode state instead of changing it."},
-            OptionSpec{"refresh", 'r', false, false, false, "", "Refresh cached block-mode state from the device."},
-            OptionSpec{"verbose", 'v', false, false, false, "", "Emit verbose diagnostics during the operation."}
-        },
-        .min_positionals = 0,
-        .max_positionals = 0,
-        .safety = CommandSafety::RequiresForce,
-        .requires_session = true,
-        .requires_root = true,
-        .handler = block_mode_command,
-    });
-
-    registry.register_command({
         .name = "set-feature",
         .aliases = {"feature-set"},
         .summary = "Issue an ONFI SET FEATURES command.",
@@ -1561,7 +1475,6 @@ set_flags("verify-page", true, true);
 set_flags("verify-block", true, true);
 set_flags("erase-chip", true, true);
 set_flags("scan-bad-blocks", true, true);
-set_flags("block-mode", true, true);
 set_flags("set-feature", true, true);
 set_flags("get-feature", true, true);
 set_flags("reset-device", true, true);

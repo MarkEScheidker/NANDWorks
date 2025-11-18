@@ -12,12 +12,9 @@ Date: 			18 July 2020
 
 // include our next header
 #include "microprocessor_interface.hpp"
-#include "onfi/block_mode.hpp"
 #include "onfi/types.hpp"
 #include "onfi/transport.hpp"
 #include <array>
-#include <functional>
-#include <mutex>
 #include <vector>
 
 
@@ -58,19 +55,8 @@ private:
 	std::fstream time_info_file;
 	mutable std::vector<uint8_t> scratch_buffer_;
 	bool erase_enabled_ = true;
-    bool block_mode_supported_ = false;
-    mutable std::vector<onfi::BlockMode> block_mode_cache_;
-    mutable std::function<void(uint8_t, const std::array<uint8_t, 4>&, onfi::FeatureCommand)> feature_write_hook_;
-    mutable std::function<void(uint8_t, std::array<uint8_t, 4>&, onfi::FeatureCommand)> feature_read_hook_;
-    mutable std::mutex block_mode_mutex_;
 
 	uint8_t* ensure_scratch(size_t size);
-    void ensure_block_mode_cache();
-    bool fetch_block_mode(unsigned int block, std::array<uint8_t, 4>& payload);
-    void encode_block_address(unsigned int block, std::array<uint8_t, 4>& payload) const;
-    std::array<uint8_t, 4> encode_block_mode_payload(onfi::BlockMode mode) const;
-    onfi::BlockMode decode_block_mode_payload(const std::array<uint8_t, 4>& payload) const;
-    void update_block_mode_support(bool supported);
 
 public:
 	// public items go here: this should be almost all the required functions
@@ -312,46 +298,6 @@ public:
 	 */
 	void get_features(uint8_t address, uint8_t* data_received,
 		onfi::FeatureCommand command = onfi::FeatureCommand::Get) const;
-
-	/**
-	 * @brief Query whether the active device supports block-mode toggling.
-	 */
-	bool supports_block_mode_toggle() const;
-
-	/**
-	 * @brief Retrieve the cached or live block mode for a given block.
-	 * @param block Block number.
-	 * @param refresh When true, issues a READ FEATURES sequence before returning.
-	 */
-	onfi::BlockMode get_block_mode(unsigned int block, bool refresh = true);
-
-	/**
-	 * @brief Change the logical mode (SLC/MLC) for the specified block on Micron parts.
-	 * @param block Block number.
-	 * @param mode Desired operating mode.
-	 * @param force_erase When false, an erase is issued before toggling to guarantee clean state.
-	 * @param verify When true, performs a GET FEATURES query to validate the change.
-	 * @param verbose Emit additional diagnostics on stdout when true.
-	 */
-	void set_block_mode(unsigned int block,
-	                    onfi::BlockMode mode,
-	                    bool force_erase = false,
-	                    bool verify = true,
-	                    bool verbose = false);
-
-	/**
-	 * @brief Clear block mode cache entries (e.g., after full-chip operations).
-	 */
-	void invalidate_block_mode_cache();
-
-	using FeatureWriteHook = std::function<void(uint8_t, const std::array<uint8_t, 4>&, onfi::FeatureCommand)>;
-	using FeatureReadHook = std::function<void(uint8_t, std::array<uint8_t, 4>&, onfi::FeatureCommand)>;
-
-	/**
-	 * @brief Install test hooks for SET/GET FEATURES transactions.
-	 * @details Primarily intended for unit tests; production flows should rely on hardware access.
-	 */
-	void set_feature_hooks(FeatureWriteHook write_hook, FeatureReadHook read_hook) const;
 
 	/**
 	 * @brief Busy-wait delay used by profiling and margining routines.

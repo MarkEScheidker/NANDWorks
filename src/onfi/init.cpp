@@ -7,7 +7,6 @@
 #include <cstdint>
 #include <iomanip>
 #include <algorithm>
-#include <mutex>
 #include "logging.hpp"
 
 void onfi_interface::get_started(param_type ONFI_OR_JEDEC, bool verbose) {
@@ -89,13 +88,6 @@ void onfi_interface::deinitialize_onfi(bool verbose) {
     }
 #endif
     // No need for unmap_physical or close_physical with pigpio
-    {
-        std::lock_guard<std::mutex> lock(block_mode_mutex_);
-        feature_write_hook_ = nullptr;
-        feature_read_hook_ = nullptr;
-        block_mode_cache_.clear();
-    }
-    update_block_mode_support(false);
 }
 
 // this function can be used to test the LEDs if they are properly set up
