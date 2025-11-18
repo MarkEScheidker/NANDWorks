@@ -1,6 +1,7 @@
 #include "onfi_interface.hpp"
 #include "onfi/controller.hpp"
 #include "onfi/device.hpp"
+#include "onfi/device_utils.hpp"
 #include "onfi/types.hpp"
 
 #include <algorithm>
@@ -210,14 +211,7 @@ int main(int argc, char **argv) {
 
     onfi::OnfiController ctrl(onfi_instance);
     onfi::NandDevice dev(ctrl);
-    dev.geometry.page_size_bytes = onfi_instance.num_bytes_in_page;
-    dev.geometry.spare_size_bytes = onfi_instance.num_spare_bytes_in_page;
-    dev.geometry.pages_per_block = onfi_instance.num_pages_in_block;
-    dev.geometry.blocks_per_lun = onfi_instance.num_blocks;
-    dev.geometry.column_cycles = onfi_instance.num_column_cycles;
-    dev.geometry.row_cycles = onfi_instance.num_row_cycles;
-    dev.interface_type = onfi_instance.interface_type;
-    dev.chip = onfi_instance.flash_chip;
+    onfi::populate_device(onfi_instance, dev);
 
     std::vector<MarginObservation> program_results;
     std::vector<MarginObservation> erase_results;

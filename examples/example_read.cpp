@@ -1,6 +1,7 @@
 #include "onfi_interface.hpp"
 #include "onfi/controller.hpp"
 #include "onfi/device.hpp"
+#include "onfi/device_utils.hpp"
 #include <vector>
 
 int main() {
@@ -9,14 +10,7 @@ int main() {
 
     onfi::OnfiController ctrl(onfi);
     onfi::NandDevice dev(ctrl);
-    dev.geometry.page_size_bytes = onfi.num_bytes_in_page;
-    dev.geometry.spare_size_bytes = onfi.num_spare_bytes_in_page;
-    dev.geometry.pages_per_block = onfi.num_pages_in_block;
-    dev.geometry.blocks_per_lun = onfi.num_blocks;
-    dev.geometry.column_cycles = onfi.num_column_cycles;
-    dev.geometry.row_cycles = onfi.num_row_cycles;
-    dev.interface_type = onfi.interface_type;
-    dev.chip = onfi.flash_chip;
+    onfi::populate_device(onfi, dev);
 
     std::vector<uint8_t> buffer;
     dev.read_page(0, 0, /*including_spare*/false, /*bytewise*/false, buffer);

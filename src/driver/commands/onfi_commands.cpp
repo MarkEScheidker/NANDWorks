@@ -5,6 +5,7 @@
 #include "gpio.hpp"
 #include "onfi/controller.hpp"
 #include "onfi/device.hpp"
+#include "onfi/device_utils.hpp"
 #include "onfi/timed_commands.hpp"
 #include "onfi_interface.hpp"
 #include <algorithm>
@@ -24,6 +25,8 @@
 
 namespace nandworks::commands {
 namespace {
+
+using onfi::populate_device;
 
 struct GeometrySummary {
     uint32_t page_bytes = 0;
@@ -252,17 +255,6 @@ std::string to_hex_string(const uint8_t* data, std::size_t len) {
         if (i + 1 < len) oss << ':';
     }
     return oss.str();
-}
-
-void populate_device(onfi_interface& onfi, onfi::NandDevice& device) {
-    device.geometry.page_size_bytes = onfi.num_bytes_in_page;
-    device.geometry.spare_size_bytes = onfi.num_spare_bytes_in_page;
-    device.geometry.pages_per_block = onfi.num_pages_in_block;
-    device.geometry.blocks_per_lun = onfi.num_blocks;
-    device.geometry.column_cycles = onfi.num_column_cycles;
-    device.geometry.row_cycles = onfi.num_row_cycles;
-    device.interface_type = onfi.interface_type;
-    device.chip = onfi.flash_chip;
 }
 
 int probe_command(const CommandContext& context) {

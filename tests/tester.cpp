@@ -9,6 +9,7 @@ Description: This source file is to test the basic functionality of the interfac
 // onfi_interface.hpp has the necessary functionalities defined
 #include "onfi_interface.hpp"
 #include "onfi/device.hpp"
+#include "onfi/device_utils.hpp"
 #include "onfi/controller.hpp"
 #include "onfi/data_sink.hpp"
 #include "onfi/types.hpp"
@@ -67,14 +68,7 @@ static bool test_block_erase(onfi_interface &onfi_instance, bool verbose) {
     if (verbose) cout << "Erasing block " << block << endl;
     onfi::OnfiController ctrl(onfi_instance);
     onfi::NandDevice dev(ctrl);
-    dev.geometry.page_size_bytes = onfi_instance.num_bytes_in_page;
-    dev.geometry.spare_size_bytes = onfi_instance.num_spare_bytes_in_page;
-    dev.geometry.pages_per_block = onfi_instance.num_pages_in_block;
-    dev.geometry.blocks_per_lun = onfi_instance.num_blocks;
-    dev.geometry.column_cycles = onfi_instance.num_column_cycles;
-    dev.geometry.row_cycles = onfi_instance.num_row_cycles;
-    dev.interface_type = onfi_instance.interface_type;
-    dev.chip = onfi_instance.flash_chip;
+    onfi::populate_device(onfi_instance, dev);
 
     dev.erase_block(block);
 
@@ -100,14 +94,7 @@ static bool test_single_page_program(onfi_interface &onfi_instance, bool verbose
 
     onfi::OnfiController ctrl(onfi_instance);
     onfi::NandDevice dev(ctrl);
-    dev.geometry.page_size_bytes = onfi_instance.num_bytes_in_page;
-    dev.geometry.spare_size_bytes = onfi_instance.num_spare_bytes_in_page;
-    dev.geometry.pages_per_block = onfi_instance.num_pages_in_block;
-    dev.geometry.blocks_per_lun = onfi_instance.num_blocks;
-    dev.geometry.column_cycles = onfi_instance.num_column_cycles;
-    dev.geometry.row_cycles = onfi_instance.num_row_cycles;
-    dev.interface_type = onfi_instance.interface_type;
-    dev.chip = onfi_instance.flash_chip;
+    onfi::populate_device(onfi_instance, dev);
 
     dev.erase_block(block);
     dev.program_page(block, page, pattern, true);
@@ -120,14 +107,7 @@ static bool test_multi_page_program(onfi_interface &onfi_instance, bool verbose)
     unsigned int block = pick_good_block(onfi_instance);
     onfi::OnfiController ctrl(onfi_instance);
     onfi::NandDevice dev(ctrl);
-    dev.geometry.page_size_bytes = onfi_instance.num_bytes_in_page;
-    dev.geometry.spare_size_bytes = onfi_instance.num_spare_bytes_in_page;
-    dev.geometry.pages_per_block = onfi_instance.num_pages_in_block;
-    dev.geometry.blocks_per_lun = onfi_instance.num_blocks;
-    dev.geometry.column_cycles = onfi_instance.num_column_cycles;
-    dev.geometry.row_cycles = onfi_instance.num_row_cycles;
-    dev.interface_type = onfi_instance.interface_type;
-    dev.chip = onfi_instance.flash_chip;
+    onfi::populate_device(onfi_instance, dev);
 
     // Ensure the block is erased before programming multiple pages
     dev.erase_block(block);
@@ -142,14 +122,7 @@ static bool test_page_reads(onfi_interface &onfi_instance, bool verbose) {
     unsigned int block = pick_good_block(onfi_instance);
     onfi::OnfiController ctrl(onfi_instance);
     onfi::NandDevice dev(ctrl);
-    dev.geometry.page_size_bytes = onfi_instance.num_bytes_in_page;
-    dev.geometry.spare_size_bytes = onfi_instance.num_spare_bytes_in_page;
-    dev.geometry.pages_per_block = onfi_instance.num_pages_in_block;
-    dev.geometry.blocks_per_lun = onfi_instance.num_blocks;
-    dev.geometry.column_cycles = onfi_instance.num_column_cycles;
-    dev.geometry.row_cycles = onfi_instance.num_row_cycles;
-    dev.interface_type = onfi_instance.interface_type;
-    dev.chip = onfi_instance.flash_chip;
+    onfi::populate_device(onfi_instance, dev);
 
     std::vector<uint8_t> page;
 
@@ -189,14 +162,7 @@ static bool test_error_analysis(onfi_interface &onfi_instance, bool verbose) {
 
     onfi::OnfiController ctrl(onfi_instance);
     onfi::NandDevice dev(ctrl);
-    dev.geometry.page_size_bytes = onfi_instance.num_bytes_in_page;
-    dev.geometry.spare_size_bytes = onfi_instance.num_spare_bytes_in_page;
-    dev.geometry.pages_per_block = onfi_instance.num_pages_in_block;
-    dev.geometry.blocks_per_lun = onfi_instance.num_blocks;
-    dev.geometry.column_cycles = onfi_instance.num_column_cycles;
-    dev.geometry.row_cycles = onfi_instance.num_row_cycles;
-    dev.interface_type = onfi_instance.interface_type;
-    dev.chip = onfi_instance.flash_chip;
+    onfi::populate_device(onfi_instance, dev);
 
     dev.erase_block(block);
     dev.program_page(block, page, pattern, true);
@@ -296,14 +262,7 @@ static bool test_spare_area_io(onfi_interface &onfi_instance, bool verbose) {
 
     onfi::OnfiController ctrl(onfi_instance);
     onfi::NandDevice dev(ctrl);
-    dev.geometry.page_size_bytes = onfi_instance.num_bytes_in_page;
-    dev.geometry.spare_size_bytes = onfi_instance.num_spare_bytes_in_page;
-    dev.geometry.pages_per_block = onfi_instance.num_pages_in_block;
-    dev.geometry.blocks_per_lun = onfi_instance.num_blocks;
-    dev.geometry.column_cycles = onfi_instance.num_column_cycles;
-    dev.geometry.row_cycles = onfi_instance.num_row_cycles;
-    dev.interface_type = onfi_instance.interface_type;
-    dev.chip = onfi_instance.flash_chip;
+    onfi::populate_device(onfi_instance, dev);
 
     dev.erase_block(block);
     dev.program_page(block, page, pattern, true);
@@ -376,14 +335,7 @@ static bool test_boundary_pages(onfi_interface &onfi_instance, bool verbose) {
 
     onfi::OnfiController ctrl(onfi_instance);
     onfi::NandDevice dev(ctrl);
-    dev.geometry.page_size_bytes = onfi_instance.num_bytes_in_page;
-    dev.geometry.spare_size_bytes = onfi_instance.num_spare_bytes_in_page;
-    dev.geometry.pages_per_block = onfi_instance.num_pages_in_block;
-    dev.geometry.blocks_per_lun = onfi_instance.num_blocks;
-    dev.geometry.column_cycles = onfi_instance.num_column_cycles;
-    dev.geometry.row_cycles = onfi_instance.num_row_cycles;
-    dev.interface_type = onfi_instance.interface_type;
-    dev.chip = onfi_instance.flash_chip;
+    onfi::populate_device(onfi_instance, dev);
 
     // Fresh erase before programming
     dev.erase_block(block);
@@ -415,14 +367,7 @@ static bool test_verify_mismatch_detection(onfi_interface &onfi_instance, bool v
 
     onfi::OnfiController ctrl(onfi_instance);
     onfi::NandDevice dev(ctrl);
-    dev.geometry.page_size_bytes = onfi_instance.num_bytes_in_page;
-    dev.geometry.spare_size_bytes = onfi_instance.num_spare_bytes_in_page;
-    dev.geometry.pages_per_block = onfi_instance.num_pages_in_block;
-    dev.geometry.blocks_per_lun = onfi_instance.num_blocks;
-    dev.geometry.column_cycles = onfi_instance.num_column_cycles;
-    dev.geometry.row_cycles = onfi_instance.num_row_cycles;
-    dev.interface_type = onfi_instance.interface_type;
-    dev.chip = onfi_instance.flash_chip;
+    onfi::populate_device(onfi_instance, dev);
 
     // Prepare block and program
     dev.erase_block(block);
@@ -455,14 +400,7 @@ static bool test_spare_preserved_when_excluded(onfi_interface &onfi_instance, bo
 
     onfi::OnfiController ctrl(onfi_instance);
     onfi::NandDevice dev(ctrl);
-    dev.geometry.page_size_bytes = onfi_instance.num_bytes_in_page;
-    dev.geometry.spare_size_bytes = onfi_instance.num_spare_bytes_in_page;
-    dev.geometry.pages_per_block = onfi_instance.num_pages_in_block;
-    dev.geometry.blocks_per_lun = onfi_instance.num_blocks;
-    dev.geometry.column_cycles = onfi_instance.num_column_cycles;
-    dev.geometry.row_cycles = onfi_instance.num_row_cycles;
-    dev.interface_type = onfi_instance.interface_type;
-    dev.chip = onfi_instance.flash_chip;
+    onfi::populate_device(onfi_instance, dev);
 
     // Ensure a known erased state
     dev.erase_block(block);
@@ -512,14 +450,7 @@ static bool test_first_last_block_erase(onfi_interface &onfi_instance, bool verb
 
     onfi::OnfiController ctrl(onfi_instance);
     onfi::NandDevice dev(ctrl);
-    dev.geometry.page_size_bytes = onfi_instance.num_bytes_in_page;
-    dev.geometry.spare_size_bytes = onfi_instance.num_spare_bytes_in_page;
-    dev.geometry.pages_per_block = onfi_instance.num_pages_in_block;
-    dev.geometry.blocks_per_lun = onfi_instance.num_blocks;
-    dev.geometry.column_cycles = onfi_instance.num_column_cycles;
-    dev.geometry.row_cycles = onfi_instance.num_row_cycles;
-    dev.interface_type = onfi_instance.interface_type;
-    dev.chip = onfi_instance.flash_chip;
+    onfi::populate_device(onfi_instance, dev);
 
     if (verbose) cout << "Erasing first usable block (" << first_good << ") and last usable block (" << last_good << ")" << endl;
 
@@ -544,14 +475,7 @@ static bool test_bulk_vs_bytewise_read_consistency(onfi_interface &onfi_instance
 
     onfi::OnfiController ctrl(onfi_instance);
     onfi::NandDevice dev(ctrl);
-    dev.geometry.page_size_bytes = onfi_instance.num_bytes_in_page;
-    dev.geometry.spare_size_bytes = onfi_instance.num_spare_bytes_in_page;
-    dev.geometry.pages_per_block = onfi_instance.num_pages_in_block;
-    dev.geometry.blocks_per_lun = onfi_instance.num_blocks;
-    dev.geometry.column_cycles = onfi_instance.num_column_cycles;
-    dev.geometry.row_cycles = onfi_instance.num_row_cycles;
-    dev.interface_type = onfi_instance.interface_type;
-    dev.chip = onfi_instance.flash_chip;
+    onfi::populate_device(onfi_instance, dev);
 
     dev.erase_block(block);
     dev.program_page(block, page, pattern.data(), /*including_spare*/true);
@@ -575,14 +499,7 @@ static bool test_block_program_subset_verify(onfi_interface &onfi_instance, bool
 
     onfi::OnfiController ctrl(onfi_instance);
     onfi::NandDevice dev(ctrl);
-    dev.geometry.page_size_bytes = onfi_instance.num_bytes_in_page;
-    dev.geometry.spare_size_bytes = onfi_instance.num_spare_bytes_in_page;
-    dev.geometry.pages_per_block = onfi_instance.num_pages_in_block;
-    dev.geometry.blocks_per_lun = onfi_instance.num_blocks;
-    dev.geometry.column_cycles = onfi_instance.num_column_cycles;
-    dev.geometry.row_cycles = onfi_instance.num_row_cycles;
-    dev.interface_type = onfi_instance.interface_type;
-    dev.chip = onfi_instance.flash_chip;
+    onfi::populate_device(onfi_instance, dev);
 
     dev.erase_block(block);
     // Use a small subset of safe pages to keep this fast (avoid last page)
@@ -616,14 +533,7 @@ static bool test_reset_persistence(onfi_interface &onfi_instance, bool verbose) 
 
     onfi::OnfiController ctrl(onfi_instance);
     onfi::NandDevice dev(ctrl);
-    dev.geometry.page_size_bytes = onfi_instance.num_bytes_in_page;
-    dev.geometry.spare_size_bytes = onfi_instance.num_spare_bytes_in_page;
-    dev.geometry.pages_per_block = onfi_instance.num_pages_in_block;
-    dev.geometry.blocks_per_lun = onfi_instance.num_blocks;
-    dev.geometry.column_cycles = onfi_instance.num_column_cycles;
-    dev.geometry.row_cycles = onfi_instance.num_row_cycles;
-    dev.interface_type = onfi_instance.interface_type;
-    dev.chip = onfi_instance.flash_chip;
+    onfi::populate_device(onfi_instance, dev);
 
     dev.erase_block(block);
     dev.program_page(block, page, pattern.data(), /*including_spare*/true);
@@ -654,14 +564,7 @@ static bool test_verify_error_counters(onfi_interface &onfi_instance, bool verbo
 
     onfi::OnfiController ctrl(onfi_instance);
     onfi::NandDevice dev(ctrl);
-    dev.geometry.page_size_bytes = onfi_instance.num_bytes_in_page;
-    dev.geometry.spare_size_bytes = onfi_instance.num_spare_bytes_in_page;
-    dev.geometry.pages_per_block = onfi_instance.num_pages_in_block;
-    dev.geometry.blocks_per_lun = onfi_instance.num_blocks;
-    dev.geometry.column_cycles = onfi_instance.num_column_cycles;
-    dev.geometry.row_cycles = onfi_instance.num_row_cycles;
-    dev.interface_type = onfi_instance.interface_type;
-    dev.chip = onfi_instance.flash_chip;
+    onfi::populate_device(onfi_instance, dev);
 
     dev.erase_block(block);
     dev.program_page(block, page, pattern.data(), /*including_spare*/true);
@@ -696,14 +599,7 @@ static bool test_tlc_subpages_if_supported(onfi_interface &onfi_instance, bool v
 
     onfi::OnfiController ctrl(onfi_instance);
     onfi::NandDevice dev(ctrl);
-    dev.geometry.page_size_bytes = onfi_instance.num_bytes_in_page;
-    dev.geometry.spare_size_bytes = onfi_instance.num_spare_bytes_in_page;
-    dev.geometry.pages_per_block = onfi_instance.num_pages_in_block;
-    dev.geometry.blocks_per_lun = onfi_instance.num_blocks;
-    dev.geometry.column_cycles = onfi_instance.num_column_cycles;
-    dev.geometry.row_cycles = onfi_instance.num_row_cycles;
-    dev.interface_type = onfi_instance.interface_type;
-    dev.chip = onfi_instance.flash_chip;
+    onfi::populate_device(onfi_instance, dev);
 
     dev.erase_block(block);
     dev.program_tlc_page(block, page, pattern.data(), /*including_spare*/true);
@@ -724,14 +620,7 @@ static bool test_read_block_with_sink(onfi_interface &onfi_instance, bool verbos
 
     onfi::OnfiController ctrl(onfi_instance);
     onfi::NandDevice dev(ctrl);
-    dev.geometry.page_size_bytes = onfi_instance.num_bytes_in_page;
-    dev.geometry.spare_size_bytes = onfi_instance.num_spare_bytes_in_page;
-    dev.geometry.pages_per_block = onfi_instance.num_pages_in_block;
-    dev.geometry.blocks_per_lun = onfi_instance.num_blocks;
-    dev.geometry.column_cycles = onfi_instance.num_column_cycles;
-    dev.geometry.row_cycles = onfi_instance.num_row_cycles;
-    dev.interface_type = onfi_instance.interface_type;
-    dev.chip = onfi_instance.flash_chip;
+    onfi::populate_device(onfi_instance, dev);
 
     onfi::HexOstreamDataSink sink(std::cout);
     dev.read_block(block, /*complete_block*/false, subset, 2, /*including_spare*/true, /*bytewise*/false, sink);
