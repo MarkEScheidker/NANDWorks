@@ -1,7 +1,7 @@
 #include "onfi_interface.hpp"
 #include "onfi/controller.hpp"
 #include "onfi/device.hpp"
-#include "onfi/device_utils.hpp"
+#include "onfi/device_config.hpp"
 #include <vector>
 
 int main() {
@@ -10,7 +10,8 @@ int main() {
 
     onfi::OnfiController ctrl(onfi);
     onfi::NandDevice dev(ctrl);
-    onfi::populate_device(onfi, dev);
+    const auto config = onfi::make_device_config(onfi);
+    onfi::apply_device_config(config, dev);
 
     std::vector<uint8_t> buffer;
     dev.read_page(0, 0, /*including_spare*/false, /*bytewise*/false, buffer);

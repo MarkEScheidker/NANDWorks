@@ -55,7 +55,7 @@ MAIN_TARGET  = $(BIN_DIR)/nandworks
 # Core/library sources (no app/test code)
 CORE_SOURCES = microprocessor_interface timing gpio \
                onfi/init onfi/identify onfi/read onfi/program onfi/erase onfi/util onfi/timed_commands \
-               onfi/address onfi/param_page onfi/controller onfi/device onfi/data_sink \
+               onfi/address onfi/param_page onfi/controller onfi/device onfi/device_config onfi/data_sink \
                driver/command_registry driver/driver_context driver/command_arguments driver/cli_parser \
                driver/commands/onfi_commands driver/commands/script_command \
                scripting/lua_engine

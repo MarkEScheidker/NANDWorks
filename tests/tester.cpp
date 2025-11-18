@@ -9,7 +9,7 @@ Description: This source file is to test the basic functionality of the interfac
 // onfi_interface.hpp has the necessary functionalities defined
 #include "onfi_interface.hpp"
 #include "onfi/device.hpp"
-#include "onfi/device_utils.hpp"
+#include "onfi/device_config.hpp"
 #include "onfi/controller.hpp"
 #include "onfi/data_sink.hpp"
 #include "onfi/types.hpp"
@@ -37,6 +37,11 @@ static unsigned int pick_good_block(onfi_interface &onfi_instance) {
         if (!onfi_instance.is_bad_block(b)) return b;
     }
     return 0; // worst case; caller should still work
+}
+
+static void configure_device(onfi_interface& onfi_instance, onfi::NandDevice& device) {
+    const auto config = onfi::make_device_config(onfi_instance);
+    onfi::apply_device_config(config, device);
 }
 
 /**
@@ -68,7 +73,7 @@ static bool test_block_erase(onfi_interface &onfi_instance, bool verbose) {
     if (verbose) cout << "Erasing block " << block << endl;
     onfi::OnfiController ctrl(onfi_instance);
     onfi::NandDevice dev(ctrl);
-    onfi::populate_device(onfi_instance, dev);
+    configure_device(onfi_instance, dev);
 
     dev.erase_block(block);
 
@@ -86,7 +91,7 @@ static bool test_single_page_program(onfi_interface &onfi_instance, bool verbose
 
     size_t page_size = onfi_instance.num_bytes_in_page +
                        onfi_instance.num_spare_bytes_in_page;
-    uint8_t *pattern = new uint8_t[page_size];
+    std::vector<uint8_t> pattern(page_size);
     for (size_t i = 0; i < page_size; ++i)
         pattern[i] = static_cast<uint8_t>(i & 0xff);
     // Ensure the first byte of the spare area is not 0x00 to avoid marking as bad block
@@ -94,12 +99,11 @@ static bool test_single_page_program(onfi_interface &onfi_instance, bool verbose
 
     onfi::OnfiController ctrl(onfi_instance);
     onfi::NandDevice dev(ctrl);
-    onfi::populate_device(onfi_instance, dev);
+    configure_device(onfi_instance, dev);
 
     dev.erase_block(block);
-    dev.program_page(block, page, pattern, true);
-    bool ok = dev.verify_program_page(block, page, pattern, /*including_spare*/false, verbose, MAX_ALLOWED_ERRORS);
-    delete[] pattern;
+    dev.program_page(block, page, pattern.data(), true);
+    bool ok = dev.verify_program_page(block, page, pattern.data(), /*including_spare*/false, verbose, MAX_ALLOWED_ERRORS);
     return ok;
 }
 
@@ -107,7 +111,7 @@ static bool test_multi_page_program(onfi_interface &onfi_instance, bool verbose)
     unsigned int block = pick_good_block(onfi_instance);
     onfi::OnfiController ctrl(onfi_instance);
     onfi::NandDevice dev(ctrl);
-    onfi::populate_device(onfi_instance, dev);
+    configure_device(onfi_instance, dev);
 
     // Ensure the block is erased before programming multiple pages
     dev.erase_block(block);
@@ -122,7 +126,7 @@ static bool test_page_reads(onfi_interface &onfi_instance, bool verbose) {
     unsigned int block = pick_good_block(onfi_instance);
     onfi::OnfiController ctrl(onfi_instance);
     onfi::NandDevice dev(ctrl);
-    onfi::populate_device(onfi_instance, dev);
+    configure_device(onfi_instance, dev);
 
     std::vector<uint8_t> page;
 
@@ -153,7 +157,7 @@ static bool test_error_analysis(onfi_interface &onfi_instance, bool verbose) {
     }
 
     size_t page_size = onfi_instance.num_bytes_in_page + onfi_instance.num_spare_bytes_in_page;
-    uint8_t *pattern = new uint8_t[page_size];
+    std::vector<uint8_t> pattern(page_size);
     for (size_t i = 0; i < page_size; ++i) {
         pattern[i] = static_cast<uint8_t>(i & 0xff);
     }
@@ -162,10 +166,10 @@ static bool test_error_analysis(onfi_interface &onfi_instance, bool verbose) {
 
     onfi::OnfiController ctrl(onfi_instance);
     onfi::NandDevice dev(ctrl);
-    onfi::populate_device(onfi_instance, dev);
+    configure_device(onfi_instance, dev);
 
     dev.erase_block(block);
-    dev.program_page(block, page, pattern, true);
+    dev.program_page(block, page, pattern.data(), true);
 
     std::vector<uint8_t> read_vec;
     dev.read_page(block, page, /*including_spare*/true, /*bytewise*/false, read_vec);
@@ -180,8 +184,6 @@ static bool test_error_analysis(onfi_interface &onfi_instance, bool verbose) {
     cout << "Found " << errors << " errors in " << onfi_instance.num_bytes_in_page << " bytes ("
          << (static_cast<double>(errors) / onfi_instance.num_bytes_in_page) * 100 << "%)" << endl;
 
-    delete[] pattern;
-    
     return errors <= MAX_ALLOWED_ERRORS;
 }
 
@@ -214,7 +216,7 @@ static bool test_random_program_read_verify_erase(onfi_interface &onfi_instance,
     unsigned int page = rand() % onfi_instance.num_pages_in_block;
 
     size_t page_size = onfi_instance.num_bytes_in_page + onfi_instance.num_spare_bytes_in_page;
-    uint8_t *pattern = new uint8_t[page_size];
+    std::vector<uint8_t> pattern(page_size);
     for (size_t i = 0; i < page_size; ++i) {
         pattern[i] = static_cast<uint8_t>(rand() % 256); // Random data
     }
@@ -225,20 +227,23 @@ static bool test_random_program_read_verify_erase(onfi_interface &onfi_instance,
         cout << "Testing random program/read/verify/erase on block " << block << " page " << page << endl;
     }
 
+    onfi::OnfiController ctrl(onfi_instance);
+    onfi::NandDevice dev(ctrl);
+    configure_device(onfi_instance, dev);
+
     // Erase the block before programming
-    onfi_instance.erase_block(block, verbose);
+    dev.erase_block(block);
 
     // Program the page with random data
-    onfi_instance.program_page(block, page, pattern, true, verbose);
+    dev.program_page(block, page, pattern.data(), true);
 
     // Verify the programmed page
-    bool program_ok = onfi_instance.verify_program_page(block, page, pattern, verbose, MAX_ALLOWED_ERRORS);
+    bool program_ok = dev.verify_program_page(block, page, pattern.data(), /*including_spare*/false, verbose, MAX_ALLOWED_ERRORS);
 
     // Erase the block after verification
-    onfi_instance.erase_block(block, verbose);
-    bool erase_ok = onfi_instance.verify_block_erase(block, true, nullptr, 0, verbose);
+    dev.erase_block(block);
+    bool erase_ok = dev.verify_erase_block(block, true, nullptr, 0, /*including_spare*/false, verbose);
 
-    delete[] pattern;
     return program_ok && erase_ok;
 }
 
@@ -250,7 +255,7 @@ static bool test_spare_area_io(onfi_interface &onfi_instance, bool verbose) {
         cout << "Testing spare area I/O on block " << block << " page " << page << endl;
         cout << "Page size (main + spare): " << page_size << " bytes" << endl;
     }
-    uint8_t *pattern = new uint8_t[page_size];
+    std::vector<uint8_t> pattern(page_size);
     // Fill main data area with one pattern
     for (size_t i = 0; i < onfi_instance.num_bytes_in_page; ++i) {
         pattern[i] = 0xAA;
@@ -262,10 +267,10 @@ static bool test_spare_area_io(onfi_interface &onfi_instance, bool verbose) {
 
     onfi::OnfiController ctrl(onfi_instance);
     onfi::NandDevice dev(ctrl);
-    onfi::populate_device(onfi_instance, dev);
+    configure_device(onfi_instance, dev);
 
     dev.erase_block(block);
-    dev.program_page(block, page, pattern, true);
+    dev.program_page(block, page, pattern.data(), true);
 
     std::vector<uint8_t> read_vec;
     dev.read_page(block, page, /*including_spare*/true, /*bytewise*/false, read_vec);
@@ -295,7 +300,6 @@ static bool test_spare_area_io(onfi_interface &onfi_instance, bool verbose) {
         cout << endl;
     }
 
-    delete[] pattern;
     return ok;
 }
 
@@ -317,8 +321,8 @@ static bool test_boundary_pages(onfi_interface &onfi_instance, bool verbose) {
     unsigned int last_page = (onfi_instance.num_pages_in_block > 1) ? 1 : 0; // use first two pages to avoid reserved/paired corners
 
     size_t page_size_total = onfi_instance.num_bytes_in_page + onfi_instance.num_spare_bytes_in_page;
-    uint8_t *pattern_first = new uint8_t[page_size_total];
-    uint8_t *pattern_last  = new uint8_t[page_size_total];
+    std::vector<uint8_t> pattern_first(page_size_total);
+    std::vector<uint8_t> pattern_last(page_size_total);
     for (size_t i = 0; i < page_size_total; ++i) {
         pattern_first[i] = static_cast<uint8_t>(i & 0xFF);
         pattern_last[i]  = static_cast<uint8_t>(i & 0xFF);
@@ -335,7 +339,7 @@ static bool test_boundary_pages(onfi_interface &onfi_instance, bool verbose) {
 
     onfi::OnfiController ctrl(onfi_instance);
     onfi::NandDevice dev(ctrl);
-    onfi::populate_device(onfi_instance, dev);
+    configure_device(onfi_instance, dev);
 
     // Fresh erase before programming
     dev.erase_block(block);
@@ -345,12 +349,10 @@ static bool test_boundary_pages(onfi_interface &onfi_instance, bool verbose) {
     ok = ok && dev.verify_erase_block(block, /*complete_block*/false, &last_idx, 1, /*including_spare*/true, verbose);
 
     // Program and do a non-strict read/verify smoke check (main-only)
-    dev.program_page(block, first_page, pattern_first, /*including_spare*/false);
+    dev.program_page(block, first_page, pattern_first.data(), /*including_spare*/false);
 
-    dev.program_page(block, last_page, pattern_last, /*including_spare*/false);
+    dev.program_page(block, last_page, pattern_last.data(), /*including_spare*/false);
 
-    delete[] pattern_first;
-    delete[] pattern_last;
     return ok;
 }
 
@@ -360,28 +362,24 @@ static bool test_verify_mismatch_detection(onfi_interface &onfi_instance, bool v
     unsigned int page = 0;
 
     size_t page_size_total = onfi_instance.num_bytes_in_page + onfi_instance.num_spare_bytes_in_page;
-    uint8_t *pattern = new uint8_t[page_size_total];
+    std::vector<uint8_t> pattern(page_size_total);
     for (size_t i = 0; i < page_size_total; ++i)
         pattern[i] = static_cast<uint8_t>(i & 0xFF);
     pattern[onfi_instance.num_bytes_in_page] = 0xFF; // keep spare marker safe
 
     onfi::OnfiController ctrl(onfi_instance);
     onfi::NandDevice dev(ctrl);
-    onfi::populate_device(onfi_instance, dev);
+    configure_device(onfi_instance, dev);
 
     // Prepare block and program
     dev.erase_block(block);
-    dev.program_page(block, page, pattern, /*including_spare*/true);
+    dev.program_page(block, page, pattern.data(), /*including_spare*/true);
 
     // Make a copy and flip a byte to force mismatch
-    uint8_t *expected_wrong = new uint8_t[onfi_instance.num_bytes_in_page];
-    memcpy(expected_wrong, pattern, onfi_instance.num_bytes_in_page);
+    std::vector<uint8_t> expected_wrong(pattern.begin(), pattern.begin() + onfi_instance.num_bytes_in_page);
     expected_wrong[10] ^= 0xFF; // flip one byte in main area
 
-    bool verify_ok = dev.verify_program_page(block, page, expected_wrong, /*including_spare*/false, verbose, /*max_allowed_errors*/0);
-
-    delete[] expected_wrong;
-    delete[] pattern;
+    bool verify_ok = dev.verify_program_page(block, page, expected_wrong.data(), /*including_spare*/false, verbose, /*max_allowed_errors*/0);
 
     // Test passes if verify detects the mismatch (returns false)
     return !verify_ok;
@@ -394,25 +392,23 @@ static bool test_spare_preserved_when_excluded(onfi_interface &onfi_instance, bo
     unsigned int page = 0;
 
     size_t main_size = onfi_instance.num_bytes_in_page;
-    uint8_t *main_only_pattern = new uint8_t[main_size];
+    std::vector<uint8_t> main_only_pattern(main_size);
     for (size_t i = 0; i < main_size; ++i)
         main_only_pattern[i] = static_cast<uint8_t>((i * 7) & 0xFF);
 
     onfi::OnfiController ctrl(onfi_instance);
     onfi::NandDevice dev(ctrl);
-    onfi::populate_device(onfi_instance, dev);
+    configure_device(onfi_instance, dev);
 
     // Ensure a known erased state
     dev.erase_block(block);
 
     // Program without spare
-    dev.program_page(block, page, main_only_pattern, /*including_spare*/false);
+    dev.program_page(block, page, main_only_pattern.data(), /*including_spare*/false);
 
     // Verify using device helper (main-only), allow generous bit errors (smoke-level)
     const int allowed = static_cast<int>(main_size); // up to main area size differences tolerated
-    bool ok = dev.verify_program_page(block, page, main_only_pattern, /*including_spare*/false, verbose, allowed);
-
-    delete[] main_only_pattern;
+    bool ok = dev.verify_program_page(block, page, main_only_pattern.data(), /*including_spare*/false, verbose, allowed);
     return ok;
 }
 
@@ -450,7 +446,7 @@ static bool test_first_last_block_erase(onfi_interface &onfi_instance, bool verb
 
     onfi::OnfiController ctrl(onfi_instance);
     onfi::NandDevice dev(ctrl);
-    onfi::populate_device(onfi_instance, dev);
+    configure_device(onfi_instance, dev);
 
     if (verbose) cout << "Erasing first usable block (" << first_good << ") and last usable block (" << last_good << ")" << endl;
 
@@ -475,7 +471,7 @@ static bool test_bulk_vs_bytewise_read_consistency(onfi_interface &onfi_instance
 
     onfi::OnfiController ctrl(onfi_instance);
     onfi::NandDevice dev(ctrl);
-    onfi::populate_device(onfi_instance, dev);
+    configure_device(onfi_instance, dev);
 
     dev.erase_block(block);
     dev.program_page(block, page, pattern.data(), /*including_spare*/true);
@@ -499,7 +495,7 @@ static bool test_block_program_subset_verify(onfi_interface &onfi_instance, bool
 
     onfi::OnfiController ctrl(onfi_instance);
     onfi::NandDevice dev(ctrl);
-    onfi::populate_device(onfi_instance, dev);
+    configure_device(onfi_instance, dev);
 
     dev.erase_block(block);
     // Use a small subset of safe pages to keep this fast (avoid last page)
@@ -533,7 +529,7 @@ static bool test_reset_persistence(onfi_interface &onfi_instance, bool verbose) 
 
     onfi::OnfiController ctrl(onfi_instance);
     onfi::NandDevice dev(ctrl);
-    onfi::populate_device(onfi_instance, dev);
+    configure_device(onfi_instance, dev);
 
     dev.erase_block(block);
     dev.program_page(block, page, pattern.data(), /*including_spare*/true);
@@ -564,7 +560,7 @@ static bool test_verify_error_counters(onfi_interface &onfi_instance, bool verbo
 
     onfi::OnfiController ctrl(onfi_instance);
     onfi::NandDevice dev(ctrl);
-    onfi::populate_device(onfi_instance, dev);
+    configure_device(onfi_instance, dev);
 
     dev.erase_block(block);
     dev.program_page(block, page, pattern.data(), /*including_spare*/true);
@@ -599,7 +595,7 @@ static bool test_tlc_subpages_if_supported(onfi_interface &onfi_instance, bool v
 
     onfi::OnfiController ctrl(onfi_instance);
     onfi::NandDevice dev(ctrl);
-    onfi::populate_device(onfi_instance, dev);
+    configure_device(onfi_instance, dev);
 
     dev.erase_block(block);
     dev.program_tlc_page(block, page, pattern.data(), /*including_spare*/true);
@@ -620,7 +616,7 @@ static bool test_read_block_with_sink(onfi_interface &onfi_instance, bool verbos
 
     onfi::OnfiController ctrl(onfi_instance);
     onfi::NandDevice dev(ctrl);
-    onfi::populate_device(onfi_instance, dev);
+    configure_device(onfi_instance, dev);
 
     onfi::HexOstreamDataSink sink(std::cout);
     dev.read_block(block, /*complete_block*/false, subset, 2, /*including_spare*/true, /*bytewise*/false, sink);
@@ -647,17 +643,21 @@ static bool test_full_block_program_verify(onfi_interface &onfi_instance, bool v
     std::vector<uint8_t> pattern(main, 0x00);
     if (verbose) cout << "Full block program/verify on block " << block << endl;
 
-    onfi_instance.erase_block(block, verbose);
+    onfi::OnfiController ctrl(onfi_instance);
+    onfi::NandDevice dev(ctrl);
+    configure_device(onfi_instance, dev);
+
+    dev.erase_block(block);
     for (uint32_t p = 0; p < onfi_instance.num_pages_in_block; p += 2) {
-        onfi_instance.program_page(block, p, pattern.data(), /*including_spare*/false, /*verbose*/false);
+        dev.program_page(block, p, pattern.data(), /*including_spare*/false);
     }
     for (uint32_t p = 1; p < onfi_instance.num_pages_in_block; p += 2) {
-        onfi_instance.program_page(block, p, pattern.data(), /*including_spare*/false, /*verbose*/false);
+        dev.program_page(block, p, pattern.data(), /*including_spare*/false);
     }
     bool ok = true;
     const int allowed = 2048; // more generous threshold for smoke-level regression
     for (uint32_t p = 0; p < onfi_instance.num_pages_in_block; ++p) {
-        if (!onfi_instance.verify_program_page(block, p, pattern.data(), /*verbose*/false, allowed)) ok = false;
+        if (!dev.verify_program_page(block, p, pattern.data(), /*including_spare*/false, /*verbose*/false, allowed)) ok = false;
     }
     return ok;
 }
@@ -676,28 +676,29 @@ static bool test_partial_erase(onfi_interface &onfi_instance, bool verbose) {
     unsigned int page = rand() % onfi_instance.num_pages_in_block; // Page number is still needed for partial_erase_block signature
 
     size_t page_size = onfi_instance.num_bytes_in_page + onfi_instance.num_spare_bytes_in_page;
-    uint8_t *pattern_program = new uint8_t[page_size];
-    memset(pattern_program, 0xAA, page_size); // Pattern to program before partial erase
+    std::vector<uint8_t> pattern_program(page_size, 0xAA); // Pattern to program before partial erase
 
     if (verbose) {
         cout << "Testing partial erase on block " << block << ", using page " << page << " for address." << endl;
     }
 
+    onfi::OnfiController ctrl(onfi_instance);
+    onfi::NandDevice dev(ctrl);
+    configure_device(onfi_instance, dev);
+
     // Erase the block first to ensure a clean state
-    onfi_instance.erase_block(block, verbose);
+    dev.erase_block(block);
 
     // Program all pages in the block with a known pattern
     for (unsigned int p = 0; p < onfi_instance.num_pages_in_block; ++p) {
-        onfi_instance.program_page(block, p, pattern_program, true, verbose);
+        dev.program_page(block, p, pattern_program.data(), true);
     }
 
     // Perform partial erase on the block (using a page address for the command)
-    onfi_instance.partial_erase_block(block, page, 30000, verbose);
+    dev.partial_erase_block(block, page, 30000);
 
     // Verify that the entire block is erased (all 0xFFs)
-    bool block_erased_ok = onfi_instance.verify_block_erase(block, true, nullptr, 0, verbose);
-
-    delete[] pattern_program;
+    bool block_erased_ok = dev.verify_erase_block(block, true, nullptr, 0, /*including_spare*/false, verbose);
 
     return block_erased_ok;
 }

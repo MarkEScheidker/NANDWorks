@@ -5,7 +5,7 @@
 #include "gpio.hpp"
 #include "onfi/controller.hpp"
 #include "onfi/device.hpp"
-#include "onfi/device_utils.hpp"
+#include "onfi/device_config.hpp"
 #include "onfi/timed_commands.hpp"
 #include "onfi_interface.hpp"
 #include <algorithm>
@@ -26,7 +26,10 @@
 namespace nandworks::commands {
 namespace {
 
-using onfi::populate_device;
+void configure_device(onfi_interface& source, onfi::NandDevice& device) {
+    const auto config = onfi::make_device_config(source);
+    onfi::apply_device_config(config, device);
+}
 
 struct GeometrySummary {
     uint32_t page_bytes = 0;
@@ -366,7 +369,7 @@ int read_page_command(const CommandContext& context) {
 
     onfi::OnfiController controller(onfi);
     onfi::NandDevice device(controller);
-    populate_device(onfi, device);
+    configure_device(onfi, device);
 
     std::vector<uint8_t> buffer;
     device.read_page(static_cast<unsigned int>(block), static_cast<unsigned int>(page), include_spare, bytewise, buffer);
@@ -414,7 +417,7 @@ int program_page_command(const CommandContext& context) {
 
     onfi::OnfiController controller(onfi);
     onfi::NandDevice device(controller);
-    populate_device(onfi, device);
+    configure_device(onfi, device);
 
     device.program_page(static_cast<unsigned int>(block), static_cast<unsigned int>(page), payload.data(), include_spare);
     onfi.wait_ready_blocking();
@@ -448,7 +451,7 @@ int erase_block_command(const CommandContext& context) {
 
     onfi::OnfiController controller(onfi);
     onfi::NandDevice device(controller);
-    populate_device(onfi, device);
+    configure_device(onfi, device);
 
     device.erase_block(static_cast<unsigned int>(block));
     onfi.wait_ready_blocking();
@@ -484,7 +487,7 @@ int read_block_command(const CommandContext& context) {
 
     onfi::OnfiController controller(onfi);
     onfi::NandDevice device(controller);
-    populate_device(onfi, device);
+    configure_device(onfi, device);
 
     std::unique_ptr<onfi::DataSink> sink;
     if (auto output = context.arguments.value("output")) {
@@ -545,7 +548,7 @@ int program_block_command(const CommandContext& context) {
 
     onfi::OnfiController controller(onfi);
     onfi::NandDevice device(controller);
-    populate_device(onfi, device);
+    configure_device(onfi, device);
 
     device.program_block(static_cast<unsigned int>(block),
                          complete,
@@ -697,7 +700,7 @@ int verify_page_command(const CommandContext& context) {
 
     onfi::OnfiController controller(onfi);
     onfi::NandDevice device(controller);
-    populate_device(onfi, device);
+    configure_device(onfi, device);
 
     uint32_t byte_errors = 0;
     uint32_t bit_errors = 0;
@@ -742,7 +745,7 @@ int verify_block_command(const CommandContext& context) {
 
     onfi::OnfiController controller(onfi);
     onfi::NandDevice device(controller);
-    populate_device(onfi, device);
+    configure_device(onfi, device);
 
     const bool ok = device.verify_program_block(static_cast<unsigned int>(block),
                                                 complete,
@@ -772,7 +775,7 @@ int erase_chip_command(const CommandContext& context) {
 
     onfi::OnfiController controller(onfi);
     onfi::NandDevice device(controller);
-    populate_device(onfi, device);
+    configure_device(onfi, device);
 
     for (int64_t offset = 0; offset < count; ++offset) {
         const unsigned int block = static_cast<unsigned int>(start + offset);

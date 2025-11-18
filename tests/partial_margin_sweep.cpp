@@ -1,7 +1,7 @@
 #include "onfi_interface.hpp"
 #include "onfi/controller.hpp"
 #include "onfi/device.hpp"
-#include "onfi/device_utils.hpp"
+#include "onfi/device_config.hpp"
 #include "onfi/types.hpp"
 
 #include <algorithm>
@@ -211,7 +211,8 @@ int main(int argc, char **argv) {
 
     onfi::OnfiController ctrl(onfi_instance);
     onfi::NandDevice dev(ctrl);
-    onfi::populate_device(onfi_instance, dev);
+    const auto config = onfi::make_device_config(onfi_instance);
+    onfi::apply_device_config(config, dev);
 
     std::vector<MarginObservation> program_results;
     std::vector<MarginObservation> erase_results;
