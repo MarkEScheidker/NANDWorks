@@ -148,18 +148,21 @@ OperationTiming read_page(onfi_interface &onfi,
                           uint8_t *destination,
                           uint32_t length,
                           bool include_spare,
-                          bool verbose) {
-    if (destination == nullptr) {
-        throw std::invalid_argument("Destination pointer must not be null");
+                          bool verbose,
+                          bool fetch_data) {
+    if (fetch_data && destination == nullptr) {
+        throw std::invalid_argument("Destination pointer must not be null when fetch_data is true");
     }
     if (block >= onfi.num_blocks || page >= onfi.num_pages_in_block) {
         throw std::out_of_range("Block/page index out of range");
     }
-    if (length > std::numeric_limits<uint16_t>::max()) {
+    if (fetch_data && length > std::numeric_limits<uint16_t>::max()) {
         throw std::invalid_argument("Read length exceeds transport capabilities");
     }
 
-    ensure_payload_length(onfi, length, include_spare);
+    if (fetch_data) {
+        ensure_payload_length(onfi, length, include_spare);
+    }
 
     uint8_t address[8] = {0};
     onfi.convert_pagenumber_to_columnrow_address(block, page, address, verbose);
@@ -177,11 +180,12 @@ OperationTiming read_page(onfi_interface &onfi,
 
     const BusyWindow busy = measure_busy_cycle(kBusyAssertTimeoutNs, kDefaultBusyTimeoutNs);
 
-    onfi.get_data(destination, static_cast<uint16_t>(length));
+    if (fetch_data) {
+        onfi.get_data(destination, static_cast<uint16_t>(length));
+    }
     const uint8_t status = onfi.get_status();
 
     return make_timing(busy, status);
 }
 
 } // namespace onfi::timed
-

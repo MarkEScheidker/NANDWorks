@@ -233,6 +233,25 @@ The main driver also exposes timing-specific variants that reuse the new low-lev
 - `measure-program --block <index> --page <index> --force [--input file] [--include-spare] [--pad]` – Programs a single page (defaulting to an 0xFF fill) and reports how long the device remained busy.
 - `measure-read --block <index> --page <index> [--include-spare] [--output <path>]` – Reads a page, printing it to stdout by default or writing to a file when `--output` is provided, and reports the array-to-cache transfer time.
 
+## Examples
+
+### Page Read Latency Experiment
+`examples/read_latency_experiment.cpp` adds a turnkey experiment that mirrors the ONFI tR measurement guidance without introducing new driver features. It reuses `onfi::timed::read_page()` (R/B# windowing) plus the existing erase/program helpers so every CE#/CLE/ALE transition stays within the established HAL.
+
+```bash
+sudo bin/examples/read_latency_experiment \
+    --blocks 10:2 \
+    --pages 0:32 \
+    --include-spare \
+    --output read_latency.csv
+```
+
+- With no arguments it profiles the entire device (every block/page) and streams CSV rows to stdout.
+- `--blocks start[:count]` / `--pages start[:count]` narrow the sweep; the tool validates the ranges against the discovered geometry so you can focus on a subset.
+- `--include-spare` extends the measurement buffer to cover each page’s spare/OOB region.
+- The timing window starts immediately after the 0x30 confirm pulse, waits for R/B# high, and only then performs any DOUT transfers, keeping host I/O outside the tR measurement.
+- Errors surface as codes (`rb_timeout`, `status_fail`, etc.) when the ready/busy pin never toggles or the status byte reports a failure; successful rows show `t_read_us` (microseconds) alongside the raw status byte. Use `--output` to redirect the CSV to a file. Because the code uses the built-in timed helpers, everything stays in user space—no firmware updates or new ONFI primitives required.
+
 ## Library Architecture
 - **Hardware Abstraction Layer (HAL):** `include/microprocessor_interface.hpp` / `src/microprocessor_interface.cpp` manage GPIO modes, signal timing, and register access using `libbcm2835`.
 - **ONFI Protocol Layer:** `include/onfi_interface.hpp` and `src/onfi/*.cpp` implement reset, identification, feature access, block/page I/O, verification helpers, and higher-level utilities (controllers, data sinks, geometry helpers).

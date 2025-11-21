@@ -663,7 +663,8 @@ int measure_read_command(const CommandContext& context) {
         buffer.data(),
         static_cast<uint32_t>(buffer.size()),
         include_spare,
-        context.verbose);
+        context.verbose,
+        true);
 
     context.out << "Captured " << buffer.size() << " bytes\n";
     print_timing_summary(context.out, "Read", timing);

@@ -35,9 +35,9 @@ OperationTiming read_page(onfi_interface &onfi,
                           uint8_t *destination,
                           uint32_t length,
                           bool include_spare,
-                          bool verbose = false);
+                          bool verbose = false,
+                          bool fetch_data = true);
 
 } // namespace onfi::timed
 
 #endif // ONFI_TIMED_COMMANDS_HPP
-
