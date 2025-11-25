@@ -1,11 +1,9 @@
 #include "onfi_interface.hpp"
 #include "gpio.hpp"
 #include "timing.hpp"
-#include <stdio.h>
+#include <cstdio>
 #include <cstring>
 #include <cstdint>
-#include <iomanip>
-#include <algorithm>
 #include <array>
 #include "logging.hpp"
 #include "onfi/param_page.hpp"

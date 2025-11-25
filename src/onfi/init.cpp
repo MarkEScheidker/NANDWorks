@@ -1,12 +1,7 @@
 #include "onfi_interface.hpp"
 #include "gpio.hpp"
 #include "timing.hpp"
-#include <stdio.h>
-#include <stdlib.h>
-#include <cstring>
 #include <cstdint>
-#include <iomanip>
-#include <algorithm>
 #include "logging.hpp"
 
 void onfi_interface::get_started(param_type ONFI_OR_JEDEC, bool verbose) {

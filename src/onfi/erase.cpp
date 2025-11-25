@@ -1,12 +1,6 @@
 #include "onfi_interface.hpp"
-#include "gpio.hpp"
-#include "timing.hpp"
-#include <stdio.h>
-#include <stdlib.h>
-#include <cstring>
 #include <cstdint>
-#include <iomanip>
-#include <algorithm>
+#include <cstdio>
 #include "logging.hpp"
 #include "onfi/controller.hpp"
 #include "onfi/types.hpp"
@@ -88,35 +82,25 @@ void onfi_interface::partial_erase_block(unsigned int my_block_number, unsigned 
     enable_erase();
     gpio_set_direction(GPIO_RB, false);
 
-    // check if it is out of Busy cycle
+    onfi::OnfiController ctrl(*this);
     wait_ready_blocking();
-
-    send_command(0x60);
-    send_addresses(row_address, 3);
 #if PROFILE_TIME
     time_info_file << "Partial Erasing block: ";
     uint64_t start_time = get_timestamp_ns();
 #endif
-        send_command(0xd0);
-
-        delay_function(loop_count);
-
-        // let us issue reset command here
-        send_command(0xff);
-
+    ctrl.partial_erase_block(row_address, loop_count);
 #if PROFILE_TIME
     uint64_t end_time = get_timestamp_ns();
     time_info_file << "  took " << (end_time - start_time) / 1000 << " microseconds\n";
 #endif
 
-    // check if it is out of Busy cycle
     wait_ready_blocking();
 
     LOG_ONFI_INFO_IF(verbose, "Inside Erase Fn: Address is: %02x,%02x,%02x.", row_address[0], row_address[1], row_address[2]);
 
     // let us read the status register value
     uint8_t status = 0;
-    status = get_status();
+    status = ctrl.get_status();
     if (status & 0x20) {
         if (status & 0x01) {
             fprintf(stdout, "Failed Erase Operation\n");
@@ -139,8 +123,7 @@ void onfi_interface::partial_erase_block(unsigned int my_block_number, unsigned 
 
 // this is the function that can be used to elaborately verify the erase operation
 // .. the first argument is the address of the block
-// .. the second argument defines if the complete block is to be verified
-// .. .. if the second argument is false, the helper default_page_selection() provides the indices
+// .. the second argument defines if the complete block is to be verified (or a provided subset)
 bool onfi_interface::verify_block_erase(unsigned int my_block_number, bool complete_block, const uint16_t *page_indices,
                                         uint16_t num_pages, bool verbose) {
     // just a placeholder for return value
@@ -152,80 +135,41 @@ bool onfi_interface::verify_block_erase(unsigned int my_block_number, bool compl
     uint8_t *data_read_from_page = ensure_scratch(num_bytes_to_test);
     uint16_t idx = 0;
 
-    //test to see if the user wants the complete block or just the selected pages
-    if (!complete_block) {
-        if (!page_indices || num_pages == 0) {
-            const auto defaults = onfi::default_page_selection();
-            page_indices = defaults.indices;
-            num_pages = defaults.count;
-        }
-        // this means we are operating only on selected pages in the block
-        // this means we are working on all the pages in the block
-        // .. let us iterate through each pages in the block
-        uint16_t curr_page_index = 0;
-        for (idx = 0; idx < num_pages; idx++) {
-            // let us grab the index from the array
-            curr_page_index = page_indices[idx];
+    const bool check_full_block = complete_block || page_indices == nullptr || num_pages == 0;
 
-            //first let us get the data from the page to the cache memory
-            read_page(my_block_number, curr_page_index, 5);
-            // now let us get the values from the cache memory to our local variable
-            get_data(data_read_from_page, num_bytes_to_test);
+    auto check_page = [&](uint16_t page_idx) {
+        read_page(my_block_number, page_idx, 5);
+        get_data(data_read_from_page, num_bytes_to_test);
 
-            //now iterate through each of them to see if they are correct
-            uint16_t byte_id = 0;
-            uint16_t fail_count = 0;
-            for (byte_id = 0; byte_id < (num_bytes_to_test); byte_id++) {
-                if (data_read_from_page[byte_id] != 0xff) {
-                    fail_count++;
-                    return_value = false;
+        uint16_t fail_count = 0;
+        for (uint16_t byte_id = 0; byte_id < num_bytes_to_test; ++byte_id) {
+            if (data_read_from_page[byte_id] != 0xff) {
+                fail_count++;
+                return_value = false;
 
-                    if (verbose) {
+                if (verbose) {
 #if DEBUG_ONFI
-                        if (onfi_debug_file) {
-                            onfi_debug_file << "E:" << std::hex << byte_id << "," << std::hex << curr_page_index << ","
-                                    << std::hex << data_read_from_page[byte_id] << std::endl;
-                        } else fprintf(stdout, "E:%x,%x,%x\n", byte_id, curr_page_index, data_read_from_page[byte_id]);
+                    if (onfi_debug_file) {
+                        onfi_debug_file << "E:" << std::hex << byte_id << "," << std::hex << page_idx << ","
+                                << std::hex << data_read_from_page[byte_id] << std::endl;
+                    } else fprintf(stdout, "E:%x,%x,%x\n", byte_id, page_idx, data_read_from_page[byte_id]);
 #else
-							fprintf(stdout,"E:%x,%x,%x\n",byte_id,curr_page_index,data_read_from_page[byte_id]);
+					fprintf(stdout,"E:%x,%x,%x\n",byte_id,page_idx,data_read_from_page[byte_id]);
 #endif
-                    }
                 }
             }
-            if (fail_count) std::cout << "The number of bytes in page id " << curr_page_index <<
-                            " where erase operation failed is " << std::dec << fail_count << std::endl;
+        }
+        if (fail_count) std::cout << "The number of bytes in page id " << page_idx << " where erase operation failed is " <<
+                        std::dec << fail_count << std::endl;
+    };
+
+    if (check_full_block) {
+        for (idx = 0; idx < num_pages_in_block; ++idx) {
+            check_page(idx);
         }
     } else {
-        // this means we are working on all the pages in the block
-        // .. let us iterate through each pages in the block
-        for (idx = 0; idx < num_pages_in_block; idx++) {
-            //first let us get the data from the page to the cache memory
-            read_page(my_block_number, idx, 5);
-            // now let us get the values from the cache memory to our local variable
-            get_data(data_read_from_page, num_bytes_to_test);
-
-            //now iterate through each of them to see if they are correct
-            uint16_t byte_id = 0;
-            uint16_t fail_count = 0;
-            for (byte_id = 0; byte_id < (num_bytes_to_test); byte_id++) {
-                if (data_read_from_page[byte_id] != 0xff) {
-                    fail_count++;
-                    return_value = false;
-
-                    if (verbose) {
-#if DEBUG_ONFI
-                        if (onfi_debug_file) {
-                            onfi_debug_file << "E:" << std::hex << byte_id << "," << std::hex << idx << "," << std::hex
-                                    << data_read_from_page[byte_id] << std::endl;
-                        } else fprintf(stdout, "E:%x,%x,%x\n", byte_id, idx, data_read_from_page[byte_id]);
-#else
-							fprintf(stdout,"E:%x,%x,%x\n",byte_id,idx,data_read_from_page[byte_id]);
-#endif
-                    }
-                }
-            }
-            if (fail_count) std::cout << "The number of bytes in page id " << idx << " where erase operation failed is " <<
-                            std::dec << fail_count << std::endl;
+        for (idx = 0; idx < num_pages; ++idx) {
+            check_page(page_indices[idx]);
         }
     }
     return return_value;

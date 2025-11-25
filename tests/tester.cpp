@@ -77,12 +77,10 @@ static bool test_block_erase(onfi_interface &onfi_instance, bool verbose) {
 
     dev.erase_block(block);
 
-    const auto selection = onfi::default_page_selection();
-    bool sampled_ok = dev.verify_erase_block(block, false, selection.indices, selection.count,
-                                             /*including_spare*/false, verbose);
+    // When no subset is provided, verify_erase_block defaults to checking the full block.
     bool full_ok = dev.verify_erase_block(block, true, nullptr, 0,
                                           /*including_spare*/false, verbose);
-    return sampled_ok && full_ok;
+    return full_ok;
 }
 
 static bool test_single_page_program(onfi_interface &onfi_instance, bool verbose) {

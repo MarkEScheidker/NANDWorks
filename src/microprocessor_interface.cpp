@@ -7,10 +7,15 @@
 #include <iostream>
 #include "logging.hpp"
 
+#if defined(__GNUC__)
+#define HOT_ATTR __attribute__((hot))
+#else
+#define HOT_ATTR
+#endif
+
 namespace {
     static uint32_t dq_all_mask = 0;
-    static uint32_t dq_set_mask[256];
-    static uint32_t dq_clear_mask[256];
+    alignas(32) static uint32_t dq_set_mask[256];
     static bool dq_lut_inited = false;
 
     constexpr uint8_t kDqPins[] = {
@@ -22,7 +27,11 @@ namespace {
         GPIO_RLED0, GPIO_RLED1, GPIO_RLED2, GPIO_RLED3,
     };
 
-    inline uint32_t bit(uint8_t pin) { return static_cast<uint32_t>(1u) << pin; }
+    constexpr uint32_t bit(uint8_t pin) { return static_cast<uint32_t>(1u) << pin; }
+
+    inline uint32_t read_levels0_fast() {
+        return bcm2835_peri_read(bcm2835_gpio + (BCM2835_GPLEV0 / 4));
+    }
 
     void init_dq_lut() {
         if (dq_lut_inited) return;
@@ -41,32 +50,23 @@ namespace {
             if (v & 0x40) mask |= bit(GPIO_DQ6);
             if (v & 0x80) mask |= bit(GPIO_DQ7);
             dq_set_mask[v] = mask;
-            dq_clear_mask[v] = dq_all_mask & ~mask;
         }
         dq_lut_inited = true;
     }
+
+    // Eagerly initialize the LUT at load time so the hot path stays branch-free.
+    struct DqLutInitializer {
+        DqLutInitializer() { init_dq_lut(); }
+    };
+    static const DqLutInitializer kDqLutInitializer{};
+
+    constexpr uint32_t kRbMask = bit(GPIO_RB);
 }
 
 // Helper to set DQ pins using LUT for speed
-void interface::set_dq_pins(uint8_t data) const {
-    if (!dq_lut_inited) init_dq_lut();
-    gpio_clr_multi(dq_clear_mask[data]);
-    gpio_set_multi(dq_set_mask[data]);
-}
-
-// Helper to read DQ pins (single GPLEV0 read for speed)
-uint8_t interface::read_dq_pins() const {
-    const uint32_t levels = gpio_read_levels0();
-    uint8_t data = 0;
-    data |= ((levels >> GPIO_DQ0) & 0x1) << 0;
-    data |= ((levels >> GPIO_DQ1) & 0x1) << 1;
-    data |= ((levels >> GPIO_DQ2) & 0x1) << 2;
-    data |= ((levels >> GPIO_DQ3) & 0x1) << 3;
-    data |= ((levels >> GPIO_DQ4) & 0x1) << 4;
-    data |= ((levels >> GPIO_DQ5) & 0x1) << 5;
-    data |= ((levels >> GPIO_DQ6) & 0x1) << 6;
-    data |= ((levels >> GPIO_DQ7) & 0x1) << 7;
-    return data;
+HOT_ATTR void interface::set_dq_pins(uint8_t data) const {
+    // Single masked write keeps to one peripheral op.
+    bcm2835_gpio_write_mask(dq_set_mask[data], dq_all_mask);
 }
 
 void interface::open_interface_debug_file() {}
@@ -194,11 +194,11 @@ void interface::send_data(const uint8_t *data_to_send, uint16_t num_data) const 
         gpio_write(GPIO_ALE, 0);
 
         gpio_write(GPIO_DQS, 0);
-        busy_wait_ns(10);
+        bool dqs_state = false;
         for (uint16_t i = 0; i < num_data; ++i) {
             set_dq_pins(data_to_send[i]);
-            gpio_write(GPIO_DQS, !gpio_read(GPIO_DQS)); // Toggle DQS
-            busy_wait_ns(10);
+            dqs_state = !dqs_state;
+            bcm2835_gpio_write(GPIO_DQS, dqs_state); // Toggle DQS without a read
         }
         restore_control_pins(true);
     }
@@ -232,15 +232,19 @@ void interface::test_leds_increment(bool verbose) {
 }
 
 bool interface::wait_ready(uint64_t timeout_ns) const {
-    const uint64_t start = get_timestamp_ns();
-    while (gpio_read(GPIO_RB) == 0) {
-        if ((get_timestamp_ns() - start) > timeout_ns) return false;
+    const uint64_t deadline = get_timestamp_ns() + timeout_ns;
+    uint32_t spin = 0;
+    while (true) {
+        if (read_levels0_fast() & kRbMask) return true;
+        if ((spin++ & 0xFF) == 0) { // amortize the clock_gettime cost
+            if (get_timestamp_ns() >= deadline) return false;
+        }
     }
-    return true;
 }
 
 void interface::wait_ready_blocking() const {
-    while (gpio_read(GPIO_RB) == 0) {
-        // tight spin, minimal overhead
+    while ((read_levels0_fast() & kRbMask) == 0) {
+        // tight spin, minimal overhead; a nop keeps the pipeline busy without touching memory
+        asm volatile("nop");
     }
 }

@@ -1,9 +1,7 @@
 #include "onfi_interface.hpp"
-#include "gpio.hpp"
-#include "timing.hpp"
-#include <stdio.h>
-#include <cstring>
+#include <cstdio>
 #include <cstdint>
+#include <cstring>
 #include <iomanip>
 #include <algorithm>
 #include <limits>
@@ -101,8 +99,7 @@ void onfi_interface::program_page(unsigned int my_block_number, unsigned int my_
     time_info_file << "  took " << (end_time - start_time) / 1000 << " microseconds\n";
 #endif
 
-    uint8_t status = 0;
-    status = ctrl.get_status();
+    uint8_t status = ctrl.get_status();
     // .. use  the commended code for multi-plane die
     // read_status_enhanced(&status_value,(address+2));
     if (status & 0x20) {
@@ -184,8 +181,7 @@ void onfi_interface::program_page_tlc_toshiba_subpage(unsigned int my_block_numb
     time_info_file << "  took " << (end_time - start_time) / 1000 << " microseconds\n";
 #endif
 
-    uint8_t status = 0;
-    status = get_status();
+    uint8_t status = get_status();
     // .. use  the commended code for multi-plane die
     // read_status_enhanced(&status_value,(address+2));
     if (status & 0x20) {

@@ -12,13 +12,6 @@ enum class FeatureCommand : uint8_t {
     Get = 0xEE,
 };
 
-struct PageSelectionView {
-    const uint16_t* indices = nullptr;
-    uint16_t count = 0;
-};
-
-PageSelectionView default_page_selection();
-
 // Describes the NAND array organization
 struct Geometry {
     uint32_t page_size_bytes = 0;        // main area
@@ -38,4 +31,3 @@ struct Version {
 } // namespace onfi
 
 #endif // ONFI_TYPES_H
-

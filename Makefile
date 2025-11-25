@@ -6,6 +6,7 @@ CXX ?= g++
 LOG_ONFI_LEVEL ?= 0
 LOG_HAL_LEVEL  ?= 0
 PROFILE_TIME   ?= 0
+# PROFILE_DELAY_TIME is read directly in code; set it via CPPFLAGS if needed.
 
 WITH_LUAJIT ?= 1
 
@@ -54,8 +55,8 @@ MAIN_TARGET  = $(BIN_DIR)/nandworks
 # Program-specific extra libraries
 # Core/library sources (no app/test code)
 CORE_SOURCES = microprocessor_interface timing gpio \
-               onfi/init onfi/identify onfi/read onfi/program onfi/erase onfi/util onfi/timed_commands \
-               onfi/address onfi/param_page onfi/controller onfi/device onfi/device_config onfi/data_sink \
+               onfi/init onfi/identify onfi/read onfi/program onfi/erase onfi/onfi_interface onfi/timed_commands \
+               onfi/address onfi/param_page onfi/controller onfi/device onfi/device_config \
                driver/command_registry driver/driver_context driver/command_arguments driver/cli_parser \
                driver/commands/onfi_commands driver/commands/script_command \
                scripting/lua_engine

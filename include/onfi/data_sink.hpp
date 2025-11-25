@@ -102,6 +102,8 @@ public:
     void flush() override { out_.flush(); }
 };
 
+// Note: all sinks are header-only; there is no corresponding .cpp.
+
 } // namespace onfi
 
 #endif // ONFI_DATA_SINK_H

@@ -1,12 +1,7 @@
 #include "onfi_interface.hpp"
 #include "gpio.hpp"
 #include "timing.hpp"
-#include <stdio.h>
-#include <stdlib.h>
-#include <cstring>
 #include <cstdint>
-#include <iomanip>
-#include <algorithm>
 #include "logging.hpp"
 #include "onfi/controller.hpp"
 
@@ -44,33 +39,3 @@ void onfi_interface::change_read_column(const uint8_t *col_address) {
     onfi::OnfiController ctrl(*this);
     ctrl.change_read_column(col_address);
 }
-
-// function to disable Program and Erase operation
-// .. when WP is low, program and erase operation are disabled
-// .. when WP is high, program and erase operation are enabled
- 
-
- 
-
-// this function reads the pages in the block
-// .. since the complete data from the block might be too much data, the parameter num_pages can be used to limit the data
-// .. the num_pages should indicate the number of pages in block starting from beginning
-// .. verbose indicates the debug messages to be printed
- 
-
-// this function reads the pages in the block
-// .. since the complete data from the block might be too much data, the parameter complete_block can be used to limit the data
-// .. if complete_block is true, the compete block will be read
-// .. if complete_block is false, the indices of the pages to be read cane be provided as an array
-// .. if the indices of pages is used, the num_pages should indicate the numb er of pages listed in the array
-// .. verbose indicates the debug messages to be printed
- 
-
-//  This function read the page specified by the index value in the
-// .. block and puts the read value into the array passed " return_value" as argument
- 
-
-//The SET FEATURES (EFh) command writes the subfeature parameters (P1-P4) to the
-// .. specified feature address to enable or disable target-specific features. This command is
-// .. accepted by the target only when all die (LUNs) on the target are idle.
-// .. the parameters P1-P4 are in data_to_send argument

@@ -209,7 +209,19 @@ public:
 
     void set_dq_pins(uint8_t data) const;
 
-    uint8_t read_dq_pins() const;
+    uint8_t read_dq_pins() const {
+        const uint32_t levels = gpio_read_levels0();
+        uint8_t data = 0;
+        data |= ((levels >> GPIO_DQ0) & 0x1) << 0;
+        data |= ((levels >> GPIO_DQ1) & 0x1) << 1;
+        data |= ((levels >> GPIO_DQ2) & 0x1) << 2;
+        data |= ((levels >> GPIO_DQ3) & 0x1) << 3;
+        data |= ((levels >> GPIO_DQ4) & 0x1) << 4;
+        data |= ((levels >> GPIO_DQ5) & 0x1) << 5;
+        data |= ((levels >> GPIO_DQ6) & 0x1) << 6;
+        data |= ((levels >> GPIO_DQ7) & 0x1) << 7;
+        return data;
+    }
 
     // Wait for Ready/Busy (R/B#) to indicate ready (high). Returns true if
     // ready before timeout, false on timeout. Uses CLOCK_MONOTONIC_RAW.
