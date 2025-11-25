@@ -39,6 +39,7 @@ struct Command {
     CommandSafety safety = CommandSafety::Safe;
     bool requires_session = true;
     bool requires_root = true;
+    bool stop_parsing_options_after_positionals = false;
     CommandHandler handler;
 };
 

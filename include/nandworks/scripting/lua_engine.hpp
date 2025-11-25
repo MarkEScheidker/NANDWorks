@@ -63,6 +63,10 @@ private:
     static int lua_driver_active(::lua_State* L);
     static int lua_command_dispatch(::lua_State* L);
     static int lua_with_session(::lua_State* L);
+    static int lua_geometry(::lua_State* L);
+    static int lua_timed_read(::lua_State* L);
+    static int lua_timed_program(::lua_State* L);
+    static int lua_timed_erase(::lua_State* L);
     static LuaEngine& from_upvalue(::lua_State* L);
 
     int invoke_command(const std::string& name, const std::vector<std::string>& args);

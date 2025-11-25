@@ -214,6 +214,17 @@ void print_timing_summary(std::ostream& out,
     }
 }
 
+std::string status_hex(uint8_t status) {
+    std::ostringstream oss;
+    oss << "0x" << std::uppercase << std::hex << std::setw(2) << std::setfill('0')
+        << static_cast<int>(status);
+    return oss.str();
+}
+
+const char* json_bool(bool value) {
+    return value ? "true" : "false";
+}
+
 void report_timing_status(std::ostream& err,
                           std::string_view label,
                           const onfi::timed::OperationTiming& timing) {
@@ -590,11 +601,29 @@ int measure_erase_command(const CommandContext& context) {
     auto& onfi = context.driver.require_onfi_started();
     const int64_t block = context.arguments.require_int("block");
     ensure_block_in_range(onfi, block);
+    const bool json = context.arguments.has("json");
 
     const auto timing = onfi::timed::erase_block(
         onfi,
         static_cast<unsigned int>(block),
         context.verbose);
+
+    if (json) {
+        context.out << "{"
+                    << "\"operation\":\"erase\","
+                    << "\"block\":" << block << ","
+                    << "\"duration_ns\":" << timing.duration_ns << ","
+                    << "\"status\":" << static_cast<int>(timing.status) << ","
+                    << "\"status_hex\":\"" << status_hex(timing.status) << "\","
+                    << "\"ready\":" << json_bool(timing.ready) << ","
+                    << "\"pass\":" << json_bool(timing.pass) << ","
+                    << "\"busy_detected\":" << json_bool(timing.busy_detected) << ","
+                    << "\"timed_out\":" << json_bool(timing.timed_out) << ","
+                    << "\"succeeded\":" << json_bool(timing.succeeded())
+                    << "}"
+                    << "\n";
+        return timing.succeeded() ? 0 : 1;
+    }
 
     print_timing_summary(context.out, "Erase", timing);
     report_timing_status(context.err, "Erase", timing);
@@ -608,6 +637,7 @@ int measure_program_command(const CommandContext& context) {
     const int64_t page = context.arguments.require_int("page");
     ensure_page_in_range(onfi, page);
 
+    const bool json = context.arguments.has("json");
     const bool include_spare = context.arguments.has("include-spare");
     const bool pad = context.arguments.has("pad");
     const auto input_path = context.arguments.value("input");
@@ -636,6 +666,26 @@ int measure_program_command(const CommandContext& context) {
         include_spare,
         context.verbose);
 
+    if (json) {
+        context.out << "{"
+                    << "\"operation\":\"program\","
+                    << "\"block\":" << block << ","
+                    << "\"page\":" << page << ","
+                    << "\"include_spare\":" << json_bool(include_spare) << ","
+                    << "\"payload_bytes\":" << payload.size() << ","
+                    << "\"duration_ns\":" << timing.duration_ns << ","
+                    << "\"status\":" << static_cast<int>(timing.status) << ","
+                    << "\"status_hex\":\"" << status_hex(timing.status) << "\","
+                    << "\"ready\":" << json_bool(timing.ready) << ","
+                    << "\"pass\":" << json_bool(timing.pass) << ","
+                    << "\"busy_detected\":" << json_bool(timing.busy_detected) << ","
+                    << "\"timed_out\":" << json_bool(timing.timed_out) << ","
+                    << "\"succeeded\":" << json_bool(timing.succeeded())
+                    << "}"
+                    << "\n";
+        return timing.succeeded() ? 0 : 1;
+    }
+
     context.out << "Payload length: " << payload.size() << " bytes\n";
     print_timing_summary(context.out, "Program", timing);
     report_timing_status(context.err, "Program", timing);
@@ -649,6 +699,7 @@ int measure_read_command(const CommandContext& context) {
     const int64_t page = context.arguments.require_int("page");
     ensure_page_in_range(onfi, page);
 
+    const bool json = context.arguments.has("json");
     const bool include_spare = context.arguments.has("include-spare");
     const auto output_path = context.arguments.value("output");
 
@@ -665,6 +716,40 @@ int measure_read_command(const CommandContext& context) {
         include_spare,
         context.verbose,
         true);
+
+    if (json) {
+        bool wrote_output = false;
+        if (output_path) {
+            if (!write_file(*output_path, buffer)) {
+                throw std::runtime_error("Failed to write output file: " + *output_path);
+            }
+            wrote_output = true;
+        }
+
+        context.out << "{"
+                    << "\"operation\":\"read\","
+                    << "\"block\":" << block << ","
+                    << "\"page\":" << page << ","
+                    << "\"include_spare\":" << json_bool(include_spare) << ","
+                    << "\"bytes\":" << buffer.size() << ",";
+        context.out << "\"output\":";
+        if (wrote_output) {
+            context.out << "\"" << *output_path << "\",";
+        } else {
+            context.out << "null,";
+        }
+        context.out << "\"duration_ns\":" << timing.duration_ns << ","
+                    << "\"status\":" << static_cast<int>(timing.status) << ","
+                    << "\"status_hex\":\"" << status_hex(timing.status) << "\","
+                    << "\"ready\":" << json_bool(timing.ready) << ","
+                    << "\"pass\":" << json_bool(timing.pass) << ","
+                    << "\"busy_detected\":" << json_bool(timing.busy_detected) << ","
+                    << "\"timed_out\":" << json_bool(timing.timed_out) << ","
+                    << "\"succeeded\":" << json_bool(timing.succeeded())
+                    << "}"
+                    << "\n";
+        return timing.succeeded() ? 0 : 1;
+    }
 
     context.out << "Captured " << buffer.size() << " bytes\n";
     print_timing_summary(context.out, "Read", timing);
@@ -1382,7 +1467,8 @@ void register_onfi_commands(CommandRegistry& registry) {
         .description = "Issues a block erase and reports the busy interval measured from R/B#.",
         .usage = "nandworks measure-erase --block <index> --force",
         .options = {
-            OptionSpec{"block", 'b', true, true, false, "index", "Block index (0-based)."}
+            OptionSpec{"block", 'b', true, true, false, "index", "Block index (0-based)."},
+            OptionSpec{"json", '\0', false, false, false, "", "Emit timing info as JSON instead of text."}
         },
         .min_positionals = 0,
         .max_positionals = 0,
@@ -1403,7 +1489,8 @@ void register_onfi_commands(CommandRegistry& registry) {
             OptionSpec{"page", 'p', true, true, false, "index", "Page index within the block."},
             OptionSpec{"include-spare", '\0', false, false, false, "", "Include spare bytes in the transfer."},
             OptionSpec{"input", 'i', false, true, false, "file", "Binary payload to program (defaults to 0xFF fill)."},
-            OptionSpec{"pad", '\0', false, false, false, "", "Pad shorter input with 0xFF."}
+            OptionSpec{"pad", '\0', false, false, false, "", "Pad shorter input with 0xFF."},
+            OptionSpec{"json", '\0', false, false, false, "", "Emit timing info as JSON instead of text."}
         },
         .min_positionals = 0,
         .max_positionals = 0,
@@ -1423,7 +1510,8 @@ void register_onfi_commands(CommandRegistry& registry) {
             OptionSpec{"block", 'b', true, true, false, "index", "Block index (0-based)."},
             OptionSpec{"page", 'p', true, true, false, "index", "Page index within the block."},
             OptionSpec{"include-spare", '\0', false, false, false, "", "Include spare bytes in the transfer."},
-            OptionSpec{"output", 'o', true, false, false, "file", "Write captured data to a file."}
+            OptionSpec{"output", 'o', true, false, false, "file", "Write captured data to a file."},
+            OptionSpec{"json", '\0', false, false, false, "", "Emit timing info as JSON instead of text."}
         },
         .min_positionals = 0,
         .max_positionals = 0,

@@ -99,6 +99,7 @@ void register_script_commands(CommandRegistry& registry) {
         .safety = CommandSafety::Safe,
         .requires_session = false,
         .requires_root = false,
+        .stop_parsing_options_after_positionals = true,
         .handler = script_command,
     });
     (void)script;

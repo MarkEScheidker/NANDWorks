@@ -65,6 +65,10 @@ ParsedCommand parse_command_arguments(const Command& command, const std::vector<
     for (std::size_t i = 0; i < raw_args.size(); ++i) {
         const std::string& token = raw_args[i];
 
+        if (!positional_mode && command.stop_parsing_options_after_positionals && !positionals.empty()) {
+            positional_mode = true;
+        }
+
         if (!positional_mode) {
             if (token == "--") {
                 positional_mode = true;

@@ -5,11 +5,16 @@
 #include "nandworks/cli_parser.hpp"
 #include "nandworks/command_context.hpp"
 #include "nandworks/driver_context.hpp"
+#include "onfi/timed_commands.hpp"
 
 #include <algorithm>
 #include <cctype>
+#include <cstdint>
 #include <exception>
+#include <fstream>
+#include <iomanip>
 #include <iostream>
+#include <iterator>
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -136,6 +141,91 @@ param_type parse_param_type_arg(const char* mode_cstr, lua_State* L) {
     return param_type::ONFI; // Unreachable, suppress compiler warning.
 }
 
+bool get_table_bool(lua_State* L, int index, const char* key, bool default_value = false) {
+    lua_getfield(L, index, key);
+    if (lua_isnil(L, -1)) {
+        lua_pop(L, 1);
+        return default_value;
+    }
+    if (!lua_isboolean(L, -1)) {
+        lua_pop(L, 1);
+        luaL_error(L, "option '%s' expects a boolean", key);
+    }
+    const bool value = lua_toboolean(L, -1) != 0;
+    lua_pop(L, 1);
+    return value;
+}
+
+lua_Integer get_table_integer(lua_State* L, int index, const char* key, bool required = false, lua_Integer default_value = 0) {
+    lua_getfield(L, index, key);
+    if (lua_isnil(L, -1)) {
+        lua_pop(L, 1);
+        if (required) {
+            luaL_error(L, "missing required option '%s'", key);
+        }
+        return default_value;
+    }
+    if (!lua_isnumber(L, -1)) {
+        lua_pop(L, 1);
+        luaL_error(L, "option '%s' expects a number", key);
+    }
+    lua_Integer value = lua_tointeger(L, -1);
+    lua_pop(L, 1);
+    return value;
+}
+
+std::string get_table_string(lua_State* L, int index, const char* key) {
+    lua_getfield(L, index, key);
+    if (lua_isnil(L, -1)) {
+        lua_pop(L, 1);
+        return {};
+    }
+    size_t len = 0;
+    const char* value = luaL_checklstring(L, -1, &len);
+    std::string result(value, len);
+    lua_pop(L, 1);
+    return result;
+}
+
+void push_timing_table(lua_State* L, const onfi::timed::OperationTiming& timing) {
+    lua_newtable(L);
+
+    lua_pushinteger(L, static_cast<lua_Integer>(timing.duration_ns));
+    lua_setfield(L, -2, "duration_ns");
+
+    lua_pushinteger(L, static_cast<lua_Integer>(timing.status));
+    lua_setfield(L, -2, "status");
+
+    lua_pushboolean(L, timing.ready);
+    lua_setfield(L, -2, "ready");
+
+    lua_pushboolean(L, timing.pass);
+    lua_setfield(L, -2, "pass");
+
+    lua_pushboolean(L, timing.busy_detected);
+    lua_setfield(L, -2, "busy_detected");
+
+    lua_pushboolean(L, timing.timed_out);
+    lua_setfield(L, -2, "timed_out");
+
+    lua_pushboolean(L, timing.succeeded());
+    lua_setfield(L, -2, "succeeded");
+
+    std::ostringstream hex;
+    hex << "0x" << std::uppercase << std::hex << std::setw(2) << std::setfill('0')
+        << static_cast<int>(timing.status);
+    lua_pushlstring(L, hex.str().c_str(), hex.str().size());
+    lua_setfield(L, -2, "status_hex");
+}
+
+std::vector<uint8_t> read_file(const std::string& path) {
+    std::ifstream ifs(path, std::ios::binary);
+    if (!ifs) {
+        throw std::runtime_error("Failed to open input file: " + path);
+    }
+    return std::vector<uint8_t>(std::istreambuf_iterator<char>(ifs), std::istreambuf_iterator<char>());
+}
+
 } // namespace
 
 namespace nandworks::scripting {
@@ -238,6 +328,153 @@ int LuaEngine::lua_driver_active(lua_State* L) {
     return 1;
 }
 
+int LuaEngine::lua_geometry(lua_State* L) {
+    LuaEngine& engine = from_upvalue(L);
+    auto& onfi = engine.driver_.require_onfi_started();
+
+    lua_newtable(L);
+    lua_pushinteger(L, static_cast<lua_Integer>(onfi.num_bytes_in_page));
+    lua_setfield(L, -2, "page_bytes");
+    lua_pushinteger(L, static_cast<lua_Integer>(onfi.num_spare_bytes_in_page));
+    lua_setfield(L, -2, "spare_bytes");
+    lua_pushinteger(L, static_cast<lua_Integer>(onfi.num_pages_in_block));
+    lua_setfield(L, -2, "pages_per_block");
+    lua_pushinteger(L, static_cast<lua_Integer>(onfi.num_blocks));
+    lua_setfield(L, -2, "blocks");
+    return 1;
+}
+
+int LuaEngine::lua_timed_read(lua_State* L) {
+    LuaEngine& engine = from_upvalue(L);
+    luaL_checktype(L, 1, LUA_TTABLE);
+    const int opts = absolute_index(L, 1);
+
+    auto& onfi = engine.driver_.require_onfi_started();
+    const lua_Integer block = get_table_integer(L, opts, "block", true);
+    const lua_Integer page = get_table_integer(L, opts, "page", true);
+
+    if (block < 0 || block >= onfi.num_blocks) {
+        return luaL_error(L, "block index out of range");
+    }
+    if (page < 0 || page >= onfi.num_pages_in_block) {
+        return luaL_error(L, "page index out of range");
+    }
+
+    const bool include_spare = get_table_bool(L, opts, "include_spare", false);
+    const bool fetch_data = get_table_bool(L, opts, "fetch_data", false);
+    const bool verbose = get_table_bool(L, opts, "verbose", engine.verbose_);
+
+    uint32_t length = 0;
+    if (fetch_data) {
+        const lua_Integer requested = get_table_integer(L,
+                                                        opts,
+                                                        "length",
+                                                        false,
+                                                        onfi.num_bytes_in_page +
+                                                            (include_spare ? onfi.num_spare_bytes_in_page : 0));
+        if (requested < 0) {
+            return luaL_error(L, "length must be non-negative");
+        }
+        length = static_cast<uint32_t>(requested);
+    }
+
+    std::vector<uint8_t> buffer(length, 0x00);
+    const auto timing = onfi::timed::read_page(onfi,
+                                               static_cast<unsigned int>(block),
+                                               static_cast<unsigned int>(page),
+                                               buffer.empty() ? nullptr : buffer.data(),
+                                               length,
+                                               include_spare,
+                                               verbose,
+                                               fetch_data);
+
+    push_timing_table(L, timing);
+
+    if (fetch_data && !buffer.empty()) {
+        lua_pushlstring(L, reinterpret_cast<const char*>(buffer.data()), buffer.size());
+        lua_setfield(L, -2, "data");
+    }
+
+    return 1;
+}
+
+int LuaEngine::lua_timed_program(lua_State* L) {
+    LuaEngine& engine = from_upvalue(L);
+    luaL_checktype(L, 1, LUA_TTABLE);
+    const int opts = absolute_index(L, 1);
+
+    auto& onfi = engine.driver_.require_onfi_started();
+    const lua_Integer block = get_table_integer(L, opts, "block", true);
+    const lua_Integer page = get_table_integer(L, opts, "page", true);
+
+    if (block < 0 || block >= onfi.num_blocks) {
+        return luaL_error(L, "block index out of range");
+    }
+    if (page < 0 || page >= onfi.num_pages_in_block) {
+        return luaL_error(L, "page index out of range");
+    }
+
+    const bool include_spare = get_table_bool(L, opts, "include_spare", false);
+    const bool pad = get_table_bool(L, opts, "pad", false);
+    const bool verbose = get_table_bool(L, opts, "verbose", engine.verbose_);
+    const std::string input = get_table_string(L, opts, "input");
+
+    const std::size_t expected = static_cast<std::size_t>(onfi.num_bytes_in_page) +
+                                 (include_spare ? onfi.num_spare_bytes_in_page : 0U);
+
+    std::vector<uint8_t> payload(expected, 0xFF);
+    if (!input.empty()) {
+        payload = read_file(input);
+        if (payload.size() < expected) {
+            if (!pad) {
+                return luaL_error(L,
+                                  "input shorter than expected page length (%zu < %zu); set pad=true to fill",
+                                  payload.size(),
+                                  expected);
+            }
+            payload.resize(expected, 0xFF);
+        } else if (payload.size() > expected) {
+            return luaL_error(L,
+                              "input larger than expected page length (%zu > %zu)",
+                              payload.size(),
+                              expected);
+        }
+    }
+
+    const auto timing = onfi::timed::program_page(onfi,
+                                                  static_cast<unsigned int>(block),
+                                                  static_cast<unsigned int>(page),
+                                                  payload.data(),
+                                                  static_cast<uint32_t>(payload.size()),
+                                                  include_spare,
+                                                  verbose);
+
+    push_timing_table(L, timing);
+    lua_pushinteger(L, static_cast<lua_Integer>(payload.size()));
+    lua_setfield(L, -2, "payload_bytes");
+    return 1;
+}
+
+int LuaEngine::lua_timed_erase(lua_State* L) {
+    LuaEngine& engine = from_upvalue(L);
+    luaL_checktype(L, 1, LUA_TTABLE);
+    const int opts = absolute_index(L, 1);
+
+    auto& onfi = engine.driver_.require_onfi_started();
+    const lua_Integer block = get_table_integer(L, opts, "block", true);
+    if (block < 0 || block >= onfi.num_blocks) {
+        return luaL_error(L, "block index out of range");
+    }
+
+    const bool verbose = get_table_bool(L, opts, "verbose", engine.verbose_);
+    const auto timing = onfi::timed::erase_block(onfi,
+                                                 static_cast<unsigned int>(block),
+                                                 verbose);
+
+    push_timing_table(L, timing);
+    return 1;
+}
+
 void LuaEngine::register_bindings() {
     ensure_state();
 
@@ -309,6 +546,23 @@ void LuaEngine::register_bindings() {
     lua_pushlightuserdata(state_, this);
     lua_pushcclosure(state_, &LuaEngine::lua_with_session, 1);
     lua_setfield(state_, module_index, "with_session");
+
+    lua_pushlightuserdata(state_, this);
+    lua_pushcclosure(state_, &LuaEngine::lua_geometry, 1);
+    lua_setfield(state_, module_index, "geometry");
+
+    lua_newtable(state_);
+    const int timed_index = lua_gettop(state_);
+    lua_pushlightuserdata(state_, this);
+    lua_pushcclosure(state_, &LuaEngine::lua_timed_read, 1);
+    lua_setfield(state_, timed_index, "read_page");
+    lua_pushlightuserdata(state_, this);
+    lua_pushcclosure(state_, &LuaEngine::lua_timed_program, 1);
+    lua_setfield(state_, timed_index, "program_page");
+    lua_pushlightuserdata(state_, this);
+    lua_pushcclosure(state_, &LuaEngine::lua_timed_erase, 1);
+    lua_setfield(state_, timed_index, "erase_block");
+    lua_setfield(state_, module_index, "timed");
 
     lua_pushlightuserdata(state_, this);
     lua_pushcclosure(state_, &LuaEngine::lua_with_session, 1);
