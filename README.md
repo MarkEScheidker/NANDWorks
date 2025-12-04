@@ -290,6 +290,12 @@ make docs
 
 `docs/html/` is ignored by git, so you can generate and delete docs locally without affecting commits.
 
+## License
+- Copyright (C) 2024 Mark Scheidker.
+- Licensed under the GNU General Public License v3.0; see `LICENSE` for the full text.
+- Redistribution note: binaries link against the GPLv3 `libbcm2835`, so distributed artifacts must include corresponding source under GPLv3 terms.
+- Third-party notices: `lib/bcm2835_install` is vendored under GPLv3; `lib/LuaJIT` is under an MIT-style license (GPL-compatible)—keep their notices intact when redistributing.
+
 ## Contributing
 Contributions are welcome—file an issue or open a pull request:
 - Match the existing formatting style (brace layout, concise inline comments).
