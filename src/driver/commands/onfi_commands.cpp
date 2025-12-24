@@ -328,13 +328,6 @@ int status_command(const CommandContext& context) {
     return 0;
 }
 
-int test_leds_command(const CommandContext& context) {
-    auto& onfi = context.driver.require_onfi_started();
-    onfi.test_onfi_leds(context.verbose);
-    context.out << "LED test completed." << "\n";
-    return 0;
-}
-
 int read_parameters_command(const CommandContext& context) {
     auto& onfi = context.driver.require_onfi_started();
     const bool use_jedec = context.arguments.has("jedec");
@@ -1098,21 +1091,6 @@ void register_onfi_commands(CommandRegistry& registry) {
     });
 
     registry.register_command({
-        .name = "test-leds",
-        .aliases = {"leds"},
-        .summary = "Pulse the ONFI indicator LEDs to validate GPIO connectivity.",
-        .description = "Runs the built-in LED test from the HAL to confirm GPIO wiring.",
-        .usage = "nandworks test-leds",
-        .options = {},
-        .min_positionals = 0,
-        .max_positionals = 0,
-        .safety = CommandSafety::Safe,
-        .requires_session = true,
-        .requires_root = true,
-        .handler = test_leds_command,
-    });
-
-    registry.register_command({
         .name = "parameters",
         .aliases = {"param"},
         .summary = "Read the ONFI or JEDEC parameter page and update cached geometry.",
@@ -1549,7 +1527,6 @@ auto set_flags = [&](std::string_view name, bool root, bool session) {
 set_flags("probe", true, true);
 set_flags("read-id", true, true);
 set_flags("status", true, true);
-set_flags("test-leds", true, true);
 set_flags("parameters", true, true);
 set_flags("read-page", true, true);
 set_flags("program-page", true, true);

@@ -23,10 +23,6 @@ namespace {
         GPIO_DQ4, GPIO_DQ5, GPIO_DQ6, GPIO_DQ7,
     };
 
-    constexpr uint8_t kLedPins[] = {
-        GPIO_RLED0, GPIO_RLED1, GPIO_RLED2, GPIO_RLED3,
-    };
-
     constexpr uint32_t bit(uint8_t pin) { return static_cast<uint32_t>(1u) << pin; }
 
     inline uint32_t read_levels0_fast() {
@@ -202,33 +198,6 @@ void interface::send_data(const uint8_t *data_to_send, uint16_t num_data) const 
         }
         restore_control_pins(true);
     }
-}
-
-void interface::turn_leds_on() {
-    for (uint8_t pin : kLedPins) {
-        gpio_write(pin, 1);
-    }
-}
-
-void interface::turn_leds_off() {
-    for (uint8_t pin : kLedPins) {
-        gpio_write(pin, 0);
-    }
-}
-
-void interface::test_leds_increment(bool verbose) {
-    LOG_HAL_INFO_IF(verbose, "Testing LEDs with a shifting lighting pattern");
-
-    for (uint8_t reps = 0; reps < 50; ++reps) {
-        for (uint8_t pin : kLedPins) {
-            gpio_write(pin, 1);
-            busy_wait_ns(65530000);
-            gpio_write(pin, 0);
-        }
-    }
-
-    LOG_HAL_INFO_IF(verbose, ".. Testing LEDs completed");
-    (void)verbose;
 }
 
 bool interface::wait_ready(uint64_t timeout_ns) const {

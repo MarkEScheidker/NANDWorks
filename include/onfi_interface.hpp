@@ -111,9 +111,6 @@ public:
 	void initialize_onfi(bool verbose = false);
 	void deinitialize_onfi(bool verbose = false);
 
-	/** @brief Drive indicator LEDs to confirm GPIO wiring. */
-	void test_onfi_leds(bool verbose = false);
-
 	/** @brief Open the onfi debug data capture stream. */
 	void open_onfi_data_file();
 

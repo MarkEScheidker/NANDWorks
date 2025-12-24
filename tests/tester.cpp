@@ -61,13 +61,6 @@ uint16_t slc_page_indices[20] = {
  * main routine can report overall status.
  */
 
-static bool test_leds(onfi_interface &onfi_instance, bool verbose) {
-    if (verbose)
-        cout << "Running LED test" << endl;
-    onfi_instance.test_onfi_leds(verbose);
-    return true; // test_onfi_leds prints errors itself
-}
-
 static bool test_block_erase(onfi_interface &onfi_instance, bool verbose) {
     unsigned int block = pick_good_block(onfi_instance);
     if (verbose) cout << "Erasing block " << block << endl;
@@ -741,12 +734,6 @@ int main(int argc, char **argv) {
 
     int pass = 0;
     int fail = 0;
-
-    cout << "\n--- Running LED Test ---" << endl;
-    if (run_test("LED Test", test_leds, onfi_instance, verbose))
-        ++pass;
-    else
-        ++fail;
 
     cout << "\n--- Running Device Init/Reset Test ---" << endl;
     if (run_test("Device Init/Reset Test", test_device_init_reset, onfi_instance, verbose))

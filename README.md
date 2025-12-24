@@ -164,7 +164,6 @@ The `bin/nandworks` binary is now the primary front-end for NANDWorks. It consol
 | Command | Capability |
 | --- | --- |
 | `verify-page`, `verify-block` | Compare flash contents against reference data and report byte/bit error counts. |
-| `test-leds` | Pulse the indicator LEDs to confirm GPIO wiring. |
 
 ### Automation
 | Command | Capability |

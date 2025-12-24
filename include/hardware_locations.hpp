@@ -50,11 +50,4 @@
 #define GPIO_DQS  5  // Data Strobe: Toggles to signal valid data.
 #define GPIO_DQSC 6  // Data Strobe Complement: The inverse of DQS.
 
-// LED Indicator Pins: Provide visual feedback on the system's status.
-#define GPIO_RLED0 14 // Red LED 0
-#define GPIO_RLED1 15 // Red LED 1
-#define GPIO_RLED2 7  // Red LED 2
-#define GPIO_RLED3 8  // Red LED 3
-
-
 #endif // HARDWARE_LOCATIONS_H

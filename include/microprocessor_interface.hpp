@@ -74,23 +74,6 @@ public:
     void close_interface_debug_file(bool verbose = false);
 
     /**
-    this function turns on the LEDs
-    .. can be used as an indicator
-    */
-    void turn_leds_on();
-
-    /**
-    this function turns off the LEDs
-    */
-    void turn_leds_off();
-
-    /**
-    this function is to test the LEDs
-    .. lights up the loweest LED and slowly light up others after a delay
-    */
-    void test_leds_increment(bool verbose = false);
-
-    /**
     we do not touch the DQ pin values here
     .. since CE#, RE# and WE# are active low, we will set them to 1
     .. since ALE and CLE are active high, we will reset them to 0

@@ -1,18 +1,11 @@
 #include "onfi_interface.hpp"
 #include "gpio.hpp"
-#include "timing.hpp"
 #include <cstdint>
 #include "logging.hpp"
 
 void onfi_interface::get_started(param_type ONFI_OR_JEDEC, bool verbose) {
     bool bytewise = false;
     initialize_onfi(verbose);
-
-    /**now that the object is created
-    .. the object should go and initialize itself by looking at the addresses and map to them
-    .. let us test if the LEDs test will succeed
-    */
-    test_onfi_leds(verbose);
 
 #if PROFILE_TIME
     open_time_profile_file();
@@ -83,19 +76,6 @@ void onfi_interface::deinitialize_onfi(bool verbose) {
     }
 #endif
     // No need for unmap_physical or close_physical with pigpio
-}
-
-// this function can be used to test the LEDs if they are properly set up
-//  since it is called as a part of onfi_interface, if this works
-// .. the interface is set up properly
-void onfi_interface::test_onfi_leds(bool verbose) {
-    if (verbose) LOG_ONFI_INFO("Testing LEDs");
-    //just a simple delay for LEDs to stay ON
-    turn_leds_on();
-    busy_wait_ns(20000000);
-    turn_leds_off();
-
-    if (verbose) LOG_ONFI_INFO("Testing LEDs completed");
 }
 
 // function to receive data from the NAND device
